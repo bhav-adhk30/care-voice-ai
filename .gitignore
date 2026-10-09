@@ -1,0 +1,7 @@
+models/
+data/
+*.npy
+kaggle.json
+.kaggle/
+__pycache__/
+.DS_Store
