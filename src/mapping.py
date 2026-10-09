@@ -97,3 +97,22 @@ def prompt_to_idx(prompt: str) -> int:
 assert len(PROMPT_TO_CLASS) == 25
 assert {c for c, _ in PROMPT_TO_CLASS.values()} == set(CLASSES)
 assert all(p in PRIORITIES for _, p in PROMPT_TO_CLASS.values())
+
+
+# Base priority when only the predicted CLASS is known.
+# ClinicalBERT predicts one of four classes, but priorities vary within a class
+# (Emergency spans P1-P2, Assistance spans P2-P3). We take the most urgent
+# priority in the class, because under-triage is the costlier error here.
+# PROMPT_TO_CLASS is still used for ground-truth evaluation and the oracle experiment.
+CLASS_BASE_PRIORITY = {
+    "Emergency":  1,
+    "Assistance": 2,
+    "Pain":       3,
+    "General":    3,
+}
+
+
+def class_base_priority(req_class: str) -> int:
+    if req_class not in CLASS_BASE_PRIORITY:
+        raise KeyError(f"Unknown class: {req_class!r}")
+    return CLASS_BASE_PRIORITY[req_class]

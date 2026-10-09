@@ -1,0 +1,14 @@
+torch
+torchaudio
+transformers
+librosa
+soundfile
+pyloudnorm
+numpy
+pandas
+scikit-learn
+jiwer
+faster-whisper
+deepfilternet
+streamlit
+matplotlib

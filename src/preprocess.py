@@ -313,3 +313,88 @@ def augment(wav, noise_bank, snr_db, *, seed: int, mp3_bitrate_kbps: int | None 
             out = out * (CONFIG["peak_ceiling"] / peak)
 
     return out.astype(np.float32)
+
+
+# ---------------------------------------------------------------------------
+# Denoise and trim.
+#
+# Deliberately NOT inside load_audio(). At inference the system sees noisy ward
+# audio and denoises it, so training must see the same order:
+#     load_audio -> augment (add noise) -> denoise -> trim -> features
+# Denoising the already-clean corpora before augmentation would mean training
+# and inference differ, and the measurements would be wrong.
+# ---------------------------------------------------------------------------
+
+_DF_MODEL = None
+_DF_STATE = None
+
+
+def _init_deepfilternet():
+    """Load DeepFilterNet once and cache it. Returns (model, state) or (None, None)."""
+    global _DF_MODEL, _DF_STATE
+    if _DF_MODEL is None:
+        try:
+            from df.enhance import init_df
+            _DF_MODEL, _DF_STATE, _ = init_df()
+        except Exception as e:
+            print(f"[preprocess] DeepFilterNet unavailable, denoise is a no-op: {e}")
+            _DF_MODEL, _DF_STATE = False, False
+    if _DF_MODEL is False:
+        return None, None
+    return _DF_MODEL, _DF_STATE
+
+
+def denoise(wav, sr=16000):
+    """
+    DeepFilterNet3 denoising. Same sample rate and length in and out.
+
+    DeepFilterNet runs natively at 48 kHz, so the signal is resampled up,
+    enhanced, and resampled back. If the package is missing, the input is
+    returned unchanged so the pipeline still runs.
+    """
+    if not CONFIG.get("enable_denoise", True):
+        return wav
+
+    model, state = _init_deepfilternet()
+    if model is None:
+        return wav
+
+    import torch
+    from df.enhance import enhance
+
+    n_in = len(wav)
+    wav48 = librosa.resample(wav.astype(np.float32), orig_sr=sr, target_sr=48000)
+    enhanced = enhance(model, state, torch.from_numpy(wav48).unsqueeze(0))
+    out = librosa.resample(enhanced.squeeze(0).cpu().numpy(), orig_sr=48000, target_sr=sr)
+
+    if len(out) < n_in:
+        out = np.pad(out, (0, n_in - len(out)))
+    return out[:n_in].astype(np.float32)
+
+
+def trim(wav, sr=16000, top_db=None, keep_pad_ms=None):
+    """
+    Trim leading and trailing silence, keeping a short margin so the first and
+    last phonemes are not clipped. Deterministic.
+
+    Returns the input unchanged if trimming would leave almost nothing, which
+    happens on very quiet clips and would otherwise destroy the sample.
+    """
+    if not CONFIG.get("enable_trim", True):
+        return wav
+
+    top_db = top_db if top_db is not None else CONFIG.get("trim_top_db", 30)
+    keep_ms = keep_pad_ms if keep_pad_ms is not None else CONFIG.get("trim_keep_pad_ms", 50)
+
+    if len(wav) == 0 or not np.any(wav):
+        return wav
+
+    _, (start, end) = librosa.effects.trim(wav, top_db=top_db)
+    pad = int(sr * keep_ms / 1000)
+    start = max(0, start - pad)
+    end = min(len(wav), end + pad)
+
+    out = wav[start:end]
+    if len(out) < int(0.1 * sr):      # under 100 ms left: trimming went wrong
+        return wav
+    return out
