@@ -1,0 +1,27 @@
+{
+  "operating_point": {
+    "threshold": 0.0677,
+    "recall": 0.9,
+    "false_alarm": 0.024
+  },
+  "auc_vs_calm_speech": 0.996,
+  "auc_vs_other_vocalisations": 0.651,
+  "auc_overall": 0.827,
+  "intensity_trend": {
+    "spearman_rho_pain_fear": 0.11,
+    "p_pain_fear": 0.0118,
+    "spearman_rho_all": 0.156,
+    "p_all": 5.09e-10,
+    "kruskal_p_pain_fear": 0.0964,
+    "verdict": "weak but significant; gate is binary, cannot grade severity"
+  },
+  "mean_score_by_emotion": {
+    "crema_neutral": 0.004,
+    "pleasure": 0.373,
+    "achievement": 0.377,
+    "surprise": 0.419,
+    "anger": 0.51,
+    "pain": 0.585,
+    "fear": 0.618
+  }
+}
