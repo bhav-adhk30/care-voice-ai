@@ -1,0 +1,7 @@
+{
+  "exact_match": 0.6327878696892358,
+  "under_triaged": 0.041585347545413605,
+  "over_triaged": 0.32562678276535056,
+  "emergency_reached_P1_P2": 0.8311588641596316,
+  "escalated_by_acoustics": 241
+}

@@ -1,0 +1,708 @@
+phrase,req_class,prompt,base_priority,n_recordings
+A terrible fall in hair,General,Hair falling out,4,9
+After a breakup  I feel something strange in me.,General,Emotional pain,3,12
+After an hard working day I have foot ache,Pain,Foot ache,3,8
+After eating  I have burning sensation inside of me.,Pain,Stomach ache,3,12
+"After playing tennis,  I had a powerful sensation close to my neck",Pain,Shoulder pain,3,12
+After walking I have some pain under my foot,Pain,Foot ache,3,11
+All my body is in a bad case and i need a good treatment,Pain,Joint pain,3,9
+All of a sudden I felt dizzy when I stood up.,Emergency,Feeling dizzy,2,8
+"Annoyance starts suddenly, often after an injury or exercise.",Pain,Knee pain,3,9
+Anytime I play tennis I feel a shoulder pain,Pain,Shoulder pain,3,6
+"At first it feels really numb, but then a thousand needles start to prick through my foot.",Pain,Foot ache,3,5
+Can't keep focus,Pain,Head ache,3,10
+Chronic bone disease at the level of the doubles of the lower Estremidades,Pain,Knee pain,3,10
+Chronic bowel Pain,Pain,Internal pain,3,9
+Chronic disease of hair follicles and sebaceous glands,General,Acne,4,11
+Don't cry,Pain,Joint pain,3,1
+"Even if the temperature is high in the house,  my body is always cold",Assistance,Feeling cold,3,12
+Even though I'm an adult my face keeps breaking out in pimples.,General,Acne,4,10
+Every morning when I wake up my neck feels like I slept on in wrong.,Pain,Muscle pain,3,11
+Every time I comb my hair there are so many hair in my comb.,General,Hair falling out,4,9
+Every time I look to left I feel a sharp pain in my neck.,Pain,Neck pain,3,11
+"Every time I make an effort, I felt dizzy.",Emergency,Feeling dizzy,2,9
+Every time I take a deep breath I start coughing,General,Cough,3,8
+Every time it rains I get hives on my belly and sides.,General,Skin issue,4,7
+Everything looks like beeing in a smoky area.,General,Blurry vision,3,10
+Feel like something is being jabbed into my joints,Pain,Joint pain,3,6
+Feels like there are pins and needles sticking in my joints,Pain,Joint pain,3,10
+"Had I stepped on a needle it wouldn't have hurt so much, like this damned spur in my heel.",Pain,Foot ache,3,8
+Have severe cold and cough,General,Cough,3,10
+He was discovered to have an open wound.,Emergency,Open wound,1,10
+Hearing any loud sounds makes my ear aches,Pain,Ear ache,3,11
+His infected wound was beginning to rot.,Emergency,Infected wound,2,8
+How do you know if you have a torn meniscus in your knee?,Pain,Knee pain,3,12
+I always feel like I have menstrual pains even if I don't have my period.,Pain,Internal pain,3,7
+"I am always cold, even when I am wearing layers",Assistance,Feeling cold,3,9
+I am having running nose,Assistance,Feeling cold,3,8
+"I am struggling to bear weight on my knee, when i stand straight I feel and hear a loud popping noise.",Pain,Knee pain,3,11
+"I am worried for my driving, because I can barely focus when I am at the wheel, my eyes feel teary.",General,Blurry vision,3,6
+"I am worried how cold intolerant I am, I am always shivering, even out in the sun.",Assistance,Feeling cold,3,9
+I break out on my face very frequently,General,Acne,4,9
+I broke my ankle while doing rock climbing in the Carpathians.,Pain,Injury from sports,3,11
+I can hardly move my neck.  It hurts.,Pain,Neck pain,3,11
+I can't carry anything I have a pain in my shoulder,Pain,Shoulder pain,3,11
+I can't do anything I feel a weak in my body,Assistance,Body feels weak,2,12
+I can't get a girlfriend because of my acne.,General,Acne,4,11
+"I can't hear out of my ear properly, I feel like there is something in it causing irritation.",Pain,Ear ache,3,11
+I can't move my head up and down.,Pain,Neck pain,3,9
+I can't really jump on my left foot because my triple fracture of the ankle left me with neverending pains.,Pain,Foot ache,3,6
+I can't see the sign I have a blurry vision,General,Blurry vision,3,9
+I can't sleep I have a hard cough,General,Cough,3,8
+I can't stand up or sit down I have a pain in my back that annoys me,Pain,Back pain,3,10
+"I can't stand up, I feel my brain is moving inside my skull.",Pain,Head ache,3,11
+I can't stand with this horrible feeling in my shoulder,Pain,Shoulder pain,3,9
+I can't stand with this horrible feeling in my stomach,Pain,Stomach ache,3,11
+I can't stop coughing,General,Cough,3,11
+I can't turn my neck to the left without feeling a stabbing pain,Pain,Neck pain,3,12
+I can't walk because i have a great foot ache,Pain,Foot ache,3,10
+I can't walk well I have an ache in my foot,Pain,Foot ache,3,11
+I can't work good I have a pain in my knee,Pain,Knee pain,3,7
+I can`t stop coughing.,General,Cough,3,12
+I cannot bear this squeezing sensation I have in my chest.,Emergency,Heart hurts,1,8
+I cannot breathe because of this dull ache below my left shoulder.,Emergency,Heart hurts,1,8
+I cannot get warm no matter how much I wrap up or how high I put the heating on,Assistance,Feeling cold,3,11
+I carried a heavy bag yesterday and when I get up today I felt a great shoulder pain.,Pain,Shoulder pain,3,10
+I chopped off the tip of my finger while I was cutting some cardboard and I cannot stop the bleeding.,Emergency,Open wound,1,7
+I complain alot with my neck pain and i really need to be better,Pain,Neck pain,3,10
+I complain alot with skin allergy,General,Skin issue,4,11
+"I cough a lot when I smell perfume, what is wrong with my lungs?",General,Cough,3,10
+I could not exercise because of my knee pain,Pain,Knee pain,3,10
+"I couldn't stop shaking or unclench my jaw, that's how cold I was.",Assistance,Feeling cold,3,8
+"I cut my finger opening a can, it won't stop bleeding and the wound is gaping and open",Emergency,Open wound,1,10
+I cut my foot at the pool and it breaks open every day when I walk on it.,Emergency,Open wound,1,8
+I cut my hand a couple of days ago and although I didn't think I needed it stitches it hasn't closed up.,Emergency,Open wound,1,12
+I cut my hand a couple of weeks ago and even though I keep using an antibiotic cream it's not getting better.,Emergency,Infected wound,2,11
+I cut myself and I'm bleeding.,Emergency,Open wound,1,12
+I do not feel better in my muscles,Pain,Muscle pain,3,7
+I do not know why I feel cold,Assistance,Feeling cold,3,10
+I don't do anything at home and still I feel exhausted.,Assistance,Body feels weak,2,9
+I don't have full range of motion with my arms,Pain,Shoulder pain,3,10
+I don't have problems taking in breath but out breath is so heavy,Emergency,Hard to breath,1,9
+I don't have the energy to do the things that I used to,Assistance,Body feels weak,2,9
+I don't know why I'm constantly sad.,General,Emotional pain,3,10
+I feel a bone-on-bone pain in my knees when I climb stairs.,Pain,Joint pain,3,10
+I feel a burning sensation in my guts about 2 hours after each meal.,Pain,Stomach ache,3,9
+I feel a burning sensation in my shoulder muscle.,Pain,Muscle pain,3,11
+I feel a clicking sensation in my knee each time I step.,Pain,Joint pain,3,7
+I feel a great amount of pressure of my head.,Pain,Head ache,3,11
+I feel a great amount of pressure on the sides of my neck,Pain,Shoulder pain,3,7
+I feel a great pain in my shoulder joint and it does not go away,Pain,Joint pain,3,7
+I feel a great pain in my shoulder when i try to lift something heavy,Pain,Shoulder pain,3,10
+I feel a huge emotional pain after I broke up with my girlfriend.,General,Emotional pain,3,10
+I feel a lot of pain in the joints.,Pain,Joint pain,3,9
+I feel a pain in my back,Pain,Back pain,3,12
+I feel a pain in my back when I sit on a chair for long.,Pain,Back pain,3,8
+I feel a pain in my neck,Pain,Neck pain,3,9
+"I feel a pain on the left side of my chest, where my heart is",Emergency,Heart hurts,1,8
+I feel a sharp pain in my ankle joint when I stand.,Pain,Joint pain,3,9
+I feel a sharp pain in my head when I think too hard.,Pain,Head ache,3,10
+I feel a sharp pain in my stomach,Pain,Internal pain,3,9
+I feel a sharp pain in the stomach after eating,Pain,Stomach ache,3,9
+I feel a soreness in my knees when I walk,Pain,Joint pain,3,10
+I feel a strange and powerful pain inside my rib cage,Emergency,Heart hurts,1,11
+I feel a tightness in my chest,Emergency,Hard to breath,1,11
+I feel abdominal pain,Pain,Stomach ache,3,7
+I feel aching on my insides.,Pain,Internal pain,3,9
+I feel back pain when I carry heavy things,Pain,Back pain,3,8
+"I feel chilly, like an ice cube.  My sister said that she needs several blankets to cover her so that she is warm enough.",Assistance,Feeling cold,3,10
+I feel cold although we are in summer.,Assistance,Feeling cold,3,9
+I feel cold and chills even though my clothes are heavy,Assistance,Feeling cold,3,10
+I feel cold when the night comes,Assistance,Feeling cold,3,9
+I feel congestion in my chest,General,Cough,3,10
+I feel deep Tingling when I touch Acne followed by bad sensation,General,Acne,4,9
+I feel depressed when I see my hair falling out,General,Hair falling out,4,12
+I feel discomfort throughout the body in general,Assistance,Body feels weak,2,12
+I feel dizzy after doing a muscular effort.,Emergency,Feeling dizzy,2,12
+I feel dizzy and out of sight,Emergency,Feeling dizzy,2,9
+"I feel dizzy when I set in-front of my laptop for an hour or two, what possibly could be the reason?",Emergency,Feeling dizzy,2,10
+I feel dizzy when i make sudden movements,Emergency,Feeling dizzy,2,9
+I feel dizzy whenever I stand up.,Emergency,Feeling dizzy,2,10
+I feel emotionally crushed,General,Emotional pain,3,10
+I feel fluid trying to come up when I cough.,General,Cough,3,9
+I feel great pain in my feet after playing one of the sports games,Pain,Injury from sports,3,6
+I feel great pain in the head,Pain,Head ache,3,8
+I feel great pressure in my chest,Emergency,Hard to breath,1,6
+I feel heart pain when I walk a lot,Emergency,Heart hurts,1,10
+I feel hurts in my heart,Emergency,Heart hurts,1,11
+I feel increased heart rate with prick,Emergency,Heart hurts,1,9
+I feel joint pain every time I move,Pain,Joint pain,3,11
+I feel lightheaded,Emergency,Feeling dizzy,2,12
+I feel lightheaded when I stand up,Emergency,Feeling dizzy,2,10
+I feel like I can hardly breathe unless I get what's in my lungs out,General,Cough,3,9
+"I feel like I just can't cope anymore, I feel overwhelmed and like I just can't get a break.",General,Emotional pain,3,12
+I feel like I went to an acupuncture's practice and had 100 needles in my shoulder,Pain,Shoulder pain,3,8
+I feel like I've always got something in my throat,General,Cough,3,8
+I feel like l fell in hot water,General,Skin issue,4,10
+I feel like my heart is on fire.,Emergency,Heart hurts,1,8
+I feel like something is squeezing my lungs.,Emergency,Hard to breath,1,10
+I feel like the room is spinning,Emergency,Feeling dizzy,2,15
+I feel like the world goes round and round,Emergency,Feeling dizzy,2,9
+I feel like there is something swollen and inflamed at the back of my knee.,Pain,Knee pain,3,10
+I feel muscle pain every time I make an extra effort.,Pain,Muscle pain,3,8
+I feel pain in my back,Pain,Back pain,3,8
+I feel pain in my ears with tinnitus,Pain,Ear ache,3,8
+I feel pain in my eyes I can see fog,General,Blurry vision,3,9
+I feel pain in my head with a vertigo,Pain,Head ache,3,7
+I feel pain in my heart when I wake up,Emergency,Heart hurts,1,8
+I feel pain in my joint after an injury in the last football match I played.,Pain,Joint pain,3,11
+I feel pain in my knee when I climb the stairs.,Pain,Joint pain,3,8
+"I feel pain in my legs muscles after I ran yesterday, I took some pain killers but it doesn't help.",Pain,Muscle pain,3,8
+I feel pain in my neck after waking up,Pain,Neck pain,3,10
+I feel pain in my neck while I'm working.,Pain,Neck pain,3,7
+I feel pain in my right shoulder after the tennis match.,Pain,Injury from sports,3,9
+I feel pain in my shoulders when I write on the keyboard.,Pain,Shoulder pain,3,12
+I feel pain in my throat,General,Cough,3,9
+I feel pain in the knee,Pain,Knee pain,3,11
+I feel pain in the knee when walking,Pain,Knee pain,3,10
+I feel pain in the lower back,Pain,Back pain,3,9
+I feel pain inside I do not know what it is,Pain,Internal pain,3,11
+I feel pain inside and I can not identify it,Pain,Internal pain,3,10
+I feel pain when i think of her,General,Emotional pain,3,8
+I feel pain when parting loved ones,General,Emotional pain,3,7
+I feel really sad all the time.,General,Emotional pain,3,12
+I feel sad like hurt or pain,General,Emotional pain,3,8
+I feel severe itching in the skin with redness,General,Skin issue,4,9
+I feel shoulder pain at intervals of time.,Pain,Shoulder pain,3,11
+I feel so sore in my stomach area.,Pain,Stomach ache,3,10
+I feel something hurt me in taking breath and I cant take my breath,Emergency,Hard to breath,1,10
+I feel strong pain in my knee after it was hit during the football match.,Pain,Injury from sports,3,7
+I feel suicidal.,General,Emotional pain,3,9
+I feel very hard to breathe,Emergency,Hard to breath,1,9
+I feel very weak in my body,Assistance,Body feels weak,2,10
+I feel weak all over.,Assistance,Body feels weak,2,10
+I fell a stiffness in my elbows and shoulders,Pain,Joint pain,3,10
+I fell off my bike and since then I had hard  knee pain,Pain,Knee pain,3,7
+"I fell through a window while I was cleaning it and I have a shard of glass stuck in my left eye, I think it is pretty serious, please help!",Emergency,Open wound,1,10
+I felt my heart hurts when I ran for along distance,Emergency,Heart hurts,1,9
+I get a knee pain when I walk a lot,Pain,Knee pain,3,9
+I get an ear ache when it is cold,Pain,Ear ache,3,11
+I get big patches of irritated pimples on my back and they hurt.,General,Acne,4,8
+I get breakouts on my chest with red patches that get more intense when i get hot.,General,Acne,4,10
+I get chills and aches all over.,Assistance,Feeling cold,3,12
+I get clusters of pimples on my face that never go away.,General,Acne,4,11
+I get clusters of whiteheads and blackheads on my back.,General,Acne,4,9
+I get i joint pain when i try to bend my leg or my arm,Pain,Joint pain,3,9
+I get terrible headaches every few months and when I get them my vision is affected.,Pain,Head ache,3,8
+"I get tired too fast, I can barely put on my clothes in the morning.",Assistance,Body feels weak,2,11
+I got a divorce last year and I just can't stop dwelling on how to get revenge on my ex husband.,General,Emotional pain,3,12
+I got acne when I ate chili,General,Acne,4,12
+I got injured exercising,Pain,Injury from sports,3,11
+I had a cold the last time I travelled by plane and I still have a discomfort in my ears.,Pain,Ear ache,3,9
+I had a collision while playing soccer.  My knee buckled and now it's unstable.,Pain,Injury from sports,3,9
+I had a cut that was stitched together but it is not healing.  It is oozing green puss and burns.,Emergency,Infected wound,2,10
+I had a pain in my knee when I was swimming,Pain,Knee pain,3,12
+I had a sharp pain in my stomach,Pain,Stomach ache,3,11
+I had alot of exercise yesterday so i feel sharp muscle pains,Pain,Muscle pain,3,6
+I had an accident and my wound was open when I arrived to hospital,Emergency,Open wound,1,8
+I had internal pain and gases when I ate indian spicy food yesterday,Pain,Internal pain,3,8
+"I hardly have enough stength to get up,",Assistance,Body feels weak,2,8
+I hate my acne.,General,Acne,4,7
+I have a back pain since I fell on the floor.,Pain,Back pain,3,6
+I have a back pain since I turned 70 years old.,Pain,Back pain,3,8
+I have a blurry vision after my head was hit yesterday.,General,Blurry vision,3,10
+"I have a blurry vision and i can't see in the darkness , what is the reason doctor ?",General,Blurry vision,3,10
+"I have a blurry vision during my swimming training in the pool, why?",General,Blurry vision,3,11
+"I have a blurry vision since I woke up this morning, what could be the reason?",General,Blurry vision,3,10
+I have a break in the skin between my thumb and index finger and it will not close.,Emergency,Open wound,1,9
+I have a break in the skin inside one of my nostrils that has become infected and is now filled with pus.,Emergency,Infected wound,2,8
+I have a cold and it makes me cough alot,General,Cough,3,7
+I have a cut on my foot that became infected from using the showers at the gym.,Emergency,Infected wound,2,10
+I have a cut that has become red and oozes puss.,Emergency,Infected wound,2,11
+I have a cut that is red and swollen.,Emergency,Infected wound,2,12
+I have a dry skin,General,Skin issue,4,11
+I have a dry throat,General,Cough,3,9
+I have a dull ache in  my lower back which makes it difficult to move,Pain,Back pain,3,11
+I have a dull ache in my head,Pain,Head ache,3,11
+I have a dull ache in my stomach.  It gets worse after I eat.,Pain,Internal pain,3,10
+I have a ear ache when I go to the pool,Pain,Ear ache,3,9
+I have a feeling like my whole body is complaining,Pain,Joint pain,3,8
+I have a foot ache after running 500m with my running shoes.,Pain,Foot ache,3,7
+I have a foot ache although I don't walk a lot.,Pain,Foot ache,3,9
+"I have a foot ache in winter, or when it feels cold, why?",Pain,Foot ache,3,10
+I have a great stomach ache and i can't eat any thing,Pain,Stomach ache,3,11
+I have a hair shortage,General,Hair falling out,4,11
+I have a hard muscle pain since i went to the gym,Pain,Muscle pain,3,10
+I have a head pain every single day.,Pain,Internal pain,3,11
+I have a headache almost every day,Pain,Head ache,3,10
+I have a headache every time I eat ice cream,Pain,Head ache,3,11
+I have a lot of knee pain whenever I go running.,Pain,Knee pain,3,5
+I have a lot of mucus when I cough.,General,Cough,3,9
+I have a mental suffering,General,Emotional pain,3,9
+I have a neck pain when I sit in-front of my laptop.,Pain,Neck pain,3,10
+I have a pain in my head,Pain,Head ache,3,11
+I have a pain in my joint,Pain,Joint pain,3,10
+I have a pain in my muscle,Pain,Muscle pain,3,9
+I have a pain in my stomach,Pain,Internal pain,3,9
+I have a pain internal,Pain,Internal pain,3,10
+I have a pain that radiates up from my right hip to my rib cage.  It is at it's worst when I urinate.,Pain,Internal pain,3,9
+I have a painful cramp in my feet,Pain,Foot ache,3,8
+I have a powerful pain inside my neck,Pain,Neck pain,3,10
+I have a problem in the expiration because i have abronchial asthma,Emergency,Hard to breath,1,6
+I have a rash and it itches very bad.,General,Skin issue,4,12
+I have a rash on my skin,General,Skin issue,4,9
+I have a red rash that is itchy on my skin,General,Skin issue,4,10
+I have a scab on the back of my hand that just won't go away.,General,Skin issue,4,11
+I have a sharp pain and clicking sound in my ankle joint when I try to stand on it and walk.,Pain,Joint pain,3,11
+I have a sharp pain in my abdomen.,Pain,Internal pain,3,9
+I have a sharp pain in my ear,Pain,Ear ache,3,10
+I have a sharp pain in my lower stomach.,Pain,Stomach ache,3,11
+I have a sharp pain in my neck,Pain,Neck pain,3,11
+I have a skin rash after eating an ice-cream.,General,Skin issue,4,9
+I have a split on my thumb that will not heal.,Emergency,Open wound,1,12
+I have a strange rash on my arm,Pain,Foot ache,3,1
+I have a throbbing in my joints,Pain,Joint pain,3,10
+I have a very rash sensation close to my arms,General,Skin issue,4,11
+I have a wound between my toes that gets better overnight and then reopens ever day when I wear dress shoes to work.,Emergency,Open wound,1,6
+I have acne all over my face,General,Acne,4,11
+I have acne in my face and other problema in my derma like itching,General,Skin issue,4,8
+I have acne in my face and other problems in my derma like itching,General,Skin issue,4,1
+I have an ear ache that won't go away.  I don't have a cold or headache or any other symptoms.  Just an earache.,Pain,Ear ache,3,8
+I have an ear ache when showering,Pain,Ear ache,3,9
+I have an indigestion,Pain,Stomach ache,3,11
+I have an internal pain I cannot describe,Pain,Internal pain,3,10
+I have an open wound in my arm,Emergency,Open wound,1,9
+I have blurred vision.,General,Blurry vision,3,9
+I have blurry vision after I used a wrong medicine.,General,Blurry vision,3,11
+I have cloudy eyes,General,Blurry vision,3,10
+I have constant stomach pain and bloating.,Pain,Internal pain,3,12
+I have cut my finger because of playing football and I have to apply pain relief cream but it does not help,Pain,Injury from sports,3,1
+I have dark spots on my skin,General,Skin issue,4,10
+I have difficulty in breathing in crowded places.,Emergency,Hard to breath,1,11
+I have eruptions on my face that come and go .,General,Acne,4,11
+I have for dia,Emergency,Heart hurts,1,1
+I have found some issues in my skin and tried to use cream but it doesn't get better,General,Skin issue,4,9
+I have front head pain and when I get it the light bothers me.,Pain,Head ache,3,8
+I have general discomfort in my torso.,Pain,Internal pain,3,9
+I have internal pain whenever I come down with a cold.,Pain,Internal pain,3,11
+I have muscle pain in my left leg,Pain,Shoulder pain,3,1
+I have pain in my chest that saddens me.,Emergency,Heart hurts,1,11
+I have pain in my colon and my stomach like something cutting it,Pain,Stomach ache,3,9
+I have pain in my stomach,Pain,Stomach ache,3,11
+I have pimples in patches along with a lot of redness on my face.,General,Acne,4,9
+I have pimples on my back.,General,Acne,4,10
+I have severe shoulder pain,Pain,Shoulder pain,3,9
+I have shooting pain in my kneecap after working out.,Pain,Knee pain,3,9
+I have shooting pains up and down my back.,Pain,Back pain,3,11
+I have shoulder pain when I try to carry my groceries.,Pain,Shoulder pain,3,9
+I have some pain when i'm walking around my knees,Pain,Joint pain,3,11
+I have some terrible problems when i'm breathing during the night.,General,Cough,3,11
+I have terrible pain in my heart,Emergency,Heart hurts,1,11
+I have the impression of having no strength in my body,Assistance,Body feels weak,2,12
+I have this strange rash on my arm.,General,Skin issue,4,9
+I have throbing in my shoulder,Pain,Shoulder pain,3,10
+I have tried to make massage on my foot but they still pain me,Pain,Foot ache,3,9
+I have tried to relief it but I can't,Assistance,Body feels weak,2,11
+I hit my head at the basketball game.  Could I have a concussion?,Pain,Injury from sports,3,9
+I hit myself and the would doesn't want to heal,Emergency,Open wound,1,11
+I hve cut my finger because of playing football and I  to apply pain relief cream but it does not help,Pain,Injury from sports,3,8
+I just can't seem to get warm.  Even when everyone around me is warm I always feel cold.,Assistance,Feeling cold,3,10
+I knocked my foot and it really hurts.,Pain,Foot ache,3,8
+I lose a lot of my hair,General,Hair falling out,2,10
+I love to garden but I get a terrible twinge in my lower back when I lean over.,Pain,Back pain,3,9
+I love to walk and be outside but the bottoms of my feet get sore so quickly.,Pain,Foot ache,3,8
+I m feeling cold though the temperature is high,Assistance,Feeling cold,3,9
+I made lots and lots of analysis to know the main reason for my stomach ache,Pain,Stomach ache,3,10
+"I may have overdone it with the weightlifting, because I am afraid I may have torn a muscle on my back.",Pain,Injury from sports,3,8
+I must see a doctor i have an open wound,Emergency,Open wound,1,9
+I need a kind of cream wich make my muscles more relaxed,Pain,Muscle pain,3,9
+"I never had any acne problem until my last pregnancy, when all of a sudden my back got covered in zits.",General,Acne,4,7
+I notice a lot more hair coming out than usual when I brush my hair,General,Hair falling out,4,7
+I noticed an important decrease in my vision when I try to look at things up close.,General,Blurry vision,3,11
+I often get a sharp pain in my chest and I can't tell what I'm doing that might be triggering it.,Emergency,Heart hurts,1,11
+I often get a stomach ache after I eat.  I haven't been able to pinpoint which foods might be the trigger.,Pain,Stomach ache,3,9
+I read a book for along time and when I finished reading I feel head ache,Pain,Head ache,3,8
+I sliced myself deeply with a knife while I was cooking,Emergency,Open wound,1,11
+"I started taking swimming lessons and I guess I swallowed too much water through my nose, because this sinusitis is killing me now.",Pain,Injury from sports,3,9
+I stopped sports because I get Injury from sports,Pain,Injury from sports,3,9
+I suffered a deep wound in my hand and I can not stop the bleeding,Emergency,Infected wound,2,12
+I think I overdid it when I carried all that lumber from the yard. My lower back is killing me.,Pain,Back pain,3,10
+I think I sprained my ankle it really hurts.,Pain,Injury from sports,3,10
+I think my body temperature is very low.,Assistance,Feeling cold,3,8
+I think my wound is infected,Emergency,Infected wound,2,9
+I think there's fluid in my ears.,Pain,Ear ache,3,12
+"I think there's something wrong with my wound, it does not seem to heal like it should.",Emergency,Infected wound,2,11
+I toppled over while jumping to catch the ball.,Pain,Injury from sports,3,9
+I travelled by plane a few days ago and this time during landing my ears remained clogged and painful.,Pain,Ear ache,3,8
+I tried alot of cream but i still feel the same skin problem,General,Skin issue,4,9
+I tried to put my glasses to see more clear but cant find any change,General,Blurry vision,3,9
+I used alot of pain killer to get better but i still feel the same back pain,Pain,Back pain,3,10
+"I used to be out of breath after going up a dozen of stairs, but now I struggle to breath even when I sit down.",Emergency,Hard to breath,1,7
+I used to have acne when I was 15 years old,General,Acne,4,9
+I usually have a bad cough when I get flu.,General,Cough,3,10
+I visited many doctors but they can't find the right treatment toget my hair back,General,Hair falling out,4,9
+I wake up at night feeling cold,Assistance,Feeling cold,3,10
+I wake up with a stiff neck every morning.  Massage helps but then a couple of days later it's back again.,Pain,Neck pain,3,10
+I walk every day but now I get short of breath after going only a short way.,Emergency,Hard to breath,1,9
+"I was diagnosed with  B12-deficiency anemia, which explains why I always felt cold.",Assistance,Feeling cold,3,9
+I was kicked in the head playing soccer last night.,Pain,Injury from sports,3,12
+I was playing soccer and I twisted my ankle,Pain,Injury from sports,3,8
+I was very active in sports but now my body is feeling pain.,Pain,Injury from sports,3,11
+I wish this excruciating feeling of loss could go away.,General,Emotional pain,3,8
+I'm feeling nauseous,Pain,Stomach ache,3,10
+I'm having a hard time hearing.,Pain,Ear ache,3,10
+I'm having a hard time reading because the letters are all fuzzy,General,Blurry vision,3,11
+I'm in need for a treatment for my hair fall,General,Hair falling out,4,9
+I'm not feeling good I can't take my breath,Emergency,Hard to breath,1,9
+I'm not feeling good I get infection wound,Emergency,Infected wound,2,10
+I'm not good i feel dizzy,Emergency,Feeling dizzy,2,9
+I'm not good i'm feeling so cold,Assistance,Feeling cold,3,9
+I'm not hearing well I have problem with my ear,Pain,Ear ache,3,9
+I'm suffering from sharp cough Accompanied by  phlegm,General,Cough,3,11
+I'm very worried that I'll go bald soon. Am I very sick?,General,Hair falling out,4,8
+I've always been very active but now I just don't have the strength or energy to go for even a short walk.,Assistance,Body feels weak,2,8
+I've been feeling very sad lately,General,Emotional pain,3,10
+I've been over my cold for weeks but still cough every day.,General,Cough,3,12
+I've got a hard time to breath- am I having a heart attack?,Emergency,Hard to breath,1,12
+I've had this cough for two weeks.,General,Cough,3,10
+I've noticed my hair falling out a lot lately.,General,Hair falling out,4,9
+"I've tried reading books, but nothing can cheer me up.",General,Emotional pain,3,8
+In highschool I had a lot of acne.,General,Acne,4,7
+In the morning my respiration is loud.,Emergency,Hard to breath,1,12
+Is pimples a skin disease?,General,Acne,4,11
+Is there a cure for acne?,General,Acne,4,10
+It feels like I can't take a deep breath,Emergency,Hard to breath,1,10
+It feels like my heart is going to leap out of my body. It hurts.,Emergency,Heart hurts,1,10
+It feels like someone is hitting my head with a hammer.  I feel pain on the top of my head and it throbs.,Pain,Head ache,3,12
+It feels like someone stuck a knife into my shoulder,Pain,Shoulder pain,3,7
+It hurts when I bent my arm,Pain,Joint pain,3,9
+It hurts when I raise my arm up,Pain,Shoulder pain,3,12
+"It is hard to breath when I am in the underground metro station, why?",Emergency,Hard to breath,1,10
+It is like I have a needle pushing through my heart.,Emergency,Heart hurts,1,11
+It itches inside my ears.,Pain,Ear ache,3,12
+"It started as a tinnitus, but today the pain is throbbing and unbearable.",Pain,Ear ache,3,9
+It's hard to see things,General,Blurry vision,3,9
+"It's hard to stand up, and I'm moving very slowly",Assistance,Body feels weak,2,7
+"Laceration, rupture or opening in the skin",Emergency,Open wound,1,6
+Mr hair is falling out just by combing it.,General,Hair falling out,4,12
+My acne gets worse when it is hot,General,Acne,4,6
+My acne is really embarassing. It's so read.,General,Acne,4,12
+My acne itches and oozes.,General,Acne,4,12
+My ankle joint throbs when I put pressure on my foot.,Pain,Joint pain,3,9
+My arm hurts when I stretch,Pain,Muscle pain,3,10
+My back got injured while i was lifting at the gym,Pain,Injury from sports,3,7
+My back hurts a lot when I bend,Pain,Back pain,3,11
+My back hurts me and i can't bend it or walk,Pain,Back pain,3,12
+My back hurts so much I can't bend down to tie my shoelaces.,Pain,Back pain,3,12
+My back is hurting so much.,Pain,Back pain,3,11
+My biceps started aching after I went to the gym,Pain,Muscle pain,3,8
+My body aches on the inside between my hips and shoulders.,Pain,Internal pain,3,11
+My body feels like it's in a refrigerator.,Assistance,Feeling cold,3,11
+"My body feels weak after my first day in the gym, why?",Assistance,Body feels weak,2,11
+"My body feels weak although I eat a lot, why?",Assistance,Body feels weak,2,10
+My body feels weak although I take my vitamins regularly.,Assistance,Body feels weak,2,10
+My body feels weak and I tried to make it relax but it stills pain me,Assistance,Body feels weak,2,9
+My body feels weak and i think that my face is fade and i can't sleep well,Assistance,Body feels weak,2,12
+My calves feel like they are tight as knots and are throbbing,Pain,Muscle pain,3,11
+My chest acne breaks out and never clears up.,General,Acne,4,11
+My chest break out with red pimples and whiteheads.,General,Acne,4,9
+My chest hurts when I go to take a breath,Emergency,Hard to breath,1,9
+My chest hurts when I smoke,Pain,Internal pain,3,8
+My cough is very heavy and I have mucus.,General,Cough,3,8
+My cut yellow or greenish-colored pus,Emergency,Infected wound,2,6
+My daughter had her ears pierced and one of her ear lobes is bright red and burning hot.,Emergency,Infected wound,2,8
+My daughter had her eyebrows threaded and it pulled an opening of skin in one of her brows that is now puffy and oozing.,Emergency,Infected wound,2,11
+"My daughter was bit by her cat and now her hand is sore, red and swollen and the wound is oozing liquid.",Emergency,Infected wound,2,9
+My ear ache when I'm listening to music.,Pain,Ear ache,3,9
+My ear hurts and it's worse when I swallow.  My ear is very painful and Tylenol hasn't helped.,Pain,Ear ache,3,11
+My ear hurts when I touch it.,Pain,Ear ache,3,12
+My ear is ringing.,Pain,Ear ache,3,12
+My entire body is freezing.,Assistance,Feeling cold,3,11
+My face break out badly every month around my cycle.,General,Acne,4,10
+"My face has broken out in painful red spots and lumps, that no matter how much I clean my face don't seem to be going away.",General,Acne,4,10
+My face is all broken out with pimples.,General,Acne,4,10
+My foot had been aching since last Tuesday.,Pain,Foot ache,3,10
+My foot hurts and I can't turn it.  Maybe it's broken.,Pain,Foot ache,3,11
+My foot hurts me a lot of playing football,Pain,Foot ache,3,11
+My foot is hurting so much.,Pain,Foot ache,3,8
+My grandmother last year went to hospital because she was having a hard time breathing,Emergency,Hard to breath,1,9
+My grandson cut his foot on a seashell in the ocean and now the foot is turning gray and is puffy.,Emergency,Infected wound,2,6
+My hair always falls out and i have lost a lot of hair lately,General,Hair falling out,4,10
+"My hair is coming out in chunks, especially when I wash it",General,Hair falling out,4,11
+My hair is falling out after I take a shower.,General,Hair falling out,4,11
+My hair is falling out in bunches.,General,Hair falling out,4,12
+My hair is falling out in huge amount,General,Hair falling out,4,10
+My hair is falling when I am combing it.,General,Hair falling out,4,11
+"My hair is falling without a reason, I can see a lot of hair on my working desk.",General,Hair falling out,4,8
+My head ache since I woke up this morning.,Pain,Head ache,3,10
+My head gets dizzy when I try to get up.,Emergency,Feeling dizzy,2,11
+"My head hurts and I lose the sensation in my face, then lose sight in my eye",Pain,Head ache,3,10
+My head hurts in the back and the pain lasts all day.,Pain,Head ache,3,12
+My head hurts when I'm doing this.,Pain,Head ache,3,11
+My head hurts whenever I try to do something.,Pain,Head ache,3,10
+My head is so heavy can't think normally,Pain,Head ache,3,7
+My head is spinning when I get up.,Emergency,Feeling dizzy,2,10
+My heart feels like it's going to explode.,Emergency,Heart hurts,1,12
+My heart hurts when I exercise,Emergency,Heart hurts,1,9
+"My heart hurts while I'm sad, why?",Emergency,Heart hurts,1,9
+My heart is beating fast and it scares me.,Emergency,Heart hurts,1,10
+My heart is pumping fast and I'm having a hard time to breath.,Emergency,Hard to breath,1,11
+My husband has a spot on his lip that he though was cold sore but now it has broken open and leaks fluid all day.,Emergency,Infected wound,2,8
+"My husband left me for another woman, my heart hurts so badly to the point I can't eat or sleep.",Emergency,Heart hurts,1,12
+My infected wound cause fever,General,Skin issue,4,1
+My infected wound caused a fever,Emergency,Infected wound,2,8
+My joints ache whenever it is cold,Pain,Joint pain,3,12
+My joints feel swollen,Pain,Joint pain,3,8
+My kee is swallowing which indicates i have an infected wound,Emergency,Infected wound,2,7
+My knee catches and hurts when I first stand up after sitting.,Pain,Knee pain,3,9
+My knee doesn't want to bend well.,Pain,Knee pain,3,12
+My knee feels weak and it gave way the other day at the top of the stairs.  Luckily there was a rail to hold on to.,Pain,Knee pain,3,10
+My knee hurts when I play squash,Pain,Knee pain,3,12
+My knee hurts when I walk,Pain,Knee pain,3,11
+My knee is hurting so badly.,Pain,Joint pain,3,11
+My kneecap feels like it is grating bone on bone when I walk.,Pain,Knee pain,3,8
+My knees ache on cold and rainy days.,Pain,Knee pain,3,11
+My knees hurt so bad to walk that I stay sitting more than I should.,Pain,Knee pain,3,9
+My knees seem to grind as I go up or down stairs.,Pain,Knee pain,3,12
+My knees swell right below the knee cap and hurt when I put weight on them.,Pain,Knee pain,3,6
+"My left ear is ok, but the right one feels like it's being stabbed with a nail.",Pain,Ear ache,3,8
+My lower back hurts but it improves if I stretch it,Pain,Muscle pain,3,10
+My lungs feel heavy like they are filled with mucus,General,Cough,3,11
+"My mind feels very sad, as if it hurts.  The way I feel in my head is awful and when I think about my break-up, I cry with sadness.",General,Emotional pain,3,10
+My muscle in my shoulder burns when I move my arm.,Pain,Muscle pain,3,9
+My muscles feel tired,Assistance,Body feels weak,2,10
+My muscles in my lower back are aching,Emergency,Infected wound,2,1
+My muscles in my lower back are aching.,Pain,Muscle pain,3,9
+My neck feels stiff,Pain,Neck pain,3,12
+My neck has been sore since the accident.,Pain,Neck pain,3,9
+My neck hurts me and i can't stand with this pain,Pain,Neck pain,3,10
+My neck is annoying me I can't sleep bacause of it,Pain,Neck pain,3,10
+My nose is congested all the time and there's this gluey secretion in my throat that makes it impossible for me to sleep. I often have to nap sitting down.,Emergency,Hard to breath,1,9
+My right shoulder clicks when I move my arm.,Pain,Shoulder pain,3,10
+My shoulder aches when I try to lift five pounds.,Pain,Shoulder pain,3,10
+My shoulder has agreat pain,Pain,Shoulder pain,3,10
+My shoulder hurts me so much,Pain,Shoulder pain,3,11
+My shoulder hurts when I try to reach something above my head.,Pain,Shoulder pain,3,12
+My shoulder muscle hurts when I try to reach up.,Pain,Muscle pain,3,7
+My shower drain is full of hair every time.,General,Hair falling out,4,9
+"My skin color on my back is red, I don't know why.",General,Skin issue,4,8
+My skin is itching.,General,Skin issue,4,11
+My skin is itchy and inflamed,General,Skin issue,4,11
+My skin is very dry and peeling.,General,Skin issue,4,12
+My son got a tattoo several weeks ago and the skin around it is raised and hot and it looks infected.,Emergency,Infected wound,2,8
+My son had a root canal and the dentist accidentally cut the inside of his cheek and now it will not heal.,Emergency,Infected wound,2,9
+My son had his lip pierced and it is swollen and the skin inside on his lip is grey and looks infected.,Emergency,Infected wound,2,11
+My son has a lot of acne.,General,Acne,4,10
+My son nicked his neck with an old razor and that spot has become inflamed and looks like it is infected.,Emergency,Infected wound,2,9
+My son squeezed a pimple and it broke open only to scab over and now looks like it is infected.,Emergency,Infected wound,2,7
+My sore isn't healing well and it's been like this for two weeks.,Emergency,Open wound,1,12
+My sore looks like its not healing well.,Emergency,Infected wound,2,9
+"My stomach aches after I drink any soda drink, why?",Pain,Stomach ache,3,9
+"My stomach aches when I eat hot food, why?",Pain,Stomach ache,3,10
+My stomach feels full and upset  and bloating after big meals.,Pain,Stomach ache,3,12
+My stomach feels starts hurting but then it feels better after I eat something mild.,Pain,Stomach ache,3,8
+My stomach has been sore since yesterday.,Pain,Stomach ache,3,7
+My television and computer seem out of focus even though I have new glasses.,General,Blurry vision,3,9
+My throught is so sore.,Pain,Neck pain,3,9
+My upper back has been sore for a week.,Pain,Back pain,3,9
+My wound opened up again,Emergency,Open wound,1,10
+My wound was infected when i was planting some flowers in my garden,Emergency,Infected wound,2,6
+Need to scratch my skin every minute,General,Skin issue,4,8
+Oh my heart hurts me I tried to be calm and I can't,Emergency,Heart hurts,1,10
+Pain in the large neck,Pain,Neck pain,3,8
+Severe pain in the ear,Pain,Ear ache,3,10
+Sharp pain and heavy breathing,Pain,Internal pain,3,12
+Since I went into the forest  I have pain on my ear,Pain,Ear ache,3,11
+Something dark is there on my arm,General,Skin issue,4,12
+Sometimes I cough because I'm a smoker,General,Cough,3,9
+Sometimes I feel like a claw on my chest that leaves me breathless.,Emergency,Hard to breath,1,9
+Sometimes my body feels week without reason,Assistance,Body feels weak,2,8
+"Sometimes when it is cold outside, my face hurts, especially around the pimples that are ready to pop.",General,Acne,4,8
+Sterilizer for the eye,General,Blurry vision,3,7
+Stomach pain after drinking milk,Pain,Stomach ache,3,9
+Surgical wound infections,Emergency,Infected wound,2,10
+The acne was causing me to feel embarrassed.,General,Acne,4,9
+The arches of my feet hurt when I wear heels,Pain,Foot ache,3,8
+The area around my heart doesn't feel good.,Emergency,Heart hurts,1,11
+The crushing sensation on my heart leaves me breathless.,Emergency,Heart hurts,1,9
+The feeling of coughing increases in winter's reach,General,Cough,3,7
+The joints in my fingers are painful in the morning.,Pain,Joint pain,3,10
+The knee feels like it rusted and I suddenly cannot bend it anymore.,Pain,Knee pain,3,11
+"The last time I clipped my toenails, I cut them too short and now I have an infected nail.",Emergency,Infected wound,2,11
+The nerves were so damaged during the operation on my ankle that I cannot stand being touched on the scar.,Pain,Foot ache,3,9
+The pain feels like it's right below the skin,Pain,Muscle pain,3,8
+The pain in my back dwwls like a sharp knife in it,Pain,Back pain,3,8
+The pain in my ear is unbearable.,Pain,Ear ache,3,11
+"The pain is intense especially when I go down the stairs, it feels like something has snapped inside my knee.",Pain,Knee pain,3,9
+The severe pain in the stomach I feel,Pain,Stomach ache,3,11
+The warming system of my house is broken and  feel so cold,Assistance,Feeling cold,3,11
+The worst headache was during a hangover in my twenties: I sincerely thought I was going to die from brain inflammation.,Pain,Head ache,3,9
+The wound is still open,Emergency,Open wound,1,10
+There are lots of hairs on my pillow in the morning.,General,Hair falling out,4,12
+There are some pimples on my face that bother me a lot,General,Acne,4,10
+"There are times when I feel crushed under a huge weight and no air passing to my lungs, it actually scares the hell out of me when it happens.",Emergency,Hard to breath,1,7
+There feels like a swollen knot at my shoulderblade with pain shooting from that,Pain,Shoulder pain,3,7
+There is a constant tickle in my throat,General,Cough,3,10
+There is a sharp pain in my bicep,Pain,Muscle pain,3,10
+There is a sharp pain in my bicep. I have tried to apply pain relief cream but it does not help.,Pain,Muscle pain,3,18
+There is a sharp pain in my calve.,Pain,Muscle pain,3,10
+There is a sharp pain in my ear whenever I do this.,Pain,Ear ache,3,9
+There is a tingling sensation in my neck.,Pain,Neck pain,3,12
+"There is an extreme pressure below my belly button at the right, which I feel every time I go out for a jog.",Pain,Internal pain,3,5
+There is an injured person,Emergency,Infected wound,2,12
+There is pain in my joints. I can not bear pain,Pain,Joint pain,3,11
+There is pain in the muscles I do not know caused,Pain,Muscle pain,3,12
+There is so much pain when I move my arm.,Pain,Shoulder pain,3,8
+There is this pain that radiates from my chest up to my left arm.,Emergency,Heart hurts,1,9
+"There must be something wrong with my blood circulation, I have to wear socks even on the hottest days, my toes are frozen!",Assistance,Feeling cold,3,10
+There's swelling in my neck and it hurts.,Pain,Neck pain,3,12
+These red spots on my cheeks are new. What is it?,General,Skin issue,4,6
+This long scar on my left buttock is from falling off my mountain bike.,Pain,Injury from sports,3,8
+What helps cuts heal faster?,Emergency,Open wound,1,11
+What's the symptoms of appendicitis?,Pain,Internal pain,3,11
+When I bend over I get a shooting pain down my back,Pain,Back pain,3,8
+When I brush my hair I notice big clumps of hair coming out in the brush.,General,Hair falling out,4,11
+When I carry heavy things I feel like breaking my back,General,Hair falling out,4,1
+When I carry heavy things i feel like breaking my back,Pain,Back pain,3,9
+When I do hard exercises I feel great pain in my muscles.,Pain,Muscle pain,3,11
+"When I drink a lot, I get a headache",Pain,Head ache,3,8
+When I eat sugar I notice my vision blurs.,General,Blurry vision,3,11
+When I eat too much sugar my body gets weak and dizzy.,Assistance,Body feels weak,2,11
+When I force my eyes to view I have blurry vision.,General,Blurry vision,3,10
+When I get out of bed in the morning my body feels very weak.,Assistance,Body feels weak,2,11
+When I go to sleep I am feeling cold,Assistance,Feeling cold,3,7
+"When I go to stand, my head starts swirling",Emergency,Feeling dizzy,2,8
+When I lift my arms up I have a soreness in my shoulders,Pain,Shoulder pain,3,7
+"When I move my shoulder, it's like lightning is being sent through my shoulder",Pain,Shoulder pain,3,9
+"When I move on my shoulder, pain shoots down my arm",Pain,Shoulder pain,3,9
+When I play football I have joint pain.,Pain,Joint pain,3,11
+When I play football I have muscle pain.,Pain,Muscle pain,3,11
+When I play sports  I have some burning sensation in my spine,Pain,Back pain,3,12
+When I played football I dislocated my shoulder,Pain,Injury from sports,3,6
+When I remember her I feel down,General,Emotional pain,3,11
+When I sneeze very hard I feel ear ache,Pain,Ear ache,3,6
+When I stand I feel dizzy I do not know why,Emergency,Feeling dizzy,2,8
+When I stand up too quick my vision is blurry.,General,Blurry vision,3,11
+When I stand up too quickly I feel as though I'm going to faint.,Emergency,Feeling dizzy,2,10
+When I stand up too quickly I start to feel dizzy and light-headed,Emergency,Feeling dizzy,2,35
+"When I stand up, I feel like I'm going to fall down instantly",Emergency,Feeling dizzy,2,10
+When I think of my parents I feel pain,General,Emotional pain,3,10
+When I tried to answer the phine call I found that I can't hear the voice of the speaker,Pain,Ear ache,3,6
+When I tried to be warm and wear more clothes I found that I was still cold,Assistance,Feeling cold,3,12
+When I tried to take care if my hair I found that it is falling out,General,Hair falling out,4,9
+When I wake up I am feeling cold,Assistance,Feeling cold,3,9
+When I wake up in the morning I feel a soreness in my body,Pain,Muscle pain,3,11
+When I walk I get a stabbing pain in the top of my foot,Pain,Foot ache,3,6
+When I walk it's hard to breath.,Emergency,Hard to breath,1,9
+"When I walk up a flight of stairs, my right knee hurts.",Pain,Knee pain,3,11
+When I was young I had an injury from sports in my knee.,Pain,Injury from sports,3,11
+When I'm tired I feel my head heavy,Pain,Head ache,3,12
+When I'm too high I start to feel dizzy,Emergency,Feeling dizzy,2,9
+When get up I found that I have a stomach ache  and I tried to take medecine but my stomach still hurting me,Pain,Stomach ache,3,8
+When i eat i feel my stomach hurts,Pain,Stomach ache,3,10
+When i get up i see my skin vague,General,Skin issue,4,11
+When i'm awake in the morning I feel strange and have vertigo,Emergency,Feeling dizzy,2,12
+When i'm doing sport I have pain under my skin,Pain,Muscle pain,3,12
+When i'm driving my eyes see in double,General,Blurry vision,3,12
+When my grand father died I felt a hard emotional pain,General,Emotional pain,3,7
+Whenever I stand up I feel dizzy.,Emergency,Feeling dizzy,2,10
+Why is my shoulder aching when I try to pick up the laundry?,Pain,Shoulder pain,3,8
+Yesterday I had a shouder pain,Pain,Shoulder pain,3,10
+"You won't believe me, but this infected wound on my hand is from a paper cut I didn't take seriously.",Emergency,Infected wound,2,10
+"after playing football, i have muscle pain with my both legs.",Pain,Muscle pain,3,10
+"can't do any exercise, i feel weak",Assistance,Body feels weak,2,6
+chronic disease of hair follicles and sebaceous glands.,General,Acne,4,10
+cramps along the whole abdomen,Pain,Stomach ache,3,7
+discomfort or pain that is felt at some point along the front of the body between the neck and upper abdomen.,Pain,Internal pain,3,9
+dr. I feel a strange and powerful pain inside my rib cage,Emergency,Heart hurts,1,1
+fell skull is cracked like nuts,Pain,Head ache,3,11
+glass broken and wound my leg badly the wound is so wide,Emergency,Open wound,1,9
+having difficulty moving my knee,Pain,Knee pain,3,9
+heart aches so much,Emergency,Heart hurts,1,10
+heavy breath with fatigue,General,Emotional pain,3,9
+"i am feeling so dizzy, body is so fragile.",Assistance,Body feels weak,2,8
+i am having problems seeing things feel like a cloud on my eyes everything is blurry,General,Blurry vision,3,8
+i can hardly breathe,Emergency,Hard to breath,1,11
+i can't breath because of  Cough,General,Cough,3,11
+"i can't move my leg, there is pain in the joint",Pain,Joint pain,3,11
+i can't move my shoulder because of pain,Pain,Shoulder pain,3,8
+i can't ride my car at night because i have blurry vision.,General,Blurry vision,3,11
+i can't rotate my neck,Pain,Neck pain,3,9
+i can't see well,General,Blurry vision,3,8
+"i can't walk, my knee hurts me",Pain,Knee pain,3,11
+i cant breathe,General,Cough,3,12
+i cant sleep because of cold,Pain,Injury from sports,3,1
+i cant sleep because of cough,General,Cough,3,8
+i feel cold,Assistance,Feeling cold,3,11
+i feel dizzy after severe diarrhea,Emergency,Feeling dizzy,2,10
+i feel head ache,Pain,Head ache,3,10
+"i feel hurt, lot of pain in my heart",General,Emotional pain,3,9
+i feel pain in my back,Pain,Back pain,3,9
+i feel pain in my body,Pain,Internal pain,3,10
+i feel pain in my foot,Pain,Foot ache,3,10
+i feel pain in my knee,Pain,Knee pain,3,11
+i feel pain in my neck,Pain,Neck pain,3,10
+i feel pain in my stomach,Pain,Stomach ache,3,9
+i feel sad,General,Emotional pain,3,12
+i feel that is great pain in my left shoulder,Pain,Shoulder pain,3,9
+i feel that it's hard to breath for me specially after running or making any effort,Emergency,Hard to breath,1,8
+i feel weak,Assistance,Body feels weak,2,6
+i have a great pain in my foot like thrombing pain with relaxing my pain releif,Pain,Foot ache,3,11
+i have a great pain in my thorax from heart injury,Emergency,Heart hurts,1,8
+i have a hard pain in my stomach,Pain,Stomach ache,3,10
+i have a knee pain when i walk a lot,Pain,Knee pain,3,1
+i have a migrain and i took panadol but it doesn√ït help,Pain,Head ache,3,8
+i have a pain in my elbow joint,Pain,Joint pain,3,8
+i have a pain in my trapes,Pain,Muscle pain,3,9
+i have a problem in my back i cannot extend it,Pain,Back pain,3,10
+i have a problem in my middle ear made by infection,Pain,Ear ache,3,9
+i have a problem in seeing objects it is too difficult to see,General,Blurry vision,3,7
+i have a strong shoulder pain,Pain,Shoulder pain,3,11
+i have a very bad cough,General,Cough,3,6
+i have difficulty moving my neck,Pain,Neck pain,3,11
+i have disterbance in my emotion,General,Emotional pain,3,8
+i have injured myself during the soccer match,Pain,Injury from sports,3,12
+i have issue with my skin,General,Skin issue,4,11
+i have muscle pain at my left leg.,Pain,Muscle pain,3,9
+"i have muscle pain that my back
+I Have Muscle Pain at my back leg",Pain,Foot ache,3,1
+i have pain but i can't specify place,Pain,Internal pain,3,8
+i have pain like needles in my joints.,Pain,Joint pain,3,11
+i have severe dry cough,General,Cough,3,10
+i have shoulder pain after doing any home work.,Pain,Shoulder pain,3,9
+"i have whooping cough with excess mucous, need mucolytic.",General,Cough,3,7
+i hit the ground when trying to shoot a basketball,Pain,Injury from sports,3,9
+"i walked a long for 3 km, i feel pain in my foot like foot ache",Pain,Foot ache,3,8
+"i was diagnosed with pneumonia, i can't breath easily.",Emergency,Hard to breath,1,10
+"i was injured during football match, i was diagnosed with Cruciate ligament",Pain,Injury from sports,3,10
+"i was playing basketball yesterday, i have sprained ankle",Pain,Injury from sports,3,9
+i was playing football and injuried with joint pain.,Pain,Joint pain,3,11
+i was travelling by ship and i feel dizzy.,Emergency,Feeling dizzy,2,10
+i was watching tv and suddenly have blurry vision,General,Blurry vision,3,7
+i'm disappointed,General,Emotional pain,3,10
+i'm injured i can't play sports,Pain,Injury from sports,3,10
+is my cut infected or just healing?,Emergency,Infected wound,2,12
+itch at front and center of scalp,General,Hair falling out,4,10
+"laceration, rupture or opening in the skin",Emergency,Open wound,1,6
+longitudinal burning line across back with hard respiratory movements,Pain,Back pain,3,9
+my abdominal muscles have great pain since i was at GYM,Pain,Muscle pain,3,8
+my ankle is hurting me,Pain,Joint pain,3,10
+my back hurts me a lot,Pain,Back pain,3,8
+"my cbc report indicate 10 hb, i feel tired of little work.",Assistance,Body feels weak,2,9
+"my child has cough all night, she can't sleep",General,Cough,3,11
+my ear hurts me badly,Pain,Ear ache,3,10
+my hair falling out,General,Hair falling out,4,9
+my hair isn't well,General,Hair falling out,4,10
+my hand open wound got infected,Emergency,Infected wound,2,6
+my head hurts me badly,Pain,Head ache,3,9
+my heart hurts me,Emergency,Heart hurts,1,9
+my left side aches much,Pain,Internal pain,3,11
+my neck hurts me and i can't look down or up,Pain,Neck pain,3,10
+my shoulder is hurting me,Pain,Shoulder pain,3,8
+my temperature dropped and my body get synosed,Assistance,Feeling cold,3,9
+red flushes accompanied with itchy,General,Skin issue,4,7
+"redness, swelling, and difficulty walking",Pain,Knee pain,3,10
+severe pain in the upper left side of chest and may have pain to back,Emergency,Heart hurts,1,8
+standing less than five minutes and my back start to ache,Pain,Back pain,3,11
+stiffness inability to look right or left except by moving the whole body,Pain,Neck pain,3,9
+"surgical wounds red, firing pus, painful and hot to the touch",Emergency,Infected wound,2,10
+there is a red stain in my skin,General,Skin issue,4,8
+there is acne on my face,General,Acne,4,9
+there is too much pain when i move my arm,Emergency,Heart hurts,1,1
+there pain in my foot,Pain,Foot ache,3,11
+using hair tonic,General,Hair falling out,4,8
+when i extend my leg there is pain in knee joint,Pain,Joint pain,3,9
+"when i get up, i feel dizzy and fall down.",Emergency,Feeling dizzy,2,9
+when i raise my hand i feel pain in my shoulder.,Pain,Shoulder pain,3,10
+when i wake up in the morning i feel dizzy,Emergency,Feeling dizzy,2,9
+when i was washing my hair it was falling out heavily,General,Hair falling out,4,8
