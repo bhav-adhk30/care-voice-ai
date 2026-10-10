@@ -1,0 +1,34 @@
+{
+  "09_button_press_no_speech.wav": {
+    "audio_path": "09_button_press_no_speech.wav",
+    "bed": null,
+    "duration_s": 2.0,
+    "transcript": "",
+    "asr_confidence": null,
+    "asr_trusted": false,
+    "speech_present": false,
+    "speech_reason": "signal level below floor (RMS 0.00e+00 < 2.00e-03)",
+    "request_class": "Unclassified",
+    "class_probs": {},
+    "class_confidence": 0.0,
+    "base_priority": 2,
+    "arousal": 0.0,
+    "distress": 0.0,
+    "arousal_fired": false,
+    "distress_fired": false,
+    "final_priority": 2,
+    "escalated": false,
+    "reason": "no speech detected (signal level below floor (RMS 0.00e+00 < 2.00e-03)); routed as an unclassified call, equivalent to a conventional call button",
+    "latency_ms": {
+      "load": 6.0,
+      "denoise": 0.2,
+      "trim": 0.0,
+      "asr": 0.0,
+      "text_classifier": 0.0,
+      "wavlm": 0.0,
+      "acoustic_heads": 0.0,
+      "rules": 0.0,
+      "total": 6.3
+    }
+  }
+}
