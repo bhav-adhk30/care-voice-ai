@@ -72,9 +72,15 @@ DISTRESS_IS_BINARY = True
 ANGER_NOT_SEPARABLE_ACOUSTICALLY = True
 
 
-# Pipeline sentinel for a call with no usable speech. NOT a trained class: it is
+# Pipeline sentinel for a call with no transcript. NOT a trained class: it is
 # deliberately absent from mapping.CLASSES and CLASS_BASE_PRIORITY, so nothing that
-# indexes the label space can see it. Only Rule 0 may receive it.
+# indexes the label space can see it.
+#
+# The condition is an empty transcript, not the speech guard. A wordless groan
+# passes the guard on energy but gives Whisper nothing to decode; running
+# ClinicalBERT on "" would assign it a class out of distribution (it predicted
+# Emergency). Instead it is Unclassified at P_NO_SPEECH and the acoustic rules
+# still apply, so a distressed groan goes Unclassified P2 -> distress gate -> P1.
 UNCLASSIFIED = "Unclassified"
 
 
@@ -121,6 +127,8 @@ def apply_rules(
     speech_present: bool = True,
     speech_reason: str = "",
     cfg: dict = CONFIG,
+    *,
+    transcript: str,
 ) -> Decision:
     """
     Combine the two branches into a final priority.
@@ -132,18 +140,24 @@ def apply_rules(
     Lower priority number is more urgent.
 
     base_priority    1..4, from CLASS_BASE_PRIORITY via the predicted class
-    request_class    "Emergency" | "Pain" | "Assistance" | "General"
+    request_class    "Emergency" | "Pain" | "Assistance" | "General", or
+                     UNCLASSIFIED exactly when the transcript is empty
     class_confidence softmax probability of the predicted class, 0..1
     arousal          calibrated arousal-head score, 0..1
     distress         calibrated distress-gate score, 0..1
     asr_confidence   mean token log-probability from Whisper, or None
     speech_present   False when preprocess.speech_present found no usable signal
     speech_reason    why speech_present was False, shown on the dashboard
+    transcript       the ASR output; required, to enforce the invariant below
     """
-    # Not a bare assert: this must hold under python -O too.
-    if request_class == UNCLASSIFIED and speech_present:
-        raise ValueError(f"{UNCLASSIFIED!r} is only valid with speech_present=False; "
-                         "the text branch must have produced a real class")
+    # Invariant, both directions: Unclassified <=> empty transcript. Raised rather
+    # than asserted so it also holds under python -O.
+    empty = transcript.strip() == ""
+    if (request_class == UNCLASSIFIED) != empty:
+        raise ValueError(
+            f"request_class={request_class!r} with "
+            f"{'an empty' if empty else 'a non-empty'} transcript: {UNCLASSIFIED!r} "
+            "is required exactly when the transcript is empty")
 
     # --- Rule 0: no usable speech -------------------------------------------
     # Short-circuits everything. Both branches are reading noise: the text
@@ -245,23 +259,28 @@ if __name__ == "__main__":
     cases = [
         ("calm knee pain",
          dict(base_priority=3, request_class="Pain", class_confidence=0.95,
-              arousal=0.02, distress=0.01, asr_confidence=-0.2)),
+              arousal=0.02, distress=0.01, asr_confidence=-0.2,
+              transcript="my knee hurts when i bend it")),
         ("same phrase, distressed voice",
          dict(base_priority=3, request_class="Pain", class_confidence=0.95,
-              arousal=0.40, distress=0.02, asr_confidence=-0.2)),
-        ("wordless groan, no usable transcript",
-         dict(base_priority=4, request_class="General", class_confidence=0.30,
-              arousal=0.60, distress=0.85, asr_confidence=-1.8)),
+              arousal=0.40, distress=0.02, asr_confidence=-0.2,
+              transcript="my knee hurts when i bend it")),
+        ("wordless groan, no transcript",
+         dict(base_priority=CONFIG["P_NO_SPEECH"], request_class=UNCLASSIFIED,
+              class_confidence=0.0, arousal=0.60, distress=0.85,
+              asr_confidence=-10.0, transcript="")),
         ("calm chest pain",
          dict(base_priority=1, request_class="Emergency", class_confidence=0.88,
-              arousal=0.01, distress=0.00, asr_confidence=-0.15)),
+              arousal=0.01, distress=0.00, asr_confidence=-0.15,
+              transcript="i have chest pain")),
         ("frustrated but not unwell",
          dict(base_priority=4, request_class="General", class_confidence=0.91,
-              arousal=0.35, distress=0.05, asr_confidence=-0.20)),
+              arousal=0.35, distress=0.05, asr_confidence=-0.20,
+              transcript="my skin has been itching all day")),
         ("button press, no speech",
-         dict(base_priority=4, request_class="General", class_confidence=0.0,
-              arousal=0.03, distress=0.9996, asr_confidence=-5.0,
-              speech_present=False,
+         dict(base_priority=CONFIG["P_NO_SPEECH"], request_class=UNCLASSIFIED,
+              class_confidence=0.0, arousal=0.0, distress=0.0, asr_confidence=None,
+              transcript="", speech_present=False,
               speech_reason="signal level below floor (RMS 1.1e-05 < 2.0e-03)")),
     ]
     for name, kw in cases:

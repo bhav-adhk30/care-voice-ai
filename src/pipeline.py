@@ -264,27 +264,31 @@ class CareVoicePipeline:
         has_speech, speech_reason = speech_present(meta, len(wav), sr=CONFIG["sr"])
 
         # --- text branch ---
-        # Skipped entirely when there is no speech. ClinicalBERT on an empty string
-        # is not a fallback, it is the same out-of-distribution problem as the
-        # distress gate on silence: it predicted Emergency on a silent clip.
-        # UNCLASSIFIED is a pipeline sentinel, not a trained class; it is not in
-        # mapping.CLASSES and the dashboard renders it as a grey badge.
+        # ClinicalBERT runs only on a non-empty transcript. On an empty string it is
+        # out of distribution exactly as the distress gate is on silence (it
+        # predicted Emergency), so an empty transcript - no speech at all, or a
+        # wordless groan Whisper cannot decode - is UNCLASSIFIED at P_NO_SPEECH.
+        # The acoustic branch still runs for a groan, so the distress gate can take
+        # it to P1. UNCLASSIFIED is a pipeline sentinel, not a trained class; the
+        # dashboard renders it as a grey badge.
         if has_speech:
             t0 = time.perf_counter()
             transcript, asr_confidence = self._transcribe(wav)
             lat["asr"] = _ms(t0)
+        else:
+            transcript, asr_confidence = "", None
+            lat["asr"] = 0.0
 
-            t0 = time.perf_counter()
+        t0 = time.perf_counter()
+        if transcript.strip():
             class_probs = self._classify(transcript)
             request_class = max(class_probs, key=class_probs.get)
             class_confidence = class_probs[request_class]
             base_priority = class_base_priority(request_class)
-            lat["text_classifier"] = _ms(t0)
         else:
-            transcript, asr_confidence = "", None
             request_class, class_probs, class_confidence = UNCLASSIFIED, {}, 0.0
             base_priority = RULES_CONFIG["P_NO_SPEECH"]
-            lat["asr"] = lat["text_classifier"] = 0.0
+        lat["text_classifier"] = _ms(t0)
 
         # --- acoustic branch ---
         # Skipped entirely when there is no speech. The distress gate scores a WavLM
@@ -315,6 +319,7 @@ class CareVoicePipeline:
             asr_confidence=asr_confidence,
             speech_present=has_speech,
             speech_reason=speech_reason,
+            transcript=transcript,
         )
         lat["rules"] = _ms(t0)
         lat["total"] = _ms(t_all)
