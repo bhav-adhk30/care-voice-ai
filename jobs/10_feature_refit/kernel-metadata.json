@@ -1,0 +1,11 @@
+{
+  "id": "bhavishyaadhikari/care-voice-feature-refit",
+  "title": "care-voice-feature-refit",
+  "code_file": "10_feature_refit.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": ["bhavishyaadhikari/care-voice-code", "ejlok1/cremad"]
+}
