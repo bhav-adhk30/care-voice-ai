@@ -1,0 +1,31 @@
+{
+  "wer_full_corpus": 0.099,
+  "perfect_transcripts": 0.574,
+  "ASR_MIN": -0.4934,
+  "asr_gate": {
+    "below_bad_rate": 0.183,
+    "above_bad_rate": 0.015,
+    "accuracy_lowest_quintile": 0.707,
+    "accuracy_other": 0.86
+  },
+  "note": "all figures below evaluated per recording (n=6661) for comparability",
+  "tfidf_phrase_level": {
+    "macro_f1": 0.824,
+    "emergency_recall": 0.797
+  },
+  "clinicalbert_clean": {
+    "macro_f1": 0.866,
+    "emergency_recall": 0.895,
+    "emergency_fn": 137
+  },
+  "clinicalbert_on_asr": {
+    "macro_f1": 0.803,
+    "emergency_recall": 0.799,
+    "emergency_fn": 262
+  },
+  "asr_cost": {
+    "macro_f1": -0.063,
+    "emergency_recall": -0.096,
+    "extra_missed_emergencies": 125
+  }
+}
