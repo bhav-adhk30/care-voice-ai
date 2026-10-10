@@ -2,12 +2,32 @@
 
 Three file edits plus one calibration script. Apply in order.
 
-The problem: a 5 ms near-silent clip scored 0.9996 on the distress gate and was
-routed to P1. Root cause is two things stacking — `load_audio` normalises to
-−23 LUFS, which applies huge gain to a near-silent signal, and the resulting
-amplified noise floor lands somewhere the distress gate was never trained to
-see. Then `apply_rules` Rule 1 fires (no transcript → untrusted ASR, distress
-fired → P1).
+> **Correction (after applying this patch).** The root-cause paragraph below is
+> wrong about the mechanism, and is kept only as the original decision record.
+> The 5 ms clip was pure digital zeros. `normalize_loudness` returns a signal
+> with −inf loudness unchanged, so **no gain was applied**. The pipeline then
+> zero-pads to the 4 s acoustic window, so the distress gate scored a WavLM
+> embedding of four seconds of silence, at 0.9996.
+>
+> The actual cause is an out-of-distribution input. The gate's negatives were
+> CREMA-D neutral speech and other VIVAE vocalisations. Nothing in its training
+> set was an absence of signal. A logistic regression on 768-d features
+> extrapolates confidently outside its support, in an arbitrary direction.
+> ClinicalBERT on the resulting empty transcript has the same problem: it
+> predicted Emergency. The guard below is still the right fix, and the text
+> branch is now skipped as well (request class `"Unclassified"`).
+>
+> A further issue follows for notebook 09. Notebook 04 trained on the same 4 s
+> window, but `degrade()` added Gaussian noise over the whole window after
+> padding. So the heads saw noise-filled padding during training, never digital
+> zeros. Short clips at inference carry zero-padding the heads never saw.
+
+The problem (original text, mechanism superseded by the correction above): a 5
+ms near-silent clip scored 0.9996 on the distress gate and was routed to P1.
+Root cause is two things stacking — `load_audio` normalises to −23 LUFS, which
+applies huge gain to a near-silent signal, and the resulting amplified noise
+floor lands somewhere the distress gate was never trained to see. Then
+`apply_rules` Rule 1 fires (no transcript → untrusted ASR, distress fired → P1).
 
 The fix routes a no-speech call at a fixed unclassified priority and suppresses
 both acoustic scores. Do not fix it by filtering on the empty transcript: a
@@ -358,25 +378,33 @@ has broken the thing the system exists to catch.
 
 ## For the paper
 
-Limitations, one line:
+Limitations (rewritten after the correction above):
 
-> A call carrying no intelligible speech — a patient leaning on the call button,
-> or a press with no vocalisation — provides no input to either branch. The
-> system detects this from signal level and duration before classification,
-> suppresses both acoustic scores and routes the call at a fixed unclassified
-> priority, which is the behaviour of the conventional call button it replaces.
-> It does not attempt to infer urgency from a signal that contains none.
+> A call carrying no usable signal, such as a press with no vocalisation, lies
+> outside the training distribution of both branches. The distress gate's
+> negatives were neutral speech and non-distress vocalisations; it never saw an
+> absence of signal, and it scores a WavLM embedding of silence at 0.9996 — a
+> confident extrapolation with no meaning. ClinicalBERT likewise assigns a
+> class to an empty transcript. The system therefore detects this input from
+> pre-normalisation signal level and post-trim duration before either branch
+> runs, skips both branches, and routes the call at a fixed unclassified
+> priority (P2): the behaviour of the conventional call button it replaces.
+> It does not infer urgency from a signal that contains none.
 
-Worth stating in the viva as well. The honest version of this finding is that
-the distress gate scores a normalised noise floor at 0.9996, which is what any
-classifier does off its training distribution, and the guard is the standard
-answer: detect the out-of-distribution input rather than trust the score.
+Viva answer: the distress gate scores silence at 0.9996 because silence is
+nowhere near either of its training classes. That is the standard
+out-of-distribution failure of any discriminative classifier. The standard
+answer is to detect the input you were never trained on rather than trust the
+score, and that is what the guard does. (Do not mention loudness gain: it plays
+no part, since zeros stay zeros through normalisation.)
 
----
+The guard thresholds are unmeasured placeholders until
+`scripts/calibrate_speech_guard.py` has been run on the corpora.
 
 ## Demo clip
 
 Add a ninth clip, `09_button_press_no_speech.wav` — 2 s of room tone, or just
-digital silence. Show it landing at P2 with "no speech detected". It is the
+digital silence. Show it landing at P2 with "no speech detected" and an
+"Unclassified" grey badge. It is the
 clip that answers the obvious examiner question about what happens when the
 model has nothing to work with.
