@@ -5,3 +5,4 @@ kaggle.json
 .kaggle/
 __pycache__/
 .DS_Store
+.venv/

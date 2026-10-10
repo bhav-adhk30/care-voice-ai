@@ -129,7 +129,8 @@ def pad_or_crop(wav: np.ndarray, n_samples: int) -> np.ndarray:
     return np.pad(wav, (0, n_samples - len(wav)))
 
 
-def load_audio(path, target_sr=16000, target_lufs=-23.0, max_seconds=None):
+def load_audio(path, target_sr=16000, target_lufs=-23.0, max_seconds=None,
+               return_meta: bool = False):
     """Load → mono → resample to 16 kHz → loudness normalise → optional pad/crop.
     Returns float32 numpy array. Every corpus goes through this. No exceptions.
 
@@ -148,9 +149,14 @@ def load_audio(path, target_sr=16000, target_lufs=-23.0, max_seconds=None):
         If given, the output is exactly `round(max_seconds * target_sr)` samples: cropped
         from the start or zero-padded at the end. If None, natural length is kept.
 
+    return_meta : bool
+        If True, also return a dict of raw (pre-normalisation) signal statistics for
+        `speech_present`. Default False, so existing callers are unaffected.
+
     Returns
     -------
     np.ndarray, shape (n_samples,), dtype float32, nominally in [-1, 1].
+    With return_meta=True: (wav, {"raw_rms", "raw_peak", "raw_duration_s"}).
 
     Notes
     -----
@@ -160,11 +166,21 @@ def load_audio(path, target_sr=16000, target_lufs=-23.0, max_seconds=None):
     data, sr = _read(os.fspath(path))
     wav = to_mono(data)
     wav = resample(wav, sr, target_sr)
+    # Measured before normalisation. After -23 LUFS the gain applied to a
+    # near-silent clip is enormous, so post-normalisation level carries no
+    # information about whether anyone actually spoke.
+    raw_rms = float(np.sqrt(np.mean(wav ** 2))) if len(wav) else 0.0
+    raw_peak = float(np.max(np.abs(wav))) if len(wav) else 0.0
+    raw_dur = len(wav) / target_sr
     if target_lufs is not None:
         wav = normalize_loudness(wav, target_sr, target_lufs)
     if max_seconds is not None:
         wav = pad_or_crop(wav, int(round(max_seconds * target_sr)))
-    return wav.astype(np.float32)
+    wav = wav.astype(np.float32)
+    if return_meta:
+        return wav, {"raw_rms": raw_rms, "raw_peak": raw_peak,
+                     "raw_duration_s": raw_dur}
+    return wav
 
 
 # --------------------------------------------------------------------------------------
@@ -398,3 +414,42 @@ def trim(wav, sr=16000, top_db=None, keep_pad_ms=None):
     if len(out) < int(0.1 * sr):      # under 100 ms left: trimming went wrong
         return wav
     return out
+
+
+# ---------------------------------------------------------------------------
+# Minimum-speech guard
+#
+# Thresholds below are placeholders. Run scripts/calibrate_speech_guard.py and
+# replace them with the measured values before using this in any result.
+# ---------------------------------------------------------------------------
+
+SPEECH_GUARD = {
+    # UNMEASURED PLACEHOLDER. Pre-normalisation RMS floor. Set below the minimum
+    # observed across all four corpora, with margin.
+    "MIN_RAW_RMS": 2.0e-3,
+    # UNMEASURED PLACEHOLDER. Seconds of audio surviving trim(). A VIVAE groan is
+    # ~1 s; a button press with no speech leaves almost nothing.
+    "MIN_TRIMMED_S": 0.35,
+}
+
+
+def speech_present(meta: dict, trimmed_samples: int, sr: int = 16000,
+                   cfg: dict = SPEECH_GUARD) -> tuple[bool, str]:
+    """
+    Is there enough signal here for either branch to mean anything?
+
+    Returns (present, reason). `meta` is the dict from load_audio(return_meta=True),
+    `trimmed_samples` is len(wav) after trim().
+
+    Checks energy and duration, never the transcript - a wordless cry has no
+    transcript and must still be treated as a real call.
+    """
+    trimmed_s = trimmed_samples / sr
+
+    if meta["raw_rms"] < cfg["MIN_RAW_RMS"]:
+        return False, (f"signal level below floor "
+                       f"(RMS {meta['raw_rms']:.2e} < {cfg['MIN_RAW_RMS']:.2e})")
+    if trimmed_s < cfg["MIN_TRIMMED_S"]:
+        return False, (f"too little audio after silence trimming "
+                       f"({trimmed_s:.2f}s < {cfg['MIN_TRIMMED_S']}s)")
+    return True, ""
