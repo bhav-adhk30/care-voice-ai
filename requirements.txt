@@ -4,11 +4,12 @@ transformers
 librosa
 soundfile
 pyloudnorm
-numpy
+numpy>=2.0,<2.3      # heads were pickled under NumPy 2; 1.x cannot unpickle them
 pandas
-scikit-learn
+scikit-learn==1.6.1  # must match the version that pickled models/*.joblib
 jiwer
 faster-whisper
+huggingface_hub
 deepfilternet
 streamlit
 matplotlib

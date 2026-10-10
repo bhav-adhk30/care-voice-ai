@@ -51,6 +51,13 @@ CONFIG = {
     # Waiting time after which a call is escalated one level, in seconds.
     # Prevents low-priority requests starving behind a busy ward.
     "STARVATION_SECONDS": {1: 60, 2: 300, 3: 900, 4: 1800},
+
+    # A call with no usable speech carries no triage information at all. It is
+    # routed at this fixed level: the behaviour of a conventional nurse-call
+    # button, which signals a press and nothing more. Neither suppressed to the
+    # bottom of the queue nor escalated on an acoustic score computed from a
+    # noise floor.
+    "P_NO_SPEECH": 2,
 }
 
 
@@ -75,6 +82,8 @@ class Decision:
     distress_fired: bool
     arousal_fired: bool
     asr_trusted: bool
+    speech_present: bool = True
+    acoustic_used: bool = True
 
     def to_dict(self):
         return asdict(self)
@@ -103,6 +112,8 @@ def apply_rules(
     arousal: float,
     distress: float,
     asr_confidence: Optional[float] = None,
+    speech_present: bool = True,
+    speech_reason: str = "",
     cfg: dict = CONFIG,
 ) -> Decision:
     """
@@ -120,7 +131,32 @@ def apply_rules(
     arousal          calibrated arousal-head score, 0..1
     distress         calibrated distress-gate score, 0..1
     asr_confidence   mean token log-probability from Whisper, or None
+    speech_present   False when preprocess.speech_present found no usable signal
+    speech_reason    why speech_present was False, shown on the dashboard
     """
+    # --- Rule 0: no usable speech -------------------------------------------
+    # Short-circuits everything. Both branches are reading noise: the text
+    # branch has no transcript and the acoustic heads were never trained on a
+    # normalised noise floor, where the distress gate scores near 1.0.
+    #
+    # Routed at P_NO_SPEECH and returned immediately, so Rule 1 (untrusted
+    # transcript + distress -> P1) cannot fire on an empty clip. A wordless
+    # groan still reaches Rule 1, because it passes this guard on energy.
+    if not speech_present:
+        return Decision(
+            final_priority=cfg["P_NO_SPEECH"],
+            base_priority=base_priority,
+            reason=("no speech detected" + (f" ({speech_reason})" if speech_reason else "")
+                    + "; routed as an unclassified call, equivalent to a "
+                      "conventional call button"),
+            escalated=False,
+            distress_fired=False,
+            arousal_fired=False,
+            asr_trusted=False,
+            speech_present=False,
+            acoustic_used=False,
+        )
+
     priority = base_priority
     reasons = []
 
@@ -175,6 +211,8 @@ def apply_rules(
         distress_fired=distress_fired,
         arousal_fired=arousal_fired,
         asr_trusted=asr_trusted,
+        speech_present=True,
+        acoustic_used=True,
     )
 
 
@@ -209,6 +247,11 @@ if __name__ == "__main__":
         ("frustrated but not unwell",
          dict(base_priority=4, request_class="General", class_confidence=0.91,
               arousal=0.35, distress=0.05, asr_confidence=-0.20)),
+        ("button press, no speech",
+         dict(base_priority=4, request_class="General", class_confidence=0.0,
+              arousal=0.03, distress=0.9996, asr_confidence=-5.0,
+              speech_present=False,
+              speech_reason="signal level below floor (RMS 1.1e-05 < 2.0e-03)")),
     ]
     for name, kw in cases:
         d = apply_rules(**kw)
