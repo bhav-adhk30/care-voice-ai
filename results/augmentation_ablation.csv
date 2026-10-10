@@ -1,0 +1,6 @@
+augmentation,fa_at_90_recall
+none (clean),0.441
+real ESC-50 ward noise only,0.412
+aggressive synthetic,0.329
+lowpass + real noise + gain,0.33
+lowpass + gaussian + gain (chosen),0.141

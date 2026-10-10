@@ -1,0 +1,18 @@
+{
+  "gate": "passed",
+  "operating_point": {
+    "threshold": 0.105,
+    "fear_recall": 0.6,
+    "false_alarm": 0.038
+  },
+  "fa_at_90pct_recall": {
+    "clean": 0.441,
+    "augmented": 0.141
+  },
+  "corpus_id_acc": {
+    "clean": 0.997,
+    "augmented": 0.999
+  },
+  "emotion_clf_macro_f1": 0.662,
+  "fear_f1": 0.575
+}
