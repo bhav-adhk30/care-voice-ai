@@ -41,7 +41,7 @@ import torch
 from src.mapping import class_base_priority
 from src.preprocess import denoise, load_audio, pad_or_crop, speech_present, trim
 from src.rules import CONFIG as RULES_CONFIG
-from src.rules import apply_rules
+from src.rules import UNCLASSIFIED, apply_rules
 
 CONFIG = {
     "sr": 16000,
@@ -56,11 +56,21 @@ CONFIG = {
 
     # ASR. int8 on CPU is ~4x faster than the HF pipeline (CLAUDE.md section 9).
     "whisper_compute_type": "int8",
-    "whisper_beam_size": 5,
-    "whisper_language": "en",
-    # Off by default: a VAD would drop a wordless groan before Whisper sees it, and the
-    # empty-transcript path below already handles "no speech".
-    "whisper_vad_filter": False,
+    # Decoder settings. ASR_MIN in rules.py is a percentile of the log-prob these
+    # produce, so notebooks/09_threshold_recheck.ipynb measures it through
+    # transcribe() below with exactly this dict. Change one, re-measure the other.
+    "whisper_decode": {
+        "language": "en",
+        "beam_size": 5,
+        # A single temperature disables faster-whisper's fallback ladder. A segment
+        # retried at a higher temperature has a log-prob that is not comparable to a
+        # first-pass one, which would make asr_confidence meaningless against ASR_MIN.
+        "temperature": 0.0,
+        "condition_on_previous_text": False,
+        # Off: a VAD would drop a wordless groan before Whisper sees it. "No speech"
+        # is handled by preprocess.speech_present instead.
+        "vad_filter": False,
+    },
     # No speech decoded at all: treat the transcript as maximally untrusted. Any value
     # below rules.CONFIG["ASR_MIN"] works; this one is JSON-safe, unlike -inf.
     "empty_transcript_logprob": -10.0,
@@ -83,6 +93,43 @@ CONFIG = {
 
 def _ms(t0: float) -> float:
     return round((time.perf_counter() - t0) * 1000.0, 1)
+
+
+# Module-level so notebooks can measure thresholds through the exact code the
+# pipeline runs, rather than a copy of it.
+
+def transcribe(asr, wav: np.ndarray) -> tuple[str, float, list]:
+    """
+    Returns (transcript, asr_confidence, segments).
+
+    asr_confidence is the mean log-probability over every decoded token: each
+    segment's avg_logprob weighted by its token count. If nothing is decoded it is
+    CONFIG["empty_transcript_logprob"], below ASR_MIN, so the transcript is untrusted.
+    """
+    segments, _ = asr.transcribe(wav, **CONFIG["whisper_decode"])
+    segments = list(segments)  # the generator is what actually runs the decoder
+    text = " ".join(s.text.strip() for s in segments).strip()
+    if not text:
+        return "", CONFIG["empty_transcript_logprob"], segments
+    n_tok = np.array([max(len(s.tokens), 1) for s in segments], dtype=float)
+    lp = np.array([s.avg_logprob for s in segments], dtype=float)
+    return text, float((lp * n_tok).sum() / n_tok.sum()), segments
+
+
+@torch.no_grad()
+def embed(feature_extractor, wavlm, wav: np.ndarray, device: str = "cpu") -> np.ndarray:
+    """Frozen WavLM Base+, last hidden state mean-pooled over time -> (1, 768).
+
+    Fixed window, cropped from the start and zero-padded at the end - the same
+    window notebook 04 used to train both heads. Note that training then added
+    Gaussian noise over the whole window, padding included (degrade()), so the
+    heads saw noise-filled padding, never digital zeros. notebooks/09 measures
+    what that does to the scores."""
+    win = pad_or_crop(wav, int(round(CONFIG["acoustic_window_s"] * CONFIG["sr"])))
+    inp = feature_extractor(win.astype(np.float32), sampling_rate=CONFIG["sr"],
+                            return_tensors="pt")
+    h = wavlm(inp.input_values.to(device)).last_hidden_state
+    return h.mean(dim=1).float().cpu().numpy()
 
 
 class CareVoicePipeline:
@@ -176,22 +223,8 @@ class CareVoicePipeline:
     # ------------------------------------------------------------------ branches
 
     def _transcribe(self, wav: np.ndarray) -> tuple[str, float]:
-        """Returns (transcript, mean token log-probability over the whole utterance)."""
-        segments, _ = self.asr.transcribe(
-            wav,
-            language=CONFIG["whisper_language"],
-            beam_size=CONFIG["whisper_beam_size"],
-            vad_filter=CONFIG["whisper_vad_filter"],
-            condition_on_previous_text=False,
-        )
-        segments = list(segments)  # the generator is what actually runs the decoder
-        text = " ".join(s.text.strip() for s in segments).strip()
-        if not text:
-            return "", CONFIG["empty_transcript_logprob"]
-        # Token-weighted mean of segment avg_logprob = mean log-prob over all tokens.
-        n_tok = np.array([max(len(s.tokens), 1) for s in segments], dtype=float)
-        lp = np.array([s.avg_logprob for s in segments], dtype=float)
-        return text, float((lp * n_tok).sum() / n_tok.sum())
+        text, logprob, _ = transcribe(self.asr, wav)
+        return text, logprob
 
     @torch.no_grad()
     def _classify(self, transcript: str) -> dict[str, float]:
@@ -200,15 +233,8 @@ class CareVoicePipeline:
         probs = torch.softmax(self.bert(**enc).logits, dim=-1)[0].cpu().numpy()
         return {c: float(p) for c, p in zip(self.classes, probs)}
 
-    @torch.no_grad()
     def _embed(self, wav: np.ndarray) -> np.ndarray:
-        """Frozen WavLM Base+, last hidden state mean-pooled over time -> (1, 768).
-        Matches the extraction used to train both heads."""
-        win = pad_or_crop(wav, int(round(CONFIG["acoustic_window_s"] * CONFIG["sr"])))
-        inp = self.feature_extractor(win.astype(np.float32), sampling_rate=CONFIG["sr"],
-                                     return_tensors="pt")
-        h = self.wavlm(inp.input_values.to(self.device)).last_hidden_state
-        return h.mean(dim=1).float().cpu().numpy()
+        return embed(self.feature_extractor, self.wavlm, wav, self.device)
 
     # ------------------------------------------------------------------ entry point
 
@@ -238,22 +264,33 @@ class CareVoicePipeline:
         has_speech, speech_reason = speech_present(meta, len(wav), sr=CONFIG["sr"])
 
         # --- text branch ---
-        t0 = time.perf_counter()
-        transcript, asr_confidence = self._transcribe(wav)
-        lat["asr"] = _ms(t0)
+        # Skipped entirely when there is no speech. ClinicalBERT on an empty string
+        # is not a fallback, it is the same out-of-distribution problem as the
+        # distress gate on silence: it predicted Emergency on a silent clip.
+        # UNCLASSIFIED is a pipeline sentinel, not a trained class; it is not in
+        # mapping.CLASSES and the dashboard renders it as a grey badge.
+        if has_speech:
+            t0 = time.perf_counter()
+            transcript, asr_confidence = self._transcribe(wav)
+            lat["asr"] = _ms(t0)
 
-        t0 = time.perf_counter()
-        class_probs = self._classify(transcript)
-        request_class = max(class_probs, key=class_probs.get)
-        class_confidence = class_probs[request_class]
-        base_priority = class_base_priority(request_class)
-        lat["text_classifier"] = _ms(t0)
+            t0 = time.perf_counter()
+            class_probs = self._classify(transcript)
+            request_class = max(class_probs, key=class_probs.get)
+            class_confidence = class_probs[request_class]
+            base_priority = class_base_priority(request_class)
+            lat["text_classifier"] = _ms(t0)
+        else:
+            transcript, asr_confidence = "", None
+            request_class, class_probs, class_confidence = UNCLASSIFIED, {}, 0.0
+            base_priority = RULES_CONFIG["P_NO_SPEECH"]
+            lat["asr"] = lat["text_classifier"] = 0.0
 
         # --- acoustic branch ---
-        # Skipped entirely when there is no speech. Running the heads on a
-        # normalised noise floor produces a confident score with no meaning (the
-        # distress gate gave 0.9996 on a 5 ms clip), and the dashboard should show
-        # 0.0 rather than that number.
+        # Skipped entirely when there is no speech. The distress gate scores a WavLM
+        # embedding of pure silence at 0.9996: silence lies outside both of its
+        # training classes and the logistic regression extrapolates confidently in
+        # an arbitrary direction. The dashboard shows 0.0 rather than that number.
         if has_speech:
             t0 = time.perf_counter()
             emb = self._embed(wav)

@@ -72,6 +72,12 @@ DISTRESS_IS_BINARY = True
 ANGER_NOT_SEPARABLE_ACOUSTICALLY = True
 
 
+# Pipeline sentinel for a call with no usable speech. NOT a trained class: it is
+# deliberately absent from mapping.CLASSES and CLASS_BASE_PRIORITY, so nothing that
+# indexes the label space can see it. Only Rule 0 may receive it.
+UNCLASSIFIED = "Unclassified"
+
+
 @dataclass
 class Decision:
     """Everything the dashboard needs to explain itself."""
@@ -134,6 +140,11 @@ def apply_rules(
     speech_present   False when preprocess.speech_present found no usable signal
     speech_reason    why speech_present was False, shown on the dashboard
     """
+    # Not a bare assert: this must hold under python -O too.
+    if request_class == UNCLASSIFIED and speech_present:
+        raise ValueError(f"{UNCLASSIFIED!r} is only valid with speech_present=False; "
+                         "the text branch must have produced a real class")
+
     # --- Rule 0: no usable speech -------------------------------------------
     # Short-circuits everything. Both branches are reading noise: the text
     # branch has no transcript and the acoustic heads were never trained on a
