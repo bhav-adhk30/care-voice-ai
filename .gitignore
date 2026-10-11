@@ -9,3 +9,6 @@ __pycache__/
 jobs/*/*.ipynb
 app/calls.db
 app/audit_log.db
+# Raw demo takes: team members' voices, kept out of git
+app/demo_clips/raw/*
+!app/demo_clips/raw/05_vivae_ATTRIBUTION.txt
