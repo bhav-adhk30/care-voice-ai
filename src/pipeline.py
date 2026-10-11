@@ -28,6 +28,7 @@ CLI, for a smoke test:
 
 from __future__ import annotations
 
+import gc
 import hashlib
 import json
 import os
@@ -149,10 +150,14 @@ def embed_clip(feature_extractor, wavlm, wav: np.ndarray, device: str = "cpu") -
 
 
 class CareVoicePipeline:
-    def __init__(self, model_dir="models", device="cpu"):
+    def __init__(self, model_dir="models", device="cpu", load_emotion=False):
+        """load_emotion: the text-emotion model is display-only (it never affects
+        priority) and costs 313 MB of weights, so it is off by default and not
+        loaded at all. set_emotion() turns it on or off in a running pipeline."""
         t0 = time.perf_counter()
         self.model_dir = Path(model_dir)
         self.device = device
+        self.emo_model = self.emo_tokenizer = self.emo_labels = None
 
         random.seed(CONFIG["seed"])
         np.random.seed(CONFIG["seed"])
@@ -160,6 +165,8 @@ class CareVoicePipeline:
 
         self._load_asr()
         self._load_text()
+        if load_emotion:
+            self._load_emotion()
         self._load_acoustic()
         if CONFIG["warmup"]:
             self._warmup()
@@ -198,6 +205,9 @@ class CareVoicePipeline:
         if self.bert.config.num_labels != len(self.classes):
             raise ValueError(f"classes.json has {len(self.classes)} classes, model has "
                              f"{self.bert.config.num_labels} outputs")
+
+    def _load_emotion(self):
+        from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
         emo_dir = self._path("emotion_dir")
         self.emo_tokenizer = AutoTokenizer.from_pretrained(emo_dir, local_files_only=True)
@@ -258,7 +268,34 @@ class CareVoicePipeline:
         self._acoustic(wav)
         self._transcribe(trim(wav, sr=CONFIG["sr"]))
         self._classify("warm up")
-        self._emotion("warm up")
+        if self.emo_model is not None:
+            self._emotion("warm up")
+
+    # ------------------------------------------------------------------ runtime switches
+
+    @property
+    def emotion_enabled(self) -> bool:
+        return self.emo_model is not None
+
+    def set_emotion(self, enabled: bool):
+        """Load or free the display-only emotion model in place, without reloading
+        anything else (a second pipeline would double the resident weights)."""
+        if enabled and self.emo_model is None:
+            self._load_emotion()
+            self._emotion("warm up")
+        elif not enabled and self.emo_model is not None:
+            self.emo_model = self.emo_tokenizer = self.emo_labels = None
+            gc.collect()
+        self.model_versions = self._model_versions()
+
+    def keep_warm(self) -> float:
+        """One dummy inference through every loaded model; returns ms. Touching the
+        weights keeps the OS from swapping them out between calls. It only helps
+        when the machine has free RAM: under memory pressure it just pushes other
+        processes (the browser) out instead. Called by the app's keep-warm switch."""
+        t0 = time.perf_counter()
+        self._warmup()
+        return _ms(t0)
 
     # ------------------------------------------------------------------ branches
 
@@ -286,9 +323,12 @@ class CareVoicePipeline:
         out = {}
         for key in ("arousal_head", "distress_gate"):
             out[key] = hashlib.sha256(self._path(key).read_bytes()).hexdigest()[:12]
-        for key, fname in (("bert_dir", "model.safetensors"), ("emotion_dir", "config.json")):
-            f = self._path(key) / fname
-            out[key] = hashlib.sha256(f.read_bytes()).hexdigest()[:12] if f.exists() else None
+        f = self._path("bert_dir") / "model.safetensors"
+        out["bert_dir"] = hashlib.sha256(f.read_bytes()).hexdigest()[:12] if f.exists() else None
+        out["emotion_dir"] = None
+        if self.emo_model is not None:
+            f = self._path("emotion_dir") / "config.json"
+            out["emotion_dir"] = hashlib.sha256(f.read_bytes()).hexdigest()[:12]
         return out
 
     def _acoustic(self, wav: np.ndarray) -> dict:
@@ -382,7 +422,8 @@ class CareVoicePipeline:
         # "I feel cold" scores anger 0.97, a plainly angry sentence 0.67, and 27 of
         # 706 genuine requests score above 0.5 (see rules.py).
         t0 = time.perf_counter()
-        sentiment = self._emotion(transcript) if transcript.strip() else {}
+        sentiment = (self._emotion(transcript)
+                     if transcript.strip() and self.emo_model is not None else {})
         sentiment_label = max(sentiment, key=sentiment.get) if sentiment else None
         text_anger = sentiment.get("anger")
         medication = medication_tag(transcript)
@@ -423,6 +464,7 @@ class CareVoicePipeline:
             "medication": medication,
             "sentiment": sentiment,
             "sentiment_label": sentiment_label,
+            "sentiment_enabled": self.emo_model is not None,
             "text_anger": text_anger,
             "base_priority": base_priority,
             "arousal": acoustic["arousal"],

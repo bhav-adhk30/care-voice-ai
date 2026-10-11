@@ -261,35 +261,48 @@ Lower number is more urgent.
 ```python
 # src/rules.py
 
-def apply_rules(base_priority, arousal, distress, asr_confidence):
+def apply_rules(base_priority, request_class, class_confidence, distress,
+                asr_confidence=None, energy_ok=True, non_speech_prob=None,
+                energy_reason="", cfg=CONFIG, *, transcript, asr_heard=None) -> Decision:
     """
-    base_priority   int 1..4   from PROMPT_TO_CLASS via the predicted class
-    arousal         float 0..1 calibrated output of the arousal head
-    distress        float 0..1 calibrated output of the distress gate
-    asr_confidence  float 0..1 mean token log-prob from Whisper, normalised
-
-    Returns (final_priority, reason).
     Takes the MAXIMUM urgency of the signals. Never an average.
+    Returns a Decision: final_priority, reason, rules_fired (R0..R4), and the
+    speech-guard inputs, so the dashboard and audit log can explain it.
     """
 ```
 
-Rules, applied in order:
+Rules, applied in order (thresholds: `DISTRESS_HIGH` 0.4028, `NON_SPEECH_HIGH` 0.90,
+`ASR_MIN` -0.4934; provenance in `rules.py`):
 
-1. If `distress > DISTRESS_HIGH`, floor the priority at P1.
-2. Else if `distress > DISTRESS_MED` or `arousal > AROUSAL_HIGH`, raise priority by one
-   level (minimum P2).
-3. If the predicted class is Emergency, never assign worse than P2 regardless of how calm
+0. **No speech** → P2 (`P_NO_SPEECH`), routed like a plain call button, and nothing else
+   runs. Either the energy pre-filter found digital silence, or all three hold:
+   `non_speech >= NON_SPEECH_HIGH`, Whisper returned nothing or a transcript below
+   `ASR_MIN`, and `distress < DISTRESS_HIGH`. Never decided by `non_speech` alone (it
+   dropped 7/32 intelligible TTS requests at 0.5), and never when distress fires (15/20
+   VIVAE groans score as non-speech).
+1. If `asr_confidence < ASR_MIN` and `distress >= DISTRESS_HIGH`, floor at P1. The
+   transcript cannot be trusted and the acoustic path is the only signal left: the
+   wordless-groan and the hallucination case.
+2. Else if `distress >= DISTRESS_HIGH`, floor at P1.
+3. *(Removed in v2.)* Arousal/fear no longer escalates: 14.5% fear recall at a 2%
+   false-alarm budget on medical speech. Fear is displayed only. There is no
+   `AROUSAL_HIGH` and no `DISTRESS_MED`; the gate is binary.
+4. If the predicted class is Emergency, never assign worse than P2 regardless of how calm
    the voice is.
-4. If `asr_confidence < ASR_MIN` and `distress > DISTRESS_MED`, treat as P1 — the
-   transcript cannot be trusted and the acoustic path is the only signal left.
 5. Nothing suppresses the distress gate, including anger (see §2.6).
+
+An empty transcript is always `"Unclassified"` (a pipeline sentinel, not a class) at
+P2, and `"Unclassified"` is only ever used for an empty transcript; `apply_rules` raises
+otherwise.
 
 Thresholds live in a config dict at the top of `rules.py`, not scattered through the code.
 Every escalation must return a human-readable `reason` string; the dashboard displays it.
 
-**Calibrate before combining.** The two heads are trained on different corpora and produce
-scores on incomparable scales. Fit a Platt scaler per head on its own held-out set and save
-it alongside the head. Skip this and one branch silently dominates.
+**Calibration.** The plan was a Platt scaler per head. In practice the branches never
+meet on a common scale: only the distress gate reaches the rule, as a binary decision at
+a threshold chosen on its own held-out operating curve
+(`results/operating_curve_distress_v2.csv`). The shipped heads are uncalibrated
+probabilities; if a second acoustic score ever feeds the rule again, calibrate first.
 
 ---
 
@@ -454,6 +467,24 @@ Assume no internet in the room.
 - Prefer file upload over live microphone as the primary path. Mic permissions and audio
   drivers fail more often than anything else in the system.
 - Record a screen capture of a successful full run as a last-resort backup.
+
+### Memory on the 8 GB demo machine
+
+Measured: a speech call is ~1.5 s when the weights are resident (Whisper ~1.3 s of it)
+and ~10 s after 60 s idle, because macOS swaps the PyTorch weights out and pages ~1 GB
+back in. That is the whole 9.4 s seen in the app; it is not compute.
+
+- Quit other apps before presenting (the machine sat 9.7 GB into a 10 GB swap with the
+  usual apps open). This is the biggest lever.
+- The text-emotion model (313 MB, display-only) is a sidebar toggle, off by default and
+  not loaded unless switched on.
+- "Keep models warm" (sidebar, off by default) runs a dummy inference every 30 s. It only
+  helps once there is free RAM; under pressure it evicts the browser instead.
+- Available, not applied: int8 dynamic quantisation of ClinicalBERT saves 244 MB (413 →
+  169 MB) and halves its latency (38 → 19 ms); 704/706 phrases keep the same prediction.
+  It changes the evaluated model (§2.7), so re-run the 5-fold grouped text metrics on the
+  int8 model first, and only switch the app over if Emergency recall holds.
+  (On Apple Silicon set `torch.backends.quantized.engine = "qnnpack"`.)
 
 ---
 
