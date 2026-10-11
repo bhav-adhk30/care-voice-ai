@@ -312,6 +312,24 @@ def apply_starvation_timer(priority: int, waiting_seconds: float,
     return priority, False
 
 
+def starvation_priority(final_priority: int, waiting_seconds: float,
+                        cfg: dict = CONFIG) -> tuple[int, list[int]]:
+    """
+    Effective queue priority after waiting: walk apply_starvation_timer level by
+    level, each level held for its STARVATION_SECONDS before the call is bumped.
+    Returns (priority, levels it was bumped from). Never less urgent than
+    final_priority, and never less urgent the longer a call waits.
+    """
+    p, t, bumps = final_priority, waiting_seconds, []
+    while True:
+        new_p, bumped = apply_starvation_timer(p, t, cfg)
+        if not bumped:
+            return p, bumps
+        t -= cfg["STARVATION_SECONDS"][p]
+        bumps.append(p)
+        p = new_p
+
+
 if __name__ == "__main__":
     cases = [
         ("calm knee pain",

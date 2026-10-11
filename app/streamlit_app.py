@@ -42,7 +42,7 @@ import streamlit as st
 from src.audit import AuditLog
 from src.mapping import CLASS_BASE_PRIORITY
 from src.rules import CONFIG as RULES
-from src.rules import UNCLASSIFIED, apply_starvation_timer
+from src.rules import UNCLASSIFIED, starvation_priority
 
 CONFIG = {
     "model_dir": ROOT / "models",
@@ -153,19 +153,6 @@ def answer(qid: int):
     queue_db().commit()
 
 
-def effective_priority(final_priority: int, waited: float) -> tuple[int, list[int]]:
-    """Walk the starvation timer from rules.py: each level is held for its
-    STARVATION_SECONDS before the call is bumped, so a P4 is not starved forever."""
-    p, t, bumps = final_priority, waited, []
-    while True:
-        new_p, bumped = apply_starvation_timer(p, t)
-        if not bumped:
-            return p, bumps
-        t -= RULES["STARVATION_SECONDS"][p]
-        bumps.append(p)
-        p = new_p
-
-
 def waiting_queue(clock: float) -> list[dict]:
     """Waiting calls, re-prioritised by the starvation timer on every refresh,
     ordered by effective priority then by how long they have waited."""
@@ -174,7 +161,7 @@ def waiting_queue(clock: float) -> list[dict]:
             "SELECT id, bed, submitted_at, result FROM queue WHERE status='waiting'"):
         r = json.loads(res)
         waited = (now - ts) * clock
-        eff, bumps = effective_priority(r["final_priority"], waited)
+        eff, bumps = starvation_priority(r["final_priority"], waited)
         heapq.heappush(heap, (eff, ts, qid, {"qid": qid, "bed": bed, "waited": waited,
                                              "eff": eff, "bumps": bumps, **r}))
     return [heapq.heappop(heap)[3] for _ in range(len(heap))]
