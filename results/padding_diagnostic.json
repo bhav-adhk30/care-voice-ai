@@ -1,0 +1,26 @@
+{
+  "padding_probe_vivae": 1.0,
+  "padding_probe_crema_neutral": 1.0,
+  "padding_probe_medical": 0.8063,
+  "vivae_vs_crema_zeros": 1.0,
+  "vivae_vs_crema_noisepad": 1.0,
+  "vivae_vs_crema_degraded": 1.0,
+  "vivae_vs_crema_none": 1.0,
+  "medical_fa_arousal_zeros": 0.0633,
+  "medical_fa_distress_zeros": 0.02,
+  "medical_fa_arousal_degraded": 0.1,
+  "medical_fa_distress_degraded": 0.11,
+  "medical_fa_arousal_none": 0.0667,
+  "medical_fa_distress_none": 0.02,
+  "within_vivae_none": 0.6216,
+  "within_vivae_degraded": 0.6337,
+  "gate_mean_by_emotion": {
+    "achievement": 0.2934,
+    "pleasure": 0.3143,
+    "surprise": 0.3262,
+    "anger": 0.4391,
+    "pain": 0.7638,
+    "fear": 0.7691
+  },
+  "duration_only_auc_vivae_vs_crema": 0.9965
+}
