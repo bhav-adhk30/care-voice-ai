@@ -56,6 +56,7 @@ CONFIG = {
     "audio_types": ["wav", "mp3", "flac", "ogg", "m4a", "aiff", "aif", "webm"],
     "beds": [str(b) for b in range(1, 31)],
     "demo_clock": [1, 10, 60],     # waiting time multiplier, so starvation is visible on stage
+    "keep_warm_s": 30,             # dummy-inference interval when the keep-warm switch is on
 }
 
 PRIORITY_STYLE = {
@@ -184,7 +185,17 @@ def waiting_queue(clock: float) -> list[dict]:
 @st.cache_resource(show_spinner="Loading models (Whisper, ClinicalBERT, emotion, WavLM)...")
 def load_pipeline():
     from src.pipeline import CareVoicePipeline
-    return CareVoicePipeline(model_dir=str(CONFIG["model_dir"]), device="cpu")
+    # Emotion model never loaded here: it follows the sidebar toggle via set_emotion().
+    pipe = CareVoicePipeline(model_dir=str(CONFIG["model_dir"]), device="cpu", load_emotion=False)
+    st.session_state["pipeline_loaded"] = True
+    return pipe
+
+
+def apply_emotion_toggle():
+    """Load or free the display-only emotion model in the running pipeline. Does
+    nothing before the pipeline exists: it is applied at the first call instead."""
+    if st.session_state.get("pipeline_loaded"):
+        load_pipeline().set_emotion(st.session_state.get("emotion_on", False))
 
 
 def load_cache() -> dict:
@@ -204,6 +215,7 @@ def run_call(name: str, data: bytes, bed: str, cached_mode: bool) -> dict | None
         r = {**r, "bed": bed, "cached": True}
     else:
         pipe = load_pipeline()
+        pipe.set_emotion(st.session_state.get("emotion_on", False))
         with tempfile.NamedTemporaryFile(suffix=Path(name).suffix or ".wav", delete=False) as f:
             f.write(data)
             tmp = f.name
@@ -309,7 +321,8 @@ def render_breakdown(r: dict):
                         "— *display only, never affects priority*")
             st.bar_chart(pd.Series(r["sentiment"], name="probability"), horizontal=True, height=200)
         else:
-            st.markdown("**Sentiment:** n/a (no transcript)")
+            st.markdown("**Sentiment:** " + ("n/a (no transcript)" if r.get("sentiment_enabled")
+                                             else "off (sidebar: Text emotion)"))
     with right:
         st.markdown("##### Acoustic branch")
         if r["distress"] is None:
@@ -470,13 +483,33 @@ def tab_results():
 
 with st.sidebar:
     st.markdown("## 🔔 Care-Voice AI")
-    cached_mode = st.toggle("Cached mode", value=False,
+    cached_mode = st.toggle("Cached mode", value=False, key="cached_mode",
                             help="Replay precomputed results instead of running the models live.")
     n_cached = len(load_cache())
     st.caption(f"{n_cached} clip(s) in cached_results.json" if n_cached else "No cached results yet.")
     st.select_slider("Demo clock", CONFIG["demo_clock"], value=1, key="demo_clock",
                      format_func=lambda v: f"×{v}",
                      help="Speeds up waiting time so the starvation timer is visible on stage.")
+    st.toggle("Text emotion (display only)", value=False, key="emotion_on",
+              on_change=apply_emotion_toggle,
+              help="Loads the 313 MB emotion model. It never affects priority, so it is off "
+                   "by default to keep the demo machine out of swap.")
+    st.toggle("Keep models warm", value=False, key="keep_warm",
+              help=f"Runs a dummy inference every {CONFIG['keep_warm_s']} s so the weights are "
+                   "not swapped out between calls. Only helps once the machine has free RAM; "
+                   "under memory pressure it pushes the browser out instead.")
+
+    # Keep-warm: touching every loaded model's weights stops the OS paging them out
+    # between demo calls (measured: 1.5 s warm vs ~10 s after 60 s idle on the 8 GB
+    # machine). It cannot create memory: with RAM full it just evicts something else,
+    # so it is off by default. Runs only while a browser session is open.
+    @st.fragment(run_every=CONFIG["keep_warm_s"])
+    def keep_warm_ping():
+        if st.session_state.get("keep_warm") and not st.session_state.get("cached_mode"):
+            ms = load_pipeline().keep_warm()
+            st.caption(f"Keep-warm ping {time.strftime('%H:%M:%S')}: {ms:.0f} ms")
+
+    keep_warm_ping()
     st.caption("Escalation is an auditable rule (src/rules.py), not a trained fusion model.")
 
 t1, t2, t3 = st.tabs(["Nurse Station", "Submit a Call", "Results"])

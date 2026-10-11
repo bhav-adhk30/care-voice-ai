@@ -17,6 +17,7 @@
     "medication": [],
     "sentiment": {},
     "sentiment_label": null,
+    "sentiment_enabled": false,
     "text_anger": null,
     "base_priority": 2,
     "arousal": null,
@@ -42,20 +43,20 @@
       "arousal_head": "4110fcded375",
       "distress_gate": "8d584beba811",
       "bert_dir": "b43fc117d948",
-      "emotion_dir": "ab16b3e561e9"
+      "emotion_dir": null
     },
     "acoustic_contract": "no_pad_meanpool_rms0.05",
     "latency_ms": {
-      "load": 7.5,
+      "load": 7.7,
       "load_acoustic": 0.0,
       "wavlm_and_heads": 0.0,
       "denoise": 0.0,
       "trim": 0.0,
       "asr": 0.0,
       "text_classifier": 0.0,
-      "sentiment": 0.2,
+      "sentiment": 0.0,
       "rules": 0.0,
-      "total": 8.1
+      "total": 7.8
     }
   }
 }
