@@ -29,15 +29,7 @@ FIXTURE = ROOT / "tests" / "fixtures" / "tts_chest_pain.wav"   # macOS TTS, 16 k
 # Pain instead of Emergency). The clip is 8 s of silence plus the whole phrase.
 LEAD_SILENCE_S = 8.0
 
-needs_models = pytest.mark.skipif(
-    not (ROOT / "models" / "faster-whisper-small").exists(),
-    reason="models/ not present; run scripts/fetch_models.py")
-
-
-@pytest.fixture(scope="module")
-def pipe():
-    from src.pipeline import CareVoicePipeline
-    return CareVoicePipeline(model_dir=str(ROOT / "models"))
+pytestmark = pytest.mark.pipeline   # uses the session pipeline from conftest
 
 
 @pytest.fixture
@@ -51,7 +43,6 @@ def late_speech_clip(tmp_path):
     return path
 
 
-@needs_models
 @pytest.mark.xfail(strict=True, reason="acoustic branch crops the first 4 s, which are "
                                        "silence; it never sees the speech")
 def test_acoustic_branch_sees_speech_after_long_silence(pipe, late_speech_clip):
