@@ -1,0 +1,708 @@
+phrase,prompt,req_class,anger,disgust,fear,joy,neutral,sadness,surprise,top
+A terrible fall in hair,Hair falling out,General,0.0052,0.0114,0.9386,0.0009,0.0031,0.0256,0.0153,fear
+After a breakup  I feel something strange in me.,Emotional pain,General,0.0019,0.0027,0.8117,0.0033,0.0038,0.0098,0.1668,fear
+After an hard working day I have foot ache,Foot ache,Pain,0.0055,0.0084,0.0346,0.0061,0.0508,0.8845,0.0101,sadness
+After eating  I have burning sensation inside of me.,Stomach ache,Pain,0.2057,0.6866,0.0193,0.003,0.0248,0.0524,0.0082,disgust
+"After playing tennis,  I had a powerful sensation close to my neck",Shoulder pain,Pain,0.0164,0.0109,0.8266,0.0122,0.0094,0.0338,0.0907,fear
+After walking I have some pain under my foot,Foot ache,Pain,0.0184,0.0543,0.1431,0.0088,0.0999,0.6418,0.0336,sadness
+All my body is in a bad case and i need a good treatment,Joint pain,Pain,0.003,0.005,0.0109,0.0038,0.0043,0.9714,0.0017,sadness
+All of a sudden I felt dizzy when I stood up.,Feeling dizzy,Emergency,0.0036,0.0049,0.713,0.0025,0.0061,0.0045,0.2654,fear
+"Annoyance starts suddenly, often after an injury or exercise.",Knee pain,Pain,0.0086,0.0207,0.0569,0.037,0.1096,0.0061,0.761,surprise
+Anytime I play tennis I feel a shoulder pain,Shoulder pain,Pain,0.0105,0.0256,0.2817,0.0045,0.0322,0.636,0.0096,sadness
+"At first it feels really numb, but then a thousand needles start to prick through my foot.",Foot ache,Pain,0.0064,0.1031,0.0213,0.0011,0.0306,0.8282,0.0094,sadness
+Can't keep focus,Head ache,Pain,0.0231,0.0133,0.0071,0.0014,0.1136,0.825,0.0165,sadness
+Chronic bone disease at the level of the doubles of the lower Estremidades,Knee pain,Pain,0.0163,0.0639,0.1215,0.0083,0.3598,0.3465,0.0836,neutral
+Chronic bowel Pain,Internal pain,Pain,0.008,0.0668,0.116,0.0054,0.1721,0.6027,0.029,sadness
+Chronic disease of hair follicles and sebaceous glands,Acne,General,0.027,0.2024,0.1,0.0058,0.3151,0.2754,0.0743,neutral
+Don't cry,Joint pain,Pain,0.0039,0.0109,0.0123,0.0086,0.1357,0.8184,0.0102,sadness
+"Even if the temperature is high in the house,  my body is always cold",Feeling cold,Assistance,0.2169,0.0032,0.0343,0.0446,0.0242,0.6684,0.0085,sadness
+Even though I'm an adult my face keeps breaking out in pimples.,Acne,General,0.0278,0.393,0.0809,0.0052,0.3124,0.1647,0.016,disgust
+Every morning when I wake up my neck feels like I slept on in wrong.,Muscle pain,Pain,0.085,0.5131,0.0853,0.0014,0.0872,0.2241,0.0039,disgust
+Every time I comb my hair there are so many hair in my comb.,Hair falling out,General,0.0506,0.1605,0.0668,0.0022,0.2209,0.0287,0.4704,surprise
+Every time I look to left I feel a sharp pain in my neck.,Neck pain,Pain,0.2047,0.0756,0.5904,0.0026,0.0226,0.0869,0.0171,fear
+"Every time I make an effort, I felt dizzy.",Feeling dizzy,Emergency,0.003,0.0077,0.8483,0.0021,0.007,0.0052,0.1267,fear
+Every time I take a deep breath I start coughing,Cough,General,0.055,0.2041,0.6347,0.0018,0.0595,0.0271,0.0179,fear
+Every time it rains I get hives on my belly and sides.,Skin issue,General,0.0229,0.7957,0.0224,0.0021,0.0721,0.0764,0.0083,disgust
+Everything looks like beeing in a smoky area.,Blurry vision,General,0.0187,0.6084,0.0526,0.0057,0.2823,0.0222,0.0102,disgust
+Feel like something is being jabbed into my joints,Joint pain,Pain,0.2881,0.0795,0.3975,0.0014,0.0176,0.2014,0.0145,fear
+Feels like there are pins and needles sticking in my joints,Joint pain,Pain,0.0272,0.2609,0.0485,0.0025,0.0858,0.5301,0.045,sadness
+"Had I stepped on a needle it wouldn't have hurt so much, like this damned spur in my heel.",Foot ache,Pain,0.4069,0.3921,0.0152,0.0015,0.0903,0.057,0.0369,anger
+Have severe cold and cough,Cough,General,0.1539,0.0559,0.0901,0.0035,0.2901,0.3971,0.0093,sadness
+He was discovered to have an open wound.,Open wound,Emergency,0.0173,0.5922,0.0525,0.0026,0.0552,0.2334,0.0468,disgust
+Hearing any loud sounds makes my ear aches,Ear ache,Pain,0.0391,0.2173,0.4618,0.0029,0.0116,0.2589,0.0083,fear
+His infected wound was beginning to rot.,Infected wound,Emergency,0.0305,0.6719,0.0301,0.0035,0.177,0.0723,0.0146,disgust
+How do you know if you have a torn meniscus in your knee?,Knee pain,Pain,0.0341,0.1008,0.0776,0.0037,0.4816,0.0665,0.2356,neutral
+I always feel like I have menstrual pains even if I don't have my period.,Internal pain,Pain,0.0112,0.2824,0.2057,0.0064,0.1006,0.3809,0.0127,sadness
+"I am always cold, even when I am wearing layers",Feeling cold,Assistance,0.6216,0.0377,0.0827,0.0125,0.1315,0.1052,0.0088,anger
+I am having running nose,Feeling cold,Assistance,0.0206,0.0272,0.1434,0.0028,0.0771,0.6845,0.0444,sadness
+"I am struggling to bear weight on my knee, when i stand straight I feel and hear a loud popping noise.",Knee pain,Pain,0.004,0.0031,0.9806,0.0007,0.0008,0.0048,0.006,fear
+"I am worried for my driving, because I can barely focus when I am at the wheel, my eyes feel teary.",Blurry vision,General,0.001,0.0008,0.0061,0.0017,0.0082,0.9772,0.0051,sadness
+"I am worried how cold intolerant I am, I am always shivering, even out in the sun.",Feeling cold,Assistance,0.0028,0.0012,0.9832,0.0013,0.0044,0.0057,0.0015,fear
+I break out on my face very frequently,Acne,General,0.4985,0.0172,0.4483,0.0017,0.0037,0.0245,0.0061,anger
+I broke my ankle while doing rock climbing in the Carpathians.,Injury from sports,Pain,0.0229,0.0111,0.7863,0.0053,0.0114,0.1539,0.0091,fear
+I can hardly move my neck.  It hurts.,Neck pain,Pain,0.0085,0.017,0.0648,0.004,0.0448,0.8347,0.0262,sadness
+I can't carry anything I have a pain in my shoulder,Shoulder pain,Pain,0.0103,0.0186,0.1189,0.0041,0.0605,0.7722,0.0153,sadness
+I can't do anything I feel a weak in my body,Body feels weak,Assistance,0.0026,0.0144,0.0742,0.0023,0.0112,0.8926,0.0026,sadness
+I can't get a girlfriend because of my acne.,Acne,General,0.012,0.0255,0.0177,0.0027,0.0218,0.9181,0.0022,sadness
+"I can't hear out of my ear properly, I feel like there is something in it causing irritation.",Ear ache,Pain,0.7953,0.0676,0.0084,0.0015,0.0741,0.0452,0.008,anger
+I can't move my head up and down.,Neck pain,Pain,0.0313,0.0474,0.4236,0.0038,0.1151,0.3398,0.039,fear
+I can't really jump on my left foot because my triple fracture of the ankle left me with neverending pains.,Foot ache,Pain,0.0097,0.0367,0.2679,0.0044,0.0588,0.6015,0.0209,sadness
+I can't see the sign I have a blurry vision,Blurry vision,General,0.0442,0.0726,0.4564,0.0016,0.0362,0.0479,0.3411,fear
+I can't sleep I have a hard cough,Cough,General,0.0074,0.0139,0.0453,0.0014,0.0528,0.8568,0.0223,sadness
+I can't stand up or sit down I have a pain in my back that annoys me,Back pain,Pain,0.2584,0.0094,0.013,0.0037,0.0158,0.6821,0.0174,sadness
+"I can't stand up, I feel my brain is moving inside my skull.",Head ache,Pain,0.0254,0.1568,0.6667,0.0017,0.0423,0.0745,0.0326,fear
+I can't stand with this horrible feeling in my shoulder,Shoulder pain,Pain,0.0064,0.0215,0.7871,0.002,0.004,0.172,0.007,fear
+I can't stand with this horrible feeling in my stomach,Stomach ache,Pain,0.0075,0.059,0.6657,0.0021,0.0078,0.2477,0.0103,fear
+I can't stop coughing,Cough,General,0.0358,0.0963,0.0823,0.0043,0.1936,0.5503,0.0373,sadness
+I can't turn my neck to the left without feeling a stabbing pain,Neck pain,Pain,0.9072,0.0189,0.033,0.0009,0.0042,0.0332,0.0027,anger
+I can't walk because i have a great foot ache,Foot ache,Pain,0.0033,0.0024,0.0167,0.0039,0.0102,0.9556,0.0079,sadness
+I can't walk well I have an ache in my foot,Foot ache,Pain,0.0052,0.01,0.0684,0.0026,0.0329,0.8724,0.0084,sadness
+I can't work good I have a pain in my knee,Knee pain,Pain,0.0047,0.0072,0.034,0.0018,0.0216,0.9218,0.0089,sadness
+I can`t stop coughing.,Cough,General,0.0471,0.2026,0.1091,0.0039,0.2067,0.3916,0.0391,sadness
+I cannot bear this squeezing sensation I have in my chest.,Heart hurts,Emergency,0.0163,0.0887,0.3099,0.0061,0.128,0.4177,0.0333,sadness
+I cannot breathe because of this dull ache below my left shoulder.,Heart hurts,Emergency,0.0028,0.011,0.0088,0.0009,0.0132,0.96,0.0032,sadness
+I cannot get warm no matter how much I wrap up or how high I put the heating on,Feeling cold,Assistance,0.1722,0.081,0.0374,0.0059,0.47,0.2037,0.0297,neutral
+I carried a heavy bag yesterday and when I get up today I felt a great shoulder pain.,Shoulder pain,Pain,0.0105,0.0456,0.2413,0.0095,0.0557,0.6203,0.0172,sadness
+I chopped off the tip of my finger while I was cutting some cardboard and I cannot stop the bleeding.,Open wound,Emergency,0.0897,0.2531,0.0751,0.003,0.1329,0.4241,0.022,sadness
+I complain alot with my neck pain and i really need to be better,Neck pain,Pain,0.0111,0.0033,0.0211,0.0023,0.0117,0.9471,0.0034,sadness
+I complain alot with skin allergy,Skin issue,General,0.29,0.0683,0.0482,0.0042,0.2282,0.3457,0.0154,sadness
+"I cough a lot when I smell perfume, what is wrong with my lungs?",Cough,General,0.0224,0.8659,0.0621,0.0008,0.0306,0.0124,0.0058,disgust
+I could not exercise because of my knee pain,Knee pain,Pain,0.0068,0.0137,0.0863,0.0054,0.0471,0.8288,0.0117,sadness
+"I couldn't stop shaking or unclench my jaw, that's how cold I was.",Feeling cold,Assistance,0.002,0.0019,0.9901,0.0006,0.0014,0.0029,0.0011,fear
+"I cut my finger opening a can, it won't stop bleeding and the wound is gaping and open",Open wound,Emergency,0.1741,0.1853,0.0381,0.0057,0.1249,0.4033,0.0685,sadness
+I cut my foot at the pool and it breaks open every day when I walk on it.,Open wound,Emergency,0.4537,0.0672,0.114,0.0028,0.1572,0.1353,0.0698,anger
+I cut my hand a couple of days ago and although I didn't think I needed it stitches it hasn't closed up.,Open wound,Emergency,0.0405,0.0536,0.0568,0.0048,0.1554,0.2789,0.4101,surprise
+I cut my hand a couple of weeks ago and even though I keep using an antibiotic cream it's not getting better.,Infected wound,Emergency,0.0254,0.0939,0.0196,0.0021,0.1364,0.7086,0.014,sadness
+I cut myself and I'm bleeding.,Open wound,Emergency,0.0574,0.5223,0.1316,0.002,0.0566,0.2111,0.019,disgust
+I do not feel better in my muscles,Muscle pain,Pain,0.0046,0.0486,0.0145,0.3879,0.146,0.3798,0.0186,joy
+I do not know why I feel cold,Feeling cold,Assistance,0.9281,0.0081,0.0333,0.0009,0.006,0.0212,0.0024,anger
+I don't do anything at home and still I feel exhausted.,Body feels weak,Assistance,0.0025,0.0045,0.0025,0.0007,0.0077,0.9805,0.0016,sadness
+I don't have full range of motion with my arms,Shoulder pain,Pain,0.0362,0.0883,0.1119,0.0139,0.487,0.1611,0.1016,neutral
+I don't have problems taking in breath but out breath is so heavy,Hard to breath,Emergency,0.0234,0.3525,0.187,0.0025,0.1003,0.317,0.0174,disgust
+I don't have the energy to do the things that I used to,Body feels weak,Assistance,0.0492,0.0628,0.0134,0.0093,0.4308,0.3342,0.1004,neutral
+I don't know why I'm constantly sad.,Emotional pain,General,0.001,0.003,0.0025,0.0029,0.0146,0.9547,0.0213,sadness
+I feel a bone-on-bone pain in my knees when I climb stairs.,Joint pain,Pain,0.0218,0.1322,0.3473,0.0052,0.0771,0.3908,0.0256,sadness
+I feel a burning sensation in my guts about 2 hours after each meal.,Stomach ache,Pain,0.4995,0.3452,0.0121,0.0017,0.047,0.0884,0.0061,anger
+I feel a burning sensation in my shoulder muscle.,Muscle pain,Pain,0.7428,0.1059,0.007,0.0009,0.0186,0.1211,0.0036,anger
+I feel a clicking sensation in my knee each time I step.,Joint pain,Pain,0.0414,0.0522,0.7576,0.0053,0.0668,0.0205,0.0563,fear
+I feel a great amount of pressure of my head.,Head ache,Pain,0.1139,0.1319,0.4553,0.0127,0.1052,0.1691,0.012,fear
+I feel a great amount of pressure on the sides of my neck,Shoulder pain,Pain,0.0441,0.0536,0.5683,0.0066,0.0637,0.2371,0.0265,fear
+I feel a great pain in my shoulder joint and it does not go away,Joint pain,Pain,0.011,0.0371,0.107,0.0059,0.0593,0.7591,0.0207,sadness
+I feel a great pain in my shoulder when i try to lift something heavy,Shoulder pain,Pain,0.014,0.011,0.3056,0.0099,0.006,0.6391,0.0144,sadness
+I feel a huge emotional pain after I broke up with my girlfriend.,Emotional pain,General,0.0054,0.0067,0.0024,0.0013,0.0029,0.9805,0.0009,sadness
+I feel a lot of pain in the joints.,Joint pain,Pain,0.0197,0.1511,0.0828,0.0074,0.1118,0.6023,0.0249,sadness
+I feel a pain in my back,Back pain,Pain,0.008,0.0316,0.0768,0.004,0.0361,0.8254,0.018,sadness
+I feel a pain in my back when I sit on a chair for long.,Back pain,Pain,0.0163,0.1465,0.1925,0.0049,0.0624,0.562,0.0153,sadness
+I feel a pain in my neck,Neck pain,Pain,0.0171,0.041,0.1399,0.005,0.0452,0.7269,0.0248,sadness
+"I feel a pain on the left side of my chest, where my heart is",Heart hurts,Emergency,0.0066,0.0202,0.0325,0.0038,0.0424,0.8773,0.0171,sadness
+I feel a sharp pain in my ankle joint when I stand.,Joint pain,Pain,0.3341,0.1057,0.4356,0.0024,0.0234,0.0813,0.0175,fear
+I feel a sharp pain in my head when I think too hard.,Head ache,Pain,0.4552,0.1082,0.2473,0.0024,0.0269,0.137,0.0229,anger
+I feel a sharp pain in my stomach,Internal pain,Pain,0.4968,0.0368,0.254,0.0049,0.015,0.1667,0.0258,anger
+I feel a sharp pain in the stomach after eating,Stomach ache,Pain,0.361,0.1156,0.262,0.0049,0.0238,0.2044,0.0283,anger
+I feel a soreness in my knees when I walk,Joint pain,Pain,0.0174,0.0845,0.0552,0.0086,0.1115,0.7044,0.0184,sadness
+I feel a strange and powerful pain inside my rib cage,Heart hurts,Emergency,0.0037,0.0165,0.7346,0.0023,0.0084,0.0055,0.2291,fear
+I feel a tightness in my chest,Hard to breath,Emergency,0.0516,0.0618,0.6202,0.0163,0.0959,0.1219,0.0323,fear
+I feel abdominal pain,Stomach ache,Pain,0.0069,0.1126,0.1159,0.0041,0.0545,0.6885,0.0174,sadness
+I feel aching on my insides.,Internal pain,Pain,0.0008,0.0043,0.0024,0.0014,0.0106,0.9765,0.0039,sadness
+I feel back pain when I carry heavy things,Back pain,Pain,0.0136,0.0349,0.1378,0.0063,0.064,0.7275,0.0159,sadness
+"I feel chilly, like an ice cube.  My sister said that she needs several blankets to cover her so that she is warm enough.",Feeling cold,Assistance,0.1829,0.1044,0.1874,0.0243,0.1915,0.3009,0.0085,sadness
+I feel cold although we are in summer.,Feeling cold,Assistance,0.3243,0.0896,0.0282,0.007,0.0894,0.4571,0.0044,sadness
+I feel cold and chills even though my clothes are heavy,Feeling cold,Assistance,0.9279,0.0085,0.005,0.0017,0.0026,0.0534,0.0008,anger
+I feel cold when the night comes,Feeling cold,Assistance,0.8883,0.0156,0.0316,0.002,0.007,0.0537,0.0018,anger
+I feel congestion in my chest,Cough,General,0.0816,0.2879,0.061,0.0039,0.1255,0.4263,0.0139,sadness
+I feel deep Tingling when I touch Acne followed by bad sensation,Acne,General,0.0184,0.1083,0.3682,0.0022,0.0371,0.4426,0.0231,sadness
+I feel depressed when I see my hair falling out,Hair falling out,General,0.0006,0.0018,0.0018,0.0007,0.0054,0.9871,0.0025,sadness
+I feel discomfort throughout the body in general,Body feels weak,Assistance,0.0051,0.0358,0.8777,0.0044,0.0214,0.0536,0.0021,fear
+I feel dizzy after doing a muscular effort.,Feeling dizzy,Emergency,0.0036,0.0055,0.7404,0.0019,0.0067,0.0075,0.2345,fear
+I feel dizzy and out of sight,Feeling dizzy,Emergency,0.0025,0.0024,0.778,0.0023,0.0035,0.0066,0.2047,fear
+"I feel dizzy when I set in-front of my laptop for an hour or two, what possibly could be the reason?",Feeling dizzy,Emergency,0.0043,0.0061,0.6305,0.002,0.0077,0.0055,0.344,fear
+I feel dizzy when i make sudden movements,Feeling dizzy,Emergency,0.0035,0.0021,0.7026,0.0024,0.0029,0.005,0.2816,fear
+I feel dizzy whenever I stand up.,Feeling dizzy,Emergency,0.0025,0.0037,0.8043,0.0021,0.0056,0.0054,0.1765,fear
+I feel emotionally crushed,Emotional pain,General,0.0019,0.0011,0.0006,0.0009,0.003,0.9913,0.0012,sadness
+I feel fluid trying to come up when I cough.,Cough,General,0.0185,0.7998,0.0906,0.0013,0.0577,0.0193,0.0128,disgust
+I feel great pain in my feet after playing one of the sports games,Injury from sports,Pain,0.0065,0.0298,0.0774,0.0199,0.0616,0.7765,0.0283,sadness
+I feel great pain in the head,Head ache,Pain,0.0057,0.0177,0.0767,0.0491,0.0167,0.8245,0.0096,sadness
+I feel great pressure in my chest,Hard to breath,Emergency,0.0781,0.0219,0.5288,0.0116,0.0327,0.2865,0.0404,fear
+I feel heart pain when I walk a lot,Heart hurts,Emergency,0.0022,0.0033,0.0304,0.0024,0.0144,0.9375,0.0098,sadness
+I feel hurts in my heart,Heart hurts,Emergency,0.0011,0.0024,0.0012,0.0011,0.008,0.9833,0.0029,sadness
+I feel increased heart rate with prick,Heart hurts,Emergency,0.689,0.036,0.0858,0.0036,0.0635,0.0784,0.0436,anger
+I feel joint pain every time I move,Joint pain,Pain,0.0372,0.0906,0.3308,0.0072,0.1198,0.3831,0.0313,sadness
+I feel lightheaded,Feeling dizzy,Emergency,0.03,0.0014,0.0159,0.0015,0.0048,0.9356,0.0109,sadness
+I feel lightheaded when I stand up,Feeling dizzy,Emergency,0.0207,0.0022,0.4849,0.0027,0.0072,0.4388,0.0435,fear
+I feel like I can hardly breathe unless I get what's in my lungs out,Cough,General,0.0111,0.1035,0.6445,0.0022,0.0709,0.1285,0.0393,fear
+"I feel like I just can't cope anymore, I feel overwhelmed and like I just can't get a break.",Emotional pain,General,0.0081,0.002,0.3402,0.0028,0.0044,0.0038,0.6387,surprise
+I feel like I went to an acupuncture's practice and had 100 needles in my shoulder,Shoulder pain,Pain,0.0275,0.0972,0.1905,0.0086,0.2721,0.145,0.259,neutral
+I feel like I've always got something in my throat,Cough,General,0.0591,0.4433,0.264,0.0031,0.1164,0.0385,0.0757,disgust
+I feel like l fell in hot water,Skin issue,General,0.0782,0.0169,0.0472,0.0191,0.4003,0.3783,0.0599,neutral
+I feel like my heart is on fire.,Heart hurts,Emergency,0.9074,0.0061,0.0545,0.0011,0.0106,0.0066,0.0137,anger
+I feel like something is squeezing my lungs.,Hard to breath,Emergency,0.0754,0.3668,0.3918,0.0019,0.0661,0.0638,0.0342,fear
+I feel like the room is spinning,Feeling dizzy,Emergency,0.0439,0.0203,0.1351,0.0117,0.2509,0.041,0.4971,surprise
+I feel like the world goes round and round,Feeling dizzy,Emergency,0.027,0.033,0.2494,0.0217,0.4351,0.0505,0.1833,neutral
+I feel like there is something swollen and inflamed at the back of my knee.,Knee pain,Pain,0.0372,0.2164,0.036,0.0056,0.1901,0.4764,0.0383,sadness
+I feel muscle pain every time I make an extra effort.,Muscle pain,Pain,0.0968,0.2402,0.2687,0.0044,0.0664,0.318,0.0055,sadness
+I feel pain in my back,Back pain,Pain,0.008,0.031,0.0786,0.0038,0.0379,0.8239,0.0167,sadness
+I feel pain in my ears with tinnitus,Ear ache,Pain,0.0109,0.0326,0.0827,0.0028,0.0406,0.811,0.0194,sadness
+I feel pain in my eyes I can see fog,Blurry vision,General,0.009,0.0617,0.0676,0.0025,0.0384,0.812,0.0088,sadness
+I feel pain in my head with a vertigo,Head ache,Pain,0.0132,0.0275,0.2256,0.0043,0.0266,0.6864,0.0164,sadness
+I feel pain in my heart when I wake up,Heart hurts,Emergency,0.0026,0.0047,0.0486,0.0015,0.0112,0.9261,0.0053,sadness
+I feel pain in my joint after an injury in the last football match I played.,Joint pain,Pain,0.014,0.07,0.088,0.0086,0.0594,0.7381,0.0219,sadness
+I feel pain in my knee when I climb the stairs.,Joint pain,Pain,0.0171,0.1037,0.2824,0.006,0.0538,0.514,0.0231,sadness
+"I feel pain in my legs muscles after I ran yesterday, I took some pain killers but it doesn't help.",Muscle pain,Pain,0.0139,0.0976,0.0805,0.0046,0.0782,0.7123,0.0128,sadness
+I feel pain in my neck after waking up,Neck pain,Pain,0.0203,0.0571,0.268,0.0051,0.0455,0.5748,0.0291,sadness
+I feel pain in my neck while I'm working.,Neck pain,Pain,0.0276,0.1333,0.2398,0.0059,0.0735,0.4948,0.0251,sadness
+I feel pain in my right shoulder after the tennis match.,Injury from sports,Pain,0.0129,0.0608,0.1226,0.0084,0.05,0.7225,0.0227,sadness
+I feel pain in my shoulders when I write on the keyboard.,Shoulder pain,Pain,0.0162,0.0617,0.0741,0.0033,0.0434,0.7929,0.0083,sadness
+I feel pain in my throat,Cough,General,0.0514,0.1385,0.1144,0.0059,0.065,0.5891,0.0357,sadness
+I feel pain in the knee,Knee pain,Pain,0.0102,0.0409,0.0809,0.0056,0.0536,0.7871,0.0217,sadness
+I feel pain in the knee when walking,Knee pain,Pain,0.0124,0.0486,0.1147,0.0072,0.0549,0.7376,0.0246,sadness
+I feel pain in the lower back,Back pain,Pain,0.0119,0.0561,0.0759,0.0058,0.0678,0.7545,0.0281,sadness
+I feel pain inside I do not know what it is,Internal pain,Pain,0.0048,0.0176,0.0729,0.001,0.0331,0.8344,0.0361,sadness
+I feel pain inside and I can not identify it,Internal pain,Pain,0.0037,0.0211,0.033,0.001,0.0273,0.9036,0.0103,sadness
+I feel pain when i think of her,Emotional pain,General,0.0017,0.0048,0.0084,0.0016,0.004,0.9773,0.0022,sadness
+I feel pain when parting loved ones,Emotional pain,General,0.0008,0.0016,0.0016,0.001,0.0029,0.99,0.002,sadness
+I feel really sad all the time.,Emotional pain,General,0.0007,0.0017,0.0011,0.0017,0.0075,0.9839,0.0035,sadness
+I feel sad like hurt or pain,Emotional pain,General,0.0006,0.0017,0.001,0.0014,0.0057,0.9872,0.0025,sadness
+I feel severe itching in the skin with redness,Skin issue,General,0.1378,0.0898,0.3265,0.0052,0.0688,0.3609,0.011,sadness
+I feel shoulder pain at intervals of time.,Shoulder pain,Pain,0.017,0.0569,0.1851,0.0055,0.0629,0.661,0.0116,sadness
+I feel so sore in my stomach area.,Stomach ache,Pain,0.0143,0.1299,0.0283,0.003,0.0667,0.7491,0.0088,sadness
+I feel something hurt me in taking breath and I cant take my breath,Hard to breath,Emergency,0.0212,0.0067,0.095,0.0014,0.0071,0.8627,0.0059,sadness
+I feel strong pain in my knee after it was hit during the football match.,Injury from sports,Pain,0.0249,0.0501,0.71,0.0055,0.0219,0.1742,0.0134,fear
+I feel suicidal.,Emotional pain,General,0.002,0.0034,0.0859,0.0013,0.0101,0.8947,0.0027,sadness
+I feel very hard to breathe,Hard to breath,Emergency,0.0062,0.0197,0.0921,0.0014,0.0137,0.8549,0.0121,sadness
+I feel very weak in my body,Body feels weak,Assistance,0.0017,0.0148,0.0749,0.0026,0.0185,0.8827,0.0048,sadness
+I feel weak all over.,Body feels weak,Assistance,0.0018,0.0205,0.0863,0.003,0.0329,0.8509,0.0047,sadness
+I fell a stiffness in my elbows and shoulders,Joint pain,Pain,0.0496,0.0407,0.3123,0.0239,0.1762,0.3597,0.0375,sadness
+I fell off my bike and since then I had hard  knee pain,Knee pain,Pain,0.0214,0.0028,0.1081,0.0042,0.0162,0.8077,0.0397,sadness
+"I fell through a window while I was cleaning it and I have a shard of glass stuck in my left eye, I think it is pretty serious, please help!",Open wound,Emergency,0.0851,0.0626,0.3995,0.0037,0.056,0.2966,0.0966,fear
+I felt my heart hurts when I ran for along distance,Heart hurts,Emergency,0.0022,0.0012,0.0042,0.0009,0.005,0.983,0.0035,sadness
+I get a knee pain when I walk a lot,Knee pain,Pain,0.016,0.0309,0.2466,0.0094,0.0969,0.5716,0.0285,sadness
+I get an ear ache when it is cold,Ear ache,Pain,0.0365,0.0429,0.103,0.0043,0.0949,0.7099,0.0086,sadness
+I get big patches of irritated pimples on my back and they hurt.,Acne,General,0.8626,0.0334,0.0051,0.0017,0.0507,0.0376,0.009,anger
+I get breakouts on my chest with red patches that get more intense when i get hot.,Acne,General,0.5487,0.0513,0.0513,0.0047,0.0936,0.1867,0.0637,anger
+I get chills and aches all over.,Feeling cold,Assistance,0.0118,0.0838,0.0056,0.5329,0.3049,0.0326,0.0284,joy
+I get clusters of pimples on my face that never go away.,Acne,General,0.0458,0.6769,0.0281,0.0015,0.1199,0.1081,0.0198,disgust
+I get clusters of whiteheads and blackheads on my back.,Acne,General,0.0298,0.2361,0.0042,0.0025,0.695,0.0092,0.0232,neutral
+I get i joint pain when i try to bend my leg or my arm,Joint pain,Pain,0.0477,0.028,0.1663,0.0068,0.036,0.6845,0.0307,sadness
+I get terrible headaches every few months and when I get them my vision is affected.,Head ache,Pain,0.0092,0.0321,0.892,0.0014,0.0094,0.0448,0.0111,fear
+"I get tired too fast, I can barely put on my clothes in the morning.",Body feels weak,Assistance,0.0524,0.1449,0.1625,0.0034,0.096,0.1632,0.3777,surprise
+I got a divorce last year and I just can't stop dwelling on how to get revenge on my ex husband.,Emotional pain,General,0.9282,0.0176,0.0042,0.0025,0.0177,0.0274,0.0024,anger
+I got acne when I ate chili,Acne,General,0.026,0.7954,0.0152,0.0024,0.1161,0.0412,0.0036,disgust
+I got injured exercising,Injury from sports,Pain,0.0068,0.0052,0.0617,0.0042,0.0367,0.8663,0.0191,sadness
+I had a cold the last time I travelled by plane and I still have a discomfort in my ears.,Ear ache,Pain,0.0252,0.1672,0.5857,0.0049,0.0925,0.1175,0.007,fear
+I had a collision while playing soccer.  My knee buckled and now it's unstable.,Injury from sports,Pain,0.0301,0.0039,0.6523,0.009,0.0167,0.2322,0.0558,fear
+I had a cut that was stitched together but it is not healing.  It is oozing green puss and burns.,Infected wound,Emergency,0.0256,0.7318,0.0099,0.002,0.1074,0.1138,0.0094,disgust
+I had a pain in my knee when I was swimming,Knee pain,Pain,0.0134,0.0407,0.5219,0.011,0.0574,0.3235,0.0322,fear
+I had a sharp pain in my stomach,Stomach ache,Pain,0.1568,0.1243,0.2129,0.0057,0.0415,0.4208,0.038,sadness
+I had alot of exercise yesterday so i feel sharp muscle pains,Muscle pain,Pain,0.4676,0.0038,0.1479,0.0685,0.0067,0.2827,0.0228,anger
+I had an accident and my wound was open when I arrived to hospital,Open wound,Emergency,0.0179,0.0122,0.3279,0.0067,0.0435,0.5204,0.0713,sadness
+I had internal pain and gases when I ate indian spicy food yesterday,Internal pain,Pain,0.0222,0.5751,0.0308,0.0112,0.0676,0.2786,0.0145,disgust
+"I hardly have enough stength to get up,",Body feels weak,Assistance,0.0157,0.0631,0.1949,0.0048,0.2984,0.3575,0.0654,sadness
+I hate my acne.,Acne,General,0.3478,0.4937,0.0072,0.0052,0.0309,0.1096,0.0056,disgust
+I have a back pain since I fell on the floor.,Back pain,Pain,0.0189,0.0435,0.1483,0.0059,0.0591,0.682,0.0423,sadness
+I have a back pain since I turned 70 years old.,Back pain,Pain,0.0091,0.0433,0.1323,0.013,0.0907,0.6918,0.0199,sadness
+I have a blurry vision after my head was hit yesterday.,Blurry vision,General,0.0177,0.0301,0.8454,0.0016,0.0146,0.0596,0.0311,fear
+"I have a blurry vision and i can't see in the darkness , what is the reason doctor ?",Blurry vision,General,0.0191,0.0111,0.601,0.0015,0.0457,0.1125,0.2091,fear
+"I have a blurry vision during my swimming training in the pool, why?",Blurry vision,General,0.0282,0.0233,0.1216,0.0014,0.0496,0.0085,0.7674,surprise
+"I have a blurry vision since I woke up this morning, what could be the reason?",Blurry vision,General,0.0356,0.0433,0.4758,0.002,0.151,0.0275,0.2649,fear
+I have a break in the skin between my thumb and index finger and it will not close.,Open wound,Emergency,0.0912,0.0789,0.0825,0.0122,0.3334,0.2774,0.1243,neutral
+I have a break in the skin inside one of my nostrils that has become infected and is now filled with pus.,Infected wound,Emergency,0.0112,0.9378,0.0055,0.0006,0.0284,0.0132,0.0033,disgust
+I have a cold and it makes me cough alot,Cough,General,0.0663,0.1273,0.2458,0.005,0.1762,0.3566,0.0228,sadness
+I have a cut on my foot that became infected from using the showers at the gym.,Infected wound,Emergency,0.0345,0.4445,0.0748,0.0052,0.1499,0.2724,0.0187,disgust
+I have a cut that has become red and oozes puss.,Infected wound,Emergency,0.0306,0.8607,0.0027,0.0015,0.0634,0.037,0.0041,disgust
+I have a cut that is red and swollen.,Infected wound,Emergency,0.0298,0.1214,0.0269,0.0064,0.2073,0.5757,0.0323,sadness
+I have a dry skin,Skin issue,General,0.0198,0.1416,0.009,0.0041,0.1343,0.6811,0.0102,sadness
+I have a dry throat,Cough,General,0.0231,0.1841,0.0335,0.0051,0.3022,0.4127,0.0393,sadness
+I have a dull ache in  my lower back which makes it difficult to move,Back pain,Pain,0.0016,0.0028,0.0034,0.0013,0.0071,0.981,0.0029,sadness
+I have a dull ache in my head,Head ache,Pain,0.0026,0.009,0.0054,0.0011,0.0115,0.9669,0.0036,sadness
+I have a dull ache in my stomach.  It gets worse after I eat.,Internal pain,Pain,0.0025,0.0287,0.013,0.002,0.0193,0.9291,0.0054,sadness
+I have a ear ache when I go to the pool,Ear ache,Pain,0.0123,0.0495,0.128,0.0054,0.1274,0.6391,0.0383,sadness
+I have a feeling like my whole body is complaining,Joint pain,Pain,0.4353,0.0951,0.0042,0.0023,0.1425,0.312,0.0087,anger
+I have a foot ache after running 500m with my running shoes.,Foot ache,Pain,0.0071,0.03,0.0812,0.0072,0.044,0.8132,0.0173,sadness
+I have a foot ache although I don't walk a lot.,Foot ache,Pain,0.008,0.0313,0.066,0.0074,0.0994,0.7766,0.0113,sadness
+"I have a foot ache in winter, or when it feels cold, why?",Foot ache,Pain,0.1556,0.0689,0.059,0.0041,0.2237,0.4515,0.0373,sadness
+I have a great stomach ache and i can't eat any thing,Stomach ache,Pain,0.0048,0.0161,0.0161,0.0041,0.0321,0.9212,0.0056,sadness
+I have a hair shortage,Hair falling out,General,0.0231,0.0165,0.0251,0.0042,0.2261,0.678,0.0271,sadness
+I have a hard muscle pain since i went to the gym,Muscle pain,Pain,0.0113,0.0271,0.1406,0.0127,0.0428,0.733,0.0325,sadness
+I have a head pain every single day.,Internal pain,Pain,0.0197,0.0506,0.2584,0.0037,0.0844,0.5669,0.0164,sadness
+I have a headache almost every day,Head ache,Pain,0.0247,0.0136,0.0556,0.0036,0.0718,0.813,0.0179,sadness
+I have a headache every time I eat ice cream,Head ache,Pain,0.0805,0.0613,0.3558,0.0108,0.1269,0.3341,0.0305,fear
+I have a lot of knee pain whenever I go running.,Knee pain,Pain,0.0242,0.0284,0.4328,0.0085,0.0778,0.4053,0.023,fear
+I have a lot of mucus when I cough.,Cough,General,0.0157,0.8099,0.0222,0.0018,0.1037,0.0394,0.0074,disgust
+I have a mental suffering,Emotional pain,General,0.0027,0.0111,0.0332,0.003,0.0135,0.9337,0.0029,sadness
+I have a neck pain when I sit in-front of my laptop.,Neck pain,Pain,0.0178,0.048,0.4994,0.0043,0.0535,0.3607,0.0162,fear
+I have a pain in my head,Head ache,Pain,0.0208,0.0527,0.1561,0.0056,0.07,0.6648,0.0301,sadness
+I have a pain in my joint,Joint pain,Pain,0.0202,0.0508,0.1128,0.007,0.0789,0.6987,0.0316,sadness
+I have a pain in my muscle,Muscle pain,Pain,0.019,0.0528,0.1071,0.0072,0.0871,0.6995,0.0274,sadness
+I have a pain in my stomach,Internal pain,Pain,0.0098,0.0927,0.1212,0.0044,0.0644,0.6838,0.0237,sadness
+I have a pain internal,Internal pain,Pain,0.015,0.0519,0.0966,0.0068,0.1128,0.6793,0.0375,sadness
+I have a pain that radiates up from my right hip to my rib cage.  It is at it's worst when I urinate.,Internal pain,Pain,0.0049,0.9634,0.0087,0.0006,0.0063,0.0152,0.0009,disgust
+I have a painful cramp in my feet,Foot ache,Pain,0.007,0.035,0.097,0.0055,0.0664,0.7677,0.0213,sadness
+I have a powerful pain inside my neck,Neck pain,Pain,0.0657,0.0788,0.3987,0.0059,0.0759,0.3421,0.0328,fear
+I have a problem in the expiration because i have abronchial asthma,Hard to breath,Emergency,0.0443,0.0213,0.2055,0.0082,0.1687,0.4919,0.0601,sadness
+I have a rash and it itches very bad.,Skin issue,General,0.0744,0.2443,0.1124,0.0061,0.2084,0.3343,0.0201,sadness
+I have a rash on my skin,Skin issue,General,0.2263,0.259,0.073,0.0047,0.2713,0.1486,0.0172,neutral
+I have a red rash that is itchy on my skin,Skin issue,General,0.2589,0.1778,0.0678,0.0053,0.168,0.3116,0.0106,sadness
+I have a scab on the back of my hand that just won't go away.,Skin issue,General,0.1067,0.5271,0.057,0.002,0.2076,0.0707,0.0289,disgust
+I have a sharp pain and clicking sound in my ankle joint when I try to stand on it and walk.,Joint pain,Pain,0.2134,0.1935,0.3193,0.0038,0.1103,0.1225,0.0373,fear
+I have a sharp pain in my abdomen.,Internal pain,Pain,0.2462,0.1947,0.1564,0.0053,0.0648,0.3029,0.0298,sadness
+I have a sharp pain in my ear,Ear ache,Pain,0.2178,0.0723,0.1292,0.0058,0.0887,0.4276,0.0586,sadness
+I have a sharp pain in my lower stomach.,Stomach ache,Pain,0.1366,0.2494,0.1339,0.005,0.0747,0.3715,0.0289,sadness
+I have a sharp pain in my neck,Neck pain,Pain,0.2133,0.0469,0.177,0.0061,0.0626,0.4579,0.0362,sadness
+I have a skin rash after eating an ice-cream.,Skin issue,General,0.0384,0.7404,0.0526,0.0027,0.1179,0.0418,0.0062,disgust
+I have a split on my thumb that will not heal.,Open wound,Emergency,0.0595,0.0941,0.1282,0.0157,0.1851,0.4488,0.0686,sadness
+I have a strange rash on my arm,Foot ache,Pain,0.013,0.0997,0.513,0.0034,0.0562,0.011,0.3036,fear
+I have a throbbing in my joints,Joint pain,Pain,0.0684,0.0488,0.0479,0.0068,0.1647,0.6205,0.0429,sadness
+I have a very rash sensation close to my arms,Skin issue,General,0.1044,0.139,0.4696,0.0052,0.1816,0.0778,0.0224,fear
+I have a wound between my toes that gets better overnight and then reopens ever day when I wear dress shoes to work.,Open wound,Emergency,0.0549,0.1387,0.1052,0.0103,0.3062,0.2968,0.0878,neutral
+I have acne all over my face,Acne,General,0.0746,0.2276,0.0482,0.0074,0.2982,0.3139,0.03,sadness
+I have acne in my face and other problema in my derma like itching,Skin issue,General,0.2398,0.1034,0.0708,0.007,0.2718,0.2888,0.0184,sadness
+I have acne in my face and other problems in my derma like itching,Skin issue,General,0.2013,0.1116,0.076,0.0069,0.2519,0.3342,0.0181,sadness
+I have an ear ache that won't go away.  I don't have a cold or headache or any other symptoms.  Just an earache.,Ear ache,Pain,0.0073,0.012,0.0467,0.0072,0.1047,0.7837,0.0385,sadness
+I have an ear ache when showering,Ear ache,Pain,0.0162,0.0883,0.0773,0.0046,0.1754,0.6093,0.0288,sadness
+I have an indigestion,Stomach ache,Pain,0.0154,0.6066,0.025,0.0032,0.1268,0.2099,0.0131,disgust
+I have an internal pain I cannot describe,Internal pain,Pain,0.011,0.0947,0.0825,0.004,0.0929,0.6727,0.0422,sadness
+I have an open wound in my arm,Open wound,Emergency,0.0505,0.0502,0.0872,0.0056,0.1135,0.6249,0.0681,sadness
+I have blurred vision.,Blurry vision,General,0.0399,0.1183,0.417,0.004,0.253,0.0968,0.071,fear
+I have blurry vision after I used a wrong medicine.,Blurry vision,General,0.0996,0.2959,0.4151,0.0022,0.0365,0.1409,0.0098,fear
+I have cloudy eyes,Blurry vision,General,0.0215,0.0268,0.0519,0.0083,0.1724,0.7083,0.0108,sadness
+I have constant stomach pain and bloating.,Internal pain,Pain,0.0106,0.2833,0.054,0.0061,0.0943,0.5429,0.0089,sadness
+I have cut my finger because of playing football and I have to apply pain relief cream but it does not help,Injury from sports,Pain,0.0324,0.0325,0.0704,0.0066,0.0789,0.7534,0.0259,sadness
+I have dark spots on my skin,Skin issue,General,0.0243,0.3655,0.0506,0.0021,0.0743,0.4713,0.0118,sadness
+I have difficulty in breathing in crowded places.,Hard to breath,Emergency,0.0042,0.0131,0.9491,0.0028,0.013,0.0128,0.0051,fear
+I have eruptions on my face that come and go .,Acne,General,0.4753,0.0547,0.314,0.0033,0.0771,0.0394,0.0361,anger
+I have for dia,Heart hurts,Emergency,0.004,0.0184,0.0245,0.0402,0.8322,0.0679,0.0127,neutral
+I have found some issues in my skin and tried to use cream but it doesn't get better,Skin issue,General,0.016,0.0262,0.0134,0.0022,0.0817,0.8481,0.0124,sadness
+I have front head pain and when I get it the light bothers me.,Head ache,Pain,0.0476,0.1644,0.0401,0.0067,0.1484,0.5674,0.0254,sadness
+I have general discomfort in my torso.,Internal pain,Pain,0.0115,0.4554,0.3114,0.0073,0.1075,0.1001,0.0068,disgust
+I have internal pain whenever I come down with a cold.,Internal pain,Pain,0.0591,0.0827,0.2763,0.0042,0.0594,0.511,0.0073,sadness
+I have muscle pain in my left leg,Shoulder pain,Pain,0.0193,0.0546,0.1183,0.0092,0.1341,0.6305,0.0341,sadness
+I have pain in my chest that saddens me.,Heart hurts,Emergency,0.001,0.004,0.0035,0.0011,0.0097,0.9782,0.0025,sadness
+I have pain in my colon and my stomach like something cutting it,Stomach ache,Pain,0.0217,0.1968,0.1408,0.0052,0.1046,0.4845,0.0464,sadness
+I have pain in my stomach,Stomach ache,Pain,0.0108,0.0922,0.114,0.0044,0.0681,0.6859,0.0246,sadness
+I have pimples in patches along with a lot of redness on my face.,Acne,General,0.0193,0.3903,0.0223,0.0043,0.203,0.343,0.0178,disgust
+I have pimples on my back.,Acne,General,0.0201,0.7282,0.022,0.0027,0.0482,0.1723,0.0065,disgust
+I have severe shoulder pain,Shoulder pain,Pain,0.0148,0.0149,0.1785,0.0088,0.0649,0.7043,0.0138,sadness
+I have shooting pain in my kneecap after working out.,Knee pain,Pain,0.0389,0.1455,0.2239,0.0078,0.0918,0.4598,0.0323,sadness
+I have shooting pains up and down my back.,Back pain,Pain,0.0178,0.0501,0.2431,0.006,0.1062,0.5485,0.0284,sadness
+I have shoulder pain when I try to carry my groceries.,Shoulder pain,Pain,0.0231,0.0276,0.7653,0.0033,0.0119,0.1633,0.0055,fear
+I have some pain when i'm walking around my knees,Joint pain,Pain,0.0128,0.0477,0.2395,0.0098,0.0677,0.5824,0.0402,sadness
+I have some terrible problems when i'm breathing during the night.,Cough,General,0.0044,0.0243,0.9292,0.0017,0.0039,0.0312,0.0054,fear
+I have terrible pain in my heart,Heart hurts,Emergency,0.0028,0.0092,0.7924,0.0022,0.0057,0.1809,0.0068,fear
+I have the impression of having no strength in my body,Body feels weak,Assistance,0.0164,0.3656,0.1907,0.0029,0.1336,0.2343,0.0566,disgust
+I have this strange rash on my arm.,Skin issue,General,0.017,0.2463,0.4359,0.0037,0.0982,0.0159,0.183,fear
+I have throbing in my shoulder,Shoulder pain,Pain,0.0088,0.0345,0.146,0.0067,0.0558,0.7129,0.0353,sadness
+I have tried to make massage on my foot but they still pain me,Foot ache,Pain,0.0231,0.0543,0.0469,0.0021,0.038,0.8247,0.0108,sadness
+I have tried to relief it but I can't,Body feels weak,Assistance,0.0089,0.0041,0.0063,0.0016,0.02,0.9559,0.0033,sadness
+I hit my head at the basketball game.  Could I have a concussion?,Injury from sports,Pain,0.0373,0.0174,0.4076,0.0047,0.0454,0.3837,0.1038,fear
+I hit myself and the would doesn't want to heal,Open wound,Emergency,0.2907,0.0066,0.0258,0.0018,0.0147,0.6388,0.0215,sadness
+I hve cut my finger because of playing football and I  to apply pain relief cream but it does not help,Injury from sports,Pain,0.0133,0.0037,0.0263,0.0067,0.0151,0.9204,0.0144,sadness
+I just can't seem to get warm.  Even when everyone around me is warm I always feel cold.,Feeling cold,Assistance,0.2857,0.0228,0.0732,0.0049,0.0217,0.5793,0.0124,sadness
+I knocked my foot and it really hurts.,Foot ache,Pain,0.0144,0.0146,0.0257,0.0032,0.0564,0.8555,0.0303,sadness
+I lose a lot of my hair,Hair falling out,General,0.0465,0.0711,0.0574,0.0161,0.2672,0.4783,0.0633,sadness
+I love to garden but I get a terrible twinge in my lower back when I lean over.,Back pain,Pain,0.0057,0.0536,0.8973,0.0017,0.0032,0.0333,0.0052,fear
+I love to walk and be outside but the bottoms of my feet get sore so quickly.,Foot ache,Pain,0.0046,0.0071,0.0061,0.0302,0.0284,0.9179,0.0056,sadness
+I m feeling cold though the temperature is high,Feeling cold,Assistance,0.8732,0.0027,0.0139,0.0071,0.0011,0.101,0.001,anger
+I made lots and lots of analysis to know the main reason for my stomach ache,Stomach ache,Pain,0.0166,0.0966,0.0759,0.0096,0.1663,0.6181,0.0169,sadness
+"I may have overdone it with the weightlifting, because I am afraid I may have torn a muscle on my back.",Injury from sports,Pain,0.0023,0.0026,0.9688,0.0012,0.0122,0.0091,0.0039,fear
+I must see a doctor i have an open wound,Open wound,Emergency,0.0049,0.0126,0.0508,0.0042,0.0309,0.8235,0.0731,sadness
+I need a kind of cream wich make my muscles more relaxed,Muscle pain,Pain,0.0056,0.0101,0.0031,0.4567,0.5036,0.0132,0.0077,neutral
+"I never had any acne problem until my last pregnancy, when all of a sudden my back got covered in zits.",Acne,General,0.0174,0.0233,0.0267,0.0026,0.014,0.0055,0.9104,surprise
+I notice a lot more hair coming out than usual when I brush my hair,Hair falling out,General,0.0329,0.6185,0.0674,0.0034,0.1505,0.0275,0.0999,disgust
+I noticed an important decrease in my vision when I try to look at things up close.,Blurry vision,General,0.0334,0.2924,0.2566,0.0065,0.2088,0.042,0.1604,disgust
+I often get a sharp pain in my chest and I can't tell what I'm doing that might be triggering it.,Heart hurts,Emergency,0.1951,0.156,0.2698,0.0026,0.1327,0.13,0.1138,fear
+I often get a stomach ache after I eat.  I haven't been able to pinpoint which foods might be the trigger.,Stomach ache,Pain,0.014,0.2495,0.1221,0.0049,0.2096,0.3707,0.0291,sadness
+I read a book for along time and when I finished reading I feel head ache,Head ache,Pain,0.0115,0.0409,0.1571,0.0087,0.0297,0.7348,0.0172,sadness
+I sliced myself deeply with a knife while I was cooking,Open wound,Emergency,0.4212,0.2103,0.265,0.0039,0.0116,0.0777,0.0102,anger
+"I started taking swimming lessons and I guess I swallowed too much water through my nose, because this sinusitis is killing me now.",Injury from sports,Pain,0.0366,0.8065,0.0329,0.0011,0.0548,0.0608,0.0072,disgust
+I stopped sports because I get Injury from sports,Injury from sports,Pain,0.0709,0.0129,0.1274,0.0066,0.0586,0.6841,0.0395,sadness
+I suffered a deep wound in my hand and I can not stop the bleeding,Infected wound,Emergency,0.0155,0.0243,0.0482,0.0025,0.0379,0.8582,0.0134,sadness
+I think I overdid it when I carried all that lumber from the yard. My lower back is killing me.,Back pain,Pain,0.1141,0.282,0.0606,0.0023,0.1335,0.3563,0.0511,sadness
+I think I sprained my ankle it really hurts.,Injury from sports,Pain,0.0203,0.0293,0.0822,0.0069,0.1694,0.6451,0.0468,sadness
+I think my body temperature is very low.,Feeling cold,Assistance,0.0156,0.0422,0.0506,0.0114,0.8288,0.0416,0.0098,neutral
+I think my wound is infected,Infected wound,Emergency,0.0332,0.2065,0.0594,0.0047,0.4613,0.1604,0.0746,neutral
+I think there's fluid in my ears.,Ear ache,Pain,0.029,0.3243,0.08,0.0039,0.3874,0.0775,0.0979,neutral
+"I think there's something wrong with my wound, it does not seem to heal like it should.",Infected wound,Emergency,0.032,0.0924,0.0958,0.0067,0.4578,0.2386,0.0767,neutral
+I toppled over while jumping to catch the ball.,Injury from sports,Pain,0.0439,0.0039,0.897,0.0032,0.004,0.0114,0.0366,fear
+I travelled by plane a few days ago and this time during landing my ears remained clogged and painful.,Ear ache,Pain,0.009,0.0818,0.0401,0.0037,0.0472,0.8088,0.0094,sadness
+I tried alot of cream but i still feel the same skin problem,Skin issue,General,0.0029,0.0042,0.0027,0.0018,0.0064,0.9794,0.0026,sadness
+I tried to put my glasses to see more clear but cant find any change,Blurry vision,General,0.0213,0.0208,0.0149,0.0073,0.369,0.4208,0.1459,sadness
+I used alot of pain killer to get better but i still feel the same back pain,Back pain,Pain,0.0027,0.0042,0.0107,0.0023,0.0079,0.9666,0.0057,sadness
+"I used to be out of breath after going up a dozen of stairs, but now I struggle to breath even when I sit down.",Hard to breath,Emergency,0.0252,0.1162,0.5213,0.0019,0.1357,0.1264,0.0733,fear
+I used to have acne when I was 15 years old,Acne,General,0.0217,0.5331,0.1746,0.01,0.1404,0.107,0.0131,disgust
+I usually have a bad cough when I get flu.,Cough,General,0.0366,0.1471,0.2578,0.0063,0.3673,0.1605,0.0243,neutral
+I visited many doctors but they can't find the right treatment toget my hair back,Hair falling out,General,0.0216,0.0188,0.0116,0.0014,0.0802,0.851,0.0154,sadness
+I wake up at night feeling cold,Feeling cold,Assistance,0.9428,0.0038,0.0238,0.001,0.004,0.0226,0.002,anger
+I wake up with a stiff neck every morning.  Massage helps but then a couple of days later it's back again.,Neck pain,Pain,0.0212,0.0243,0.2445,0.005,0.1126,0.536,0.0565,sadness
+I walk every day but now I get short of breath after going only a short way.,Hard to breath,Emergency,0.0147,0.0215,0.8126,0.0011,0.0576,0.0256,0.0669,fear
+"I was diagnosed with  B12-deficiency anemia, which explains why I always felt cold.",Feeling cold,Assistance,0.3879,0.0243,0.3501,0.0059,0.0187,0.2043,0.0087,anger
+I was kicked in the head playing soccer last night.,Injury from sports,Pain,0.3651,0.0727,0.2195,0.0057,0.0068,0.3218,0.0084,anger
+I was playing soccer and I twisted my ankle,Injury from sports,Pain,0.1936,0.0114,0.7203,0.006,0.0076,0.0307,0.0305,fear
+I was very active in sports but now my body is feeling pain.,Injury from sports,Pain,0.0029,0.0108,0.0171,0.0023,0.0141,0.9494,0.0032,sadness
+I wish this excruciating feeling of loss could go away.,Emotional pain,General,0.0043,0.0176,0.0787,0.0021,0.046,0.8458,0.0055,sadness
+I'm feeling nauseous,Stomach ache,Pain,0.0043,0.0819,0.4432,0.0044,0.0272,0.4222,0.0169,fear
+I'm having a hard time hearing.,Ear ache,Pain,0.0141,0.083,0.2072,0.0037,0.037,0.6435,0.0115,sadness
+I'm having a hard time reading because the letters are all fuzzy,Blurry vision,General,0.0151,0.301,0.0381,0.0044,0.4519,0.1249,0.0646,neutral
+I'm in need for a treatment for my hair fall,Hair falling out,General,0.0066,0.0042,0.0595,0.0021,0.02,0.8999,0.0076,sadness
+I'm not feeling good I can't take my breath,Hard to breath,Emergency,0.0043,0.0092,0.0105,0.002,0.0118,0.96,0.0022,sadness
+I'm not feeling good I get infection wound,Infected wound,Emergency,0.0047,0.0209,0.0225,0.0057,0.0368,0.9051,0.0043,sadness
+I'm not good i feel dizzy,Feeling dizzy,Emergency,0.0039,0.0014,0.8077,0.0028,0.0021,0.0073,0.1748,fear
+I'm not good i'm feeling so cold,Feeling cold,Assistance,0.9125,0.0018,0.0113,0.003,0.0007,0.0698,0.0007,anger
+I'm not hearing well I have problem with my ear,Ear ache,Pain,0.0141,0.0232,0.0794,0.0024,0.0536,0.8076,0.0198,sadness
+I'm suffering from sharp cough Accompanied by  phlegm,Cough,General,0.0962,0.0102,0.0989,0.0036,0.0289,0.7472,0.0151,sadness
+I'm very worried that I'll go bald soon. Am I very sick?,Hair falling out,General,0.0044,0.0039,0.9263,0.0035,0.0158,0.0304,0.0157,fear
+I've always been very active but now I just don't have the strength or energy to go for even a short walk.,Body feels weak,Assistance,0.0085,0.0126,0.0215,0.0082,0.881,0.0449,0.0234,neutral
+I've been feeling very sad lately,Emotional pain,General,0.0006,0.0011,0.0006,0.0014,0.0046,0.9889,0.0028,sadness
+I've been over my cold for weeks but still cough every day.,Cough,General,0.0413,0.1275,0.1069,0.0049,0.2962,0.3933,0.03,sadness
+I've got a hard time to breath- am I having a heart attack?,Hard to breath,Emergency,0.0082,0.0088,0.5645,0.0037,0.046,0.2646,0.1042,fear
+I've had this cough for two weeks.,Cough,General,0.0138,0.1067,0.099,0.0063,0.4299,0.3225,0.0218,neutral
+I've noticed my hair falling out a lot lately.,Hair falling out,General,0.0445,0.1742,0.0601,0.0067,0.2113,0.3848,0.1184,sadness
+"I've tried reading books, but nothing can cheer me up.",Emotional pain,General,0.0032,0.0041,0.0007,0.0031,0.0049,0.9827,0.0013,sadness
+In highschool I had a lot of acne.,Acne,General,0.0345,0.5541,0.0847,0.0059,0.1051,0.2076,0.008,disgust
+In the morning my respiration is loud.,Hard to breath,Emergency,0.2236,0.3016,0.2404,0.0027,0.046,0.1454,0.0403,disgust
+Is pimples a skin disease?,Acne,General,0.0459,0.4386,0.0938,0.0021,0.2931,0.0931,0.0334,disgust
+Is there a cure for acne?,Acne,General,0.0172,0.0495,0.0489,0.0026,0.7806,0.0423,0.0589,neutral
+It feels like I can't take a deep breath,Hard to breath,Emergency,0.0132,0.0389,0.0436,0.001,0.0528,0.8434,0.0073,sadness
+It feels like my heart is going to leap out of my body. It hurts.,Heart hurts,Emergency,0.0054,0.0107,0.0136,0.0014,0.0256,0.9327,0.0106,sadness
+It feels like someone is hitting my head with a hammer.  I feel pain on the top of my head and it throbs.,Head ache,Pain,0.035,0.086,0.1344,0.0022,0.0354,0.6797,0.0273,sadness
+It feels like someone stuck a knife into my shoulder,Shoulder pain,Pain,0.0908,0.6873,0.1192,0.0006,0.0349,0.0587,0.0084,disgust
+It hurts when I bent my arm,Joint pain,Pain,0.0165,0.0357,0.0533,0.0048,0.074,0.7895,0.0262,sadness
+It hurts when I raise my arm up,Shoulder pain,Pain,0.0101,0.0159,0.0472,0.0032,0.0393,0.8689,0.0154,sadness
+"It is hard to breath when I am in the underground metro station, why?",Hard to breath,Emergency,0.0383,0.0676,0.1242,0.0013,0.0476,0.0174,0.7036,surprise
+It is like I have a needle pushing through my heart.,Heart hurts,Emergency,0.0354,0.0982,0.1655,0.0034,0.4474,0.076,0.174,neutral
+It itches inside my ears.,Ear ache,Pain,0.065,0.356,0.0369,0.0048,0.3128,0.1611,0.0634,disgust
+"It started as a tinnitus, but today the pain is throbbing and unbearable.",Ear ache,Pain,0.0545,0.3019,0.0567,0.0031,0.0646,0.5072,0.0119,sadness
+It's hard to see things,Blurry vision,General,0.0334,0.2658,0.0365,0.002,0.0526,0.4568,0.1528,sadness
+"It's hard to stand up, and I'm moving very slowly",Body feels weak,Assistance,0.0254,0.0626,0.6168,0.0016,0.1159,0.0763,0.1014,fear
+"Laceration, rupture or opening in the skin",Open wound,Emergency,0.1871,0.1938,0.1021,0.0073,0.3167,0.1349,0.058,neutral
+Mr hair is falling out just by combing it.,Hair falling out,General,0.0473,0.1534,0.0118,0.0027,0.5943,0.0498,0.1407,neutral
+My acne gets worse when it is hot,Acne,General,0.0428,0.3103,0.0469,0.0048,0.1685,0.4183,0.0083,sadness
+My acne is really embarassing. It's so read.,Acne,General,0.0062,0.7578,0.0159,0.0063,0.1505,0.0447,0.0186,disgust
+My acne itches and oozes.,Acne,General,0.0574,0.6006,0.0136,0.0049,0.1912,0.1186,0.0136,disgust
+My ankle joint throbs when I put pressure on my foot.,Joint pain,Pain,0.0189,0.0493,0.3192,0.0035,0.0332,0.563,0.0129,sadness
+My arm hurts when I stretch,Muscle pain,Pain,0.0136,0.0365,0.0595,0.0058,0.102,0.7628,0.0199,sadness
+My back got injured while i was lifting at the gym,Injury from sports,Pain,0.0181,0.0115,0.1963,0.0092,0.04,0.666,0.0588,sadness
+My back hurts a lot when I bend,Back pain,Pain,0.029,0.0341,0.0845,0.0098,0.1293,0.6692,0.0442,sadness
+My back hurts me and i can't bend it or walk,Back pain,Pain,0.0098,0.01,0.0339,0.0033,0.0371,0.8909,0.0151,sadness
+My back hurts so much I can't bend down to tie my shoelaces.,Back pain,Pain,0.0143,0.0284,0.0719,0.0047,0.0927,0.7683,0.0197,sadness
+My back is hurting so much.,Back pain,Pain,0.0058,0.0105,0.0228,0.0037,0.0448,0.8976,0.0149,sadness
+My biceps started aching after I went to the gym,Muscle pain,Pain,0.0033,0.021,0.0224,0.0038,0.0312,0.9088,0.0096,sadness
+My body aches on the inside between my hips and shoulders.,Internal pain,Pain,0.0072,0.0854,0.0754,0.0074,0.1295,0.6788,0.0163,sadness
+My body feels like it's in a refrigerator.,Feeling cold,Assistance,0.0441,0.1555,0.048,0.0049,0.6474,0.0249,0.0751,neutral
+"My body feels weak after my first day in the gym, why?",Body feels weak,Assistance,0.0044,0.0631,0.542,0.0019,0.0272,0.3224,0.039,fear
+"My body feels weak although I eat a lot, why?",Body feels weak,Assistance,0.0038,0.0404,0.1151,0.0019,0.0361,0.7886,0.014,sadness
+My body feels weak although I take my vitamins regularly.,Body feels weak,Assistance,0.003,0.0448,0.0818,0.003,0.0237,0.8403,0.0033,sadness
+My body feels weak and I tried to make it relax but it stills pain me,Body feels weak,Assistance,0.0025,0.0085,0.0549,0.0015,0.0076,0.9205,0.0045,sadness
+My body feels weak and i think that my face is fade and i can't sleep well,Body feels weak,Assistance,0.0011,0.0032,0.0237,0.0019,0.0029,0.965,0.0023,sadness
+My calves feel like they are tight as knots and are throbbing,Muscle pain,Pain,0.0789,0.0472,0.0552,0.0066,0.1276,0.662,0.0226,sadness
+My chest acne breaks out and never clears up.,Acne,General,0.0484,0.1801,0.0248,0.0043,0.3592,0.3732,0.0099,sadness
+My chest break out with red pimples and whiteheads.,Acne,General,0.0374,0.1248,0.0383,0.0088,0.2066,0.5197,0.0644,sadness
+My chest hurts when I go to take a breath,Hard to breath,Emergency,0.0064,0.0203,0.0496,0.0025,0.0392,0.8715,0.0106,sadness
+My chest hurts when I smoke,Internal pain,Pain,0.1264,0.2008,0.215,0.0034,0.0277,0.4195,0.0072,sadness
+My cough is very heavy and I have mucus.,Cough,General,0.0209,0.6301,0.0614,0.0022,0.0985,0.1787,0.0083,disgust
+My cut yellow or greenish-colored pus,Infected wound,Emergency,0.0275,0.8916,0.0036,0.0027,0.0343,0.0359,0.0045,disgust
+My daughter had her ears pierced and one of her ear lobes is bright red and burning hot.,Infected wound,Emergency,0.9089,0.0372,0.0036,0.0008,0.019,0.0252,0.0051,anger
+My daughter had her eyebrows threaded and it pulled an opening of skin in one of her brows that is now puffy and oozing.,Infected wound,Emergency,0.0224,0.7622,0.0078,0.0028,0.1341,0.0582,0.0125,disgust
+"My daughter was bit by her cat and now her hand is sore, red and swollen and the wound is oozing liquid.",Infected wound,Emergency,0.0293,0.8621,0.0114,0.001,0.0406,0.0503,0.0053,disgust
+My ear ache when I'm listening to music.,Ear ache,Pain,0.0194,0.1185,0.4066,0.0062,0.0438,0.3882,0.0172,fear
+My ear hurts and it's worse when I swallow.  My ear is very painful and Tylenol hasn't helped.,Ear ache,Pain,0.0075,0.0621,0.0541,0.0023,0.0231,0.8434,0.0074,sadness
+My ear hurts when I touch it.,Ear ache,Pain,0.0374,0.1122,0.0963,0.0032,0.093,0.6427,0.0153,sadness
+My ear is ringing.,Ear ache,Pain,0.1292,0.028,0.2206,0.0025,0.0801,0.4757,0.0639,sadness
+My entire body is freezing.,Feeling cold,Assistance,0.2527,0.2086,0.0444,0.0039,0.241,0.2282,0.0212,anger
+My face break out badly every month around my cycle.,Acne,General,0.0254,0.0151,0.1067,0.0051,0.0316,0.79,0.026,sadness
+"My face has broken out in painful red spots and lumps, that no matter how much I clean my face don't seem to be going away.",Acne,General,0.0123,0.0998,0.0373,0.0025,0.1112,0.7261,0.0108,sadness
+My face is all broken out with pimples.,Acne,General,0.0586,0.3137,0.0293,0.0032,0.134,0.4122,0.0491,sadness
+My foot had been aching since last Tuesday.,Foot ache,Pain,0.0029,0.0218,0.0185,0.0045,0.0473,0.8951,0.0099,sadness
+My foot hurts and I can't turn it.  Maybe it's broken.,Foot ache,Pain,0.0084,0.0124,0.0513,0.0035,0.0643,0.8281,0.032,sadness
+My foot hurts me a lot of playing football,Foot ache,Pain,0.0087,0.0106,0.0288,0.0051,0.0582,0.8733,0.0154,sadness
+My foot is hurting so much.,Foot ache,Pain,0.0056,0.0113,0.0193,0.0033,0.0435,0.9037,0.0132,sadness
+My grandmother last year went to hospital because she was having a hard time breathing,Hard to breath,Emergency,0.0017,0.005,0.0412,0.002,0.0114,0.9262,0.0125,sadness
+My grandson cut his foot on a seashell in the ocean and now the foot is turning gray and is puffy.,Infected wound,Emergency,0.0284,0.5527,0.0218,0.0056,0.1798,0.1865,0.0251,disgust
+My hair always falls out and i have lost a lot of hair lately,Hair falling out,General,0.015,0.0108,0.0143,0.0045,0.0265,0.8831,0.0458,sadness
+"My hair is coming out in chunks, especially when I wash it",Hair falling out,General,0.1178,0.5668,0.0424,0.0015,0.1052,0.146,0.0203,disgust
+My hair is falling out after I take a shower.,Hair falling out,General,0.0384,0.339,0.0481,0.0024,0.0588,0.492,0.0213,sadness
+My hair is falling out in bunches.,Hair falling out,General,0.0417,0.0543,0.0255,0.0019,0.0395,0.8064,0.0309,sadness
+My hair is falling out in huge amount,Hair falling out,General,0.076,0.0196,0.0404,0.003,0.0379,0.6714,0.1518,sadness
+My hair is falling when I am combing it.,Hair falling out,General,0.1635,0.2099,0.1514,0.0058,0.1182,0.2852,0.066,sadness
+"My hair is falling without a reason, I can see a lot of hair on my working desk.",Hair falling out,General,0.0539,0.6537,0.0437,0.0021,0.0699,0.0577,0.1191,disgust
+My head ache since I woke up this morning.,Head ache,Pain,0.012,0.0674,0.1094,0.0085,0.0528,0.7371,0.0128,sadness
+My head gets dizzy when I try to get up.,Feeling dizzy,Emergency,0.0074,0.0194,0.635,0.0026,0.0193,0.0158,0.3005,fear
+"My head hurts and I lose the sensation in my face, then lose sight in my eye",Head ache,Pain,0.0139,0.023,0.0445,0.0024,0.038,0.8596,0.0186,sadness
+My head hurts in the back and the pain lasts all day.,Head ache,Pain,0.0111,0.0281,0.0478,0.0038,0.0609,0.8345,0.0138,sadness
+My head hurts when I'm doing this.,Head ache,Pain,0.0124,0.037,0.0698,0.0022,0.0393,0.8293,0.0099,sadness
+My head hurts whenever I try to do something.,Head ache,Pain,0.2323,0.0325,0.3149,0.0029,0.013,0.399,0.0053,sadness
+My head is so heavy can't think normally,Head ache,Pain,0.0245,0.0481,0.153,0.0019,0.0401,0.5645,0.168,sadness
+My head is spinning when I get up.,Feeling dizzy,Emergency,0.0576,0.0209,0.084,0.0044,0.1057,0.055,0.6723,surprise
+My heart feels like it's going to explode.,Heart hurts,Emergency,0.5559,0.0063,0.1454,0.0049,0.0188,0.0422,0.2266,anger
+My heart hurts when I exercise,Heart hurts,Emergency,0.0022,0.0022,0.0049,0.0013,0.0103,0.9745,0.0046,sadness
+"My heart hurts while I'm sad, why?",Heart hurts,Emergency,0.001,0.0014,0.0016,0.0012,0.0074,0.9809,0.0065,sadness
+My heart is beating fast and it scares me.,Heart hurts,Emergency,0.0032,0.0006,0.9887,0.001,0.0016,0.0015,0.0034,fear
+My heart is pumping fast and I'm having a hard time to breath.,Hard to breath,Emergency,0.0219,0.0211,0.1607,0.0022,0.0614,0.6929,0.0397,sadness
+My husband has a spot on his lip that he though was cold sore but now it has broken open and leaks fluid all day.,Infected wound,Emergency,0.0681,0.118,0.0243,0.0034,0.5251,0.1974,0.0637,neutral
+"My husband left me for another woman, my heart hurts so badly to the point I can't eat or sleep.",Heart hurts,Emergency,0.008,0.0198,0.0092,0.0014,0.0239,0.9335,0.0042,sadness
+My infected wound cause fever,Skin issue,General,0.0515,0.1477,0.0901,0.0111,0.3016,0.3637,0.0345,sadness
+My infected wound caused a fever,Infected wound,Emergency,0.0653,0.2311,0.0737,0.0077,0.3322,0.2525,0.0374,neutral
+My joints ache whenever it is cold,Joint pain,Pain,0.024,0.0391,0.0882,0.0067,0.1182,0.7162,0.0075,sadness
+My joints feel swollen,Joint pain,Pain,0.0498,0.0444,0.0243,0.0061,0.0626,0.782,0.0308,sadness
+My kee is swallowing which indicates i have an infected wound,Infected wound,Emergency,0.0255,0.6138,0.0502,0.0031,0.1251,0.1418,0.0405,disgust
+My knee catches and hurts when I first stand up after sitting.,Knee pain,Pain,0.0224,0.0493,0.7674,0.0051,0.0227,0.1224,0.0106,fear
+My knee doesn't want to bend well.,Knee pain,Pain,0.0189,0.0593,0.1083,0.0063,0.1224,0.6674,0.0173,sadness
+My knee feels weak and it gave way the other day at the top of the stairs.  Luckily there was a rail to hold on to.,Knee pain,Pain,0.0032,0.0076,0.436,0.0181,0.0346,0.4361,0.0645,sadness
+My knee hurts when I play squash,Knee pain,Pain,0.0079,0.0122,0.0509,0.0072,0.0571,0.8455,0.0192,sadness
+My knee hurts when I walk,Knee pain,Pain,0.0083,0.0136,0.0828,0.0073,0.0664,0.8002,0.0214,sadness
+My knee is hurting so badly.,Joint pain,Pain,0.005,0.0093,0.0316,0.0032,0.0323,0.9076,0.0109,sadness
+My kneecap feels like it is grating bone on bone when I walk.,Knee pain,Pain,0.0922,0.8446,0.0063,0.0011,0.0365,0.0168,0.0025,disgust
+My knees ache on cold and rainy days.,Knee pain,Pain,0.0133,0.0333,0.0513,0.0099,0.0374,0.8527,0.0022,sadness
+My knees hurt so bad to walk that I stay sitting more than I should.,Knee pain,Pain,0.0089,0.0315,0.0579,0.0056,0.0872,0.7949,0.014,sadness
+My knees seem to grind as I go up or down stairs.,Knee pain,Pain,0.0579,0.0599,0.1581,0.0038,0.0837,0.5892,0.0475,sadness
+My knees swell right below the knee cap and hurt when I put weight on them.,Knee pain,Pain,0.0298,0.0407,0.213,0.0113,0.1038,0.576,0.0254,sadness
+"My left ear is ok, but the right one feels like it's being stabbed with a nail.",Ear ache,Pain,0.1842,0.1337,0.1184,0.0018,0.0705,0.4683,0.023,sadness
+My lower back hurts but it improves if I stretch it,Muscle pain,Pain,0.0114,0.0452,0.0304,0.0205,0.3639,0.4892,0.0394,sadness
+My lungs feel heavy like they are filled with mucus,Cough,General,0.0082,0.0553,0.054,0.001,0.0166,0.855,0.0099,sadness
+"My mind feels very sad, as if it hurts.  The way I feel in my head is awful and when I think about my break-up, I cry with sadness.",Emotional pain,General,0.0016,0.0122,0.0116,0.002,0.0051,0.9648,0.0027,sadness
+My muscle in my shoulder burns when I move my arm.,Muscle pain,Pain,0.2546,0.1227,0.0702,0.0075,0.099,0.4268,0.0193,sadness
+My muscles feel tired,Body feels weak,Assistance,0.0066,0.0059,0.0059,0.0014,0.0282,0.9462,0.0057,sadness
+My muscles in my lower back are aching,Infected wound,Emergency,0.0018,0.0086,0.0047,0.0031,0.0304,0.9454,0.0061,sadness
+My muscles in my lower back are aching.,Muscle pain,Pain,0.0022,0.0177,0.0063,0.003,0.0348,0.9308,0.0052,sadness
+My neck feels stiff,Neck pain,Pain,0.0956,0.0491,0.3959,0.0066,0.0564,0.386,0.0105,fear
+My neck has been sore since the accident.,Neck pain,Pain,0.0211,0.0274,0.1951,0.0064,0.0736,0.6551,0.0213,sadness
+My neck hurts me and i can't stand with this pain,Neck pain,Pain,0.0049,0.0051,0.0302,0.0027,0.0129,0.9381,0.0061,sadness
+My neck is annoying me I can't sleep bacause of it,Neck pain,Pain,0.0512,0.0076,0.0128,0.0019,0.0308,0.8872,0.0085,sadness
+My nose is congested all the time and there's this gluey secretion in my throat that makes it impossible for me to sleep. I often have to nap sitting down.,Hard to breath,Emergency,0.0606,0.1986,0.0917,0.0023,0.3265,0.2831,0.0372,neutral
+My right shoulder clicks when I move my arm.,Shoulder pain,Pain,0.1869,0.0526,0.2399,0.0177,0.3372,0.0914,0.0742,neutral
+My shoulder aches when I try to lift five pounds.,Shoulder pain,Pain,0.0122,0.0352,0.2871,0.0104,0.0473,0.5967,0.0111,sadness
+My shoulder has agreat pain,Shoulder pain,Pain,0.0226,0.0264,0.1765,0.0069,0.1254,0.6209,0.0212,sadness
+My shoulder hurts me so much,Shoulder pain,Pain,0.0021,0.0025,0.0083,0.0018,0.0155,0.9639,0.0058,sadness
+My shoulder hurts when I try to reach something above my head.,Shoulder pain,Pain,0.0423,0.0558,0.3133,0.0056,0.0477,0.5184,0.0169,sadness
+My shoulder muscle hurts when I try to reach up.,Muscle pain,Pain,0.0465,0.0642,0.1849,0.0068,0.0776,0.5997,0.0203,sadness
+My shower drain is full of hair every time.,Hair falling out,General,0.0524,0.6374,0.0538,0.0024,0.1239,0.056,0.0742,disgust
+"My skin color on my back is red, I don't know why.",Skin issue,General,0.041,0.1383,0.0198,0.0025,0.2262,0.1346,0.4375,surprise
+My skin is itching.,Skin issue,General,0.2493,0.1795,0.0383,0.0056,0.2464,0.2647,0.0162,sadness
+My skin is itchy and inflamed,Skin issue,General,0.3886,0.0429,0.011,0.0042,0.0296,0.5187,0.005,sadness
+My skin is very dry and peeling.,Skin issue,General,0.0225,0.7296,0.0056,0.0029,0.0652,0.1688,0.0054,disgust
+My son got a tattoo several weeks ago and the skin around it is raised and hot and it looks infected.,Infected wound,Emergency,0.0279,0.8227,0.015,0.001,0.0715,0.0548,0.0071,disgust
+My son had a root canal and the dentist accidentally cut the inside of his cheek and now it will not heal.,Infected wound,Emergency,0.0379,0.1468,0.0416,0.0044,0.2138,0.4382,0.1172,sadness
+My son had his lip pierced and it is swollen and the skin inside on his lip is grey and looks infected.,Infected wound,Emergency,0.0305,0.6764,0.0127,0.0016,0.1037,0.165,0.0101,disgust
+My son has a lot of acne.,Acne,General,0.0363,0.2403,0.0218,0.0053,0.2735,0.4034,0.0193,sadness
+My son nicked his neck with an old razor and that spot has become inflamed and looks like it is infected.,Infected wound,Emergency,0.0356,0.7016,0.0175,0.0014,0.1669,0.0593,0.0177,disgust
+My son squeezed a pimple and it broke open only to scab over and now looks like it is infected.,Infected wound,Emergency,0.0454,0.6948,0.0195,0.0013,0.1335,0.039,0.0666,disgust
+My sore isn't healing well and it's been like this for two weeks.,Open wound,Emergency,0.0116,0.0528,0.0285,0.0048,0.1571,0.7329,0.0122,sadness
+My sore looks like its not healing well.,Infected wound,Emergency,0.005,0.0123,0.0038,0.0025,0.0342,0.9349,0.0072,sadness
+"My stomach aches after I drink any soda drink, why?",Stomach ache,Pain,0.0294,0.2163,0.1507,0.0026,0.1689,0.1897,0.2423,surprise
+"My stomach aches when I eat hot food, why?",Stomach ache,Pain,0.0224,0.2929,0.1621,0.0038,0.1514,0.2962,0.0711,sadness
+My stomach feels full and upset  and bloating after big meals.,Stomach ache,Pain,0.5056,0.0017,0.0072,0.0046,0.0069,0.4598,0.0141,anger
+My stomach feels starts hurting but then it feels better after I eat something mild.,Stomach ache,Pain,0.0084,0.0777,0.0249,0.0134,0.0873,0.7819,0.0064,sadness
+My stomach has been sore since yesterday.,Stomach ache,Pain,0.0119,0.0932,0.0531,0.0049,0.1115,0.7066,0.0188,sadness
+My television and computer seem out of focus even though I have new glasses.,Blurry vision,General,0.1342,0.0911,0.0597,0.0044,0.2137,0.3973,0.0996,sadness
+My throught is so sore.,Neck pain,Pain,0.0295,0.1369,0.0484,0.0071,0.2604,0.4696,0.048,sadness
+My upper back has been sore for a week.,Back pain,Pain,0.0213,0.0508,0.0646,0.0107,0.1627,0.6612,0.0287,sadness
+My wound opened up again,Open wound,Emergency,0.0299,0.0622,0.077,0.009,0.2935,0.2931,0.2353,neutral
+My wound was infected when i was planting some flowers in my garden,Infected wound,Emergency,0.1595,0.4888,0.0828,0.0228,0.0544,0.1708,0.0208,disgust
+Need to scratch my skin every minute,Skin issue,General,0.3127,0.1471,0.2272,0.0032,0.1863,0.1079,0.0156,anger
+Oh my heart hurts me I tried to be calm and I can't,Heart hurts,Emergency,0.0028,0.001,0.003,0.0011,0.0039,0.9822,0.0061,sadness
+Pain in the large neck,Neck pain,Pain,0.0504,0.0568,0.1293,0.0104,0.1533,0.542,0.0578,sadness
+Severe pain in the ear,Ear ache,Pain,0.0247,0.07,0.0972,0.0048,0.1993,0.5558,0.0483,sadness
+Sharp pain and heavy breathing,Internal pain,Pain,0.2036,0.0459,0.5584,0.0021,0.0147,0.1653,0.0099,fear
+Since I went into the forest  I have pain on my ear,Ear ache,Pain,0.0235,0.0079,0.3253,0.0105,0.0227,0.5513,0.0587,sadness
+Something dark is there on my arm,Skin issue,General,0.0047,0.0379,0.8833,0.001,0.0103,0.0397,0.023,fear
+Sometimes I cough because I'm a smoker,Cough,General,0.0352,0.3474,0.1808,0.0036,0.2429,0.1491,0.0411,disgust
+Sometimes I feel like a claw on my chest that leaves me breathless.,Hard to breath,Emergency,0.0168,0.0079,0.9677,0.0004,0.0024,0.0035,0.0013,fear
+Sometimes my body feels week without reason,Body feels weak,Assistance,0.1449,0.0163,0.1057,0.0013,0.0298,0.6818,0.0202,sadness
+"Sometimes when it is cold outside, my face hurts, especially around the pimples that are ready to pop.",Acne,General,0.0352,0.1341,0.0437,0.0036,0.1359,0.6408,0.0066,sadness
+Sterilizer for the eye,Blurry vision,General,0.0193,0.1843,0.0827,0.0072,0.5194,0.1373,0.0498,neutral
+Stomach pain after drinking milk,Stomach ache,Pain,0.0159,0.3515,0.2563,0.0037,0.0723,0.2839,0.0164,disgust
+Surgical wound infections,Infected wound,Emergency,0.0208,0.1077,0.1079,0.0094,0.2166,0.4825,0.0551,sadness
+The acne was causing me to feel embarrassed.,Acne,General,0.0042,0.1243,0.0206,0.0024,0.0622,0.7763,0.01,sadness
+The arches of my feet hurt when I wear heels,Foot ache,Pain,0.0436,0.0383,0.0809,0.0049,0.0701,0.7475,0.0147,sadness
+The area around my heart doesn't feel good.,Heart hurts,Emergency,0.0019,0.0133,0.0036,0.0123,0.0519,0.9123,0.0048,sadness
+The crushing sensation on my heart leaves me breathless.,Heart hurts,Emergency,0.0041,0.0024,0.9868,0.0003,0.0011,0.0036,0.0017,fear
+The feeling of coughing increases in winter's reach,Cough,General,0.0342,0.2427,0.2783,0.0038,0.2533,0.14,0.0477,fear
+The joints in my fingers are painful in the morning.,Joint pain,Pain,0.0298,0.188,0.1068,0.0043,0.0894,0.5697,0.012,sadness
+The knee feels like it rusted and I suddenly cannot bend it anymore.,Knee pain,Pain,0.2193,0.3164,0.0551,0.004,0.1418,0.1785,0.0849,disgust
+"The last time I clipped my toenails, I cut them too short and now I have an infected nail.",Infected wound,Emergency,0.0955,0.4468,0.0206,0.002,0.2483,0.061,0.1258,disgust
+The nerves were so damaged during the operation on my ankle that I cannot stand being touched on the scar.,Foot ache,Pain,0.0667,0.131,0.2774,0.0069,0.0929,0.4117,0.0133,sadness
+The pain feels like it's right below the skin,Muscle pain,Pain,0.0171,0.1205,0.1049,0.008,0.1949,0.5111,0.0436,sadness
+The pain in my back dwwls like a sharp knife in it,Back pain,Pain,0.1582,0.1131,0.0845,0.0062,0.0977,0.4822,0.0582,sadness
+The pain in my ear is unbearable.,Ear ache,Pain,0.0297,0.1633,0.235,0.0025,0.056,0.5029,0.0105,sadness
+"The pain is intense especially when I go down the stairs, it feels like something has snapped inside my knee.",Knee pain,Pain,0.8714,0.0297,0.0201,0.001,0.032,0.0303,0.0156,anger
+The severe pain in the stomach I feel,Stomach ache,Pain,0.0151,0.0695,0.1348,0.0038,0.0388,0.7278,0.0103,sadness
+The warming system of my house is broken and  feel so cold,Feeling cold,Assistance,0.4586,0.0011,0.0114,0.0086,0.0021,0.5121,0.0061,sadness
+The worst headache was during a hangover in my twenties: I sincerely thought I was going to die from brain inflammation.,Head ache,Pain,0.0225,0.2806,0.091,0.0082,0.1299,0.44,0.0277,sadness
+The wound is still open,Open wound,Emergency,0.0324,0.1162,0.027,0.0041,0.4962,0.2207,0.1034,neutral
+There are lots of hairs on my pillow in the morning.,Hair falling out,General,0.0674,0.7647,0.0586,0.0005,0.0331,0.0554,0.0203,disgust
+There are some pimples on my face that bother me a lot,Acne,General,0.0476,0.1159,0.0103,0.0031,0.0682,0.7407,0.0142,sadness
+"There are times when I feel crushed under a huge weight and no air passing to my lungs, it actually scares the hell out of me when it happens.",Hard to breath,Emergency,0.0314,0.0543,0.5766,0.0016,0.0142,0.3151,0.0068,fear
+There feels like a swollen knot at my shoulderblade with pain shooting from that,Shoulder pain,Pain,0.0832,0.1051,0.0341,0.0061,0.2017,0.5099,0.06,sadness
+There is a constant tickle in my throat,Cough,General,0.0866,0.2619,0.2807,0.0033,0.1809,0.155,0.0315,fear
+There is a sharp pain in my bicep,Muscle pain,Pain,0.1339,0.0569,0.0716,0.0054,0.1318,0.5422,0.0581,sadness
+There is a sharp pain in my bicep. I have tried to apply pain relief cream but it does not help.,Muscle pain,Pain,0.151,0.1064,0.0549,0.0024,0.0958,0.5665,0.0229,sadness
+There is a sharp pain in my calve.,Muscle pain,Pain,0.244,0.069,0.0738,0.0045,0.0979,0.46,0.0509,sadness
+There is a sharp pain in my ear whenever I do this.,Ear ache,Pain,0.2965,0.1445,0.169,0.0023,0.0932,0.2683,0.0262,anger
+There is a tingling sensation in my neck.,Neck pain,Pain,0.0152,0.2922,0.205,0.0034,0.1377,0.3133,0.0332,sadness
+"There is an extreme pressure below my belly button at the right, which I feel every time I go out for a jog.",Internal pain,Pain,0.0199,0.1119,0.4693,0.0056,0.3062,0.0344,0.0526,fear
+There is an injured person,Infected wound,Emergency,0.0068,0.0174,0.0262,0.0025,0.0915,0.8329,0.0228,sadness
+There is pain in my joints. I can not bear pain,Joint pain,Pain,0.0107,0.0507,0.0562,0.0051,0.0778,0.786,0.0134,sadness
+There is pain in the muscles I do not know caused,Muscle pain,Pain,0.0145,0.0605,0.0583,0.0042,0.2343,0.5799,0.0483,sadness
+There is so much pain when I move my arm.,Shoulder pain,Pain,0.0185,0.1343,0.1436,0.0049,0.1296,0.5388,0.0303,sadness
+There is this pain that radiates from my chest up to my left arm.,Heart hurts,Emergency,0.0234,0.1213,0.0903,0.0052,0.2168,0.515,0.0279,sadness
+"There must be something wrong with my blood circulation, I have to wear socks even on the hottest days, my toes are frozen!",Feeling cold,Assistance,0.4754,0.1106,0.0534,0.008,0.0863,0.1287,0.1376,anger
+There's swelling in my neck and it hurts.,Neck pain,Pain,0.0136,0.0337,0.0678,0.0046,0.1204,0.7375,0.0224,sadness
+These red spots on my cheeks are new. What is it?,Skin issue,General,0.042,0.0572,0.0096,0.0028,0.369,0.0288,0.4905,surprise
+This long scar on my left buttock is from falling off my mountain bike.,Injury from sports,Pain,0.067,0.0943,0.1069,0.0116,0.1739,0.4919,0.0544,sadness
+What helps cuts heal faster?,Open wound,Emergency,0.0132,0.0117,0.007,0.0055,0.8451,0.013,0.1044,neutral
+What's the symptoms of appendicitis?,Internal pain,Pain,0.0142,0.039,0.0472,0.002,0.8145,0.0317,0.0514,neutral
+When I bend over I get a shooting pain down my back,Back pain,Pain,0.0611,0.0528,0.5479,0.0032,0.0479,0.2566,0.0304,fear
+When I brush my hair I notice big clumps of hair coming out in the brush.,Hair falling out,General,0.013,0.9297,0.0183,0.0004,0.0219,0.0061,0.0105,disgust
+When I carry heavy things I feel like breaking my back,Hair falling out,General,0.0343,0.0302,0.1329,0.0021,0.0117,0.7788,0.01,sadness
+When I carry heavy things i feel like breaking my back,Back pain,Pain,0.0121,0.0024,0.0116,0.0014,0.0016,0.968,0.0029,sadness
+When I do hard exercises I feel great pain in my muscles.,Muscle pain,Pain,0.017,0.1396,0.3125,0.0483,0.0859,0.3848,0.012,sadness
+"When I drink a lot, I get a headache",Head ache,Pain,0.0573,0.0433,0.1068,0.0043,0.0423,0.7315,0.0145,sadness
+When I eat sugar I notice my vision blurs.,Blurry vision,General,0.0469,0.3884,0.1242,0.002,0.1821,0.0444,0.212,disgust
+When I eat too much sugar my body gets weak and dizzy.,Body feels weak,Assistance,0.0054,0.0333,0.7916,0.0025,0.023,0.0879,0.0563,fear
+When I force my eyes to view I have blurry vision.,Blurry vision,General,0.0463,0.1792,0.7325,0.0012,0.0115,0.0212,0.0081,fear
+When I get out of bed in the morning my body feels very weak.,Body feels weak,Assistance,0.005,0.0937,0.4281,0.0029,0.0291,0.4336,0.0076,sadness
+When I go to sleep I am feeling cold,Feeling cold,Assistance,0.8903,0.0081,0.016,0.0012,0.0034,0.0794,0.0015,anger
+"When I go to stand, my head starts swirling",Feeling dizzy,Emergency,0.1554,0.0143,0.7848,0.0022,0.011,0.0113,0.0209,fear
+When I lift my arms up I have a soreness in my shoulders,Shoulder pain,Pain,0.0421,0.0749,0.1266,0.0111,0.15,0.5643,0.0311,sadness
+"When I move my shoulder, it's like lightning is being sent through my shoulder",Shoulder pain,Pain,0.1831,0.0086,0.1774,0.0081,0.0971,0.0118,0.5141,surprise
+"When I move on my shoulder, pain shoots down my arm",Shoulder pain,Pain,0.0631,0.0522,0.4548,0.0059,0.0706,0.3242,0.0291,fear
+When I play football I have joint pain.,Joint pain,Pain,0.0339,0.0964,0.1684,0.0085,0.0971,0.5795,0.0162,sadness
+When I play football I have muscle pain.,Muscle pain,Pain,0.0343,0.1314,0.1736,0.0097,0.0985,0.5413,0.0112,sadness
+When I play sports  I have some burning sensation in my spine,Back pain,Pain,0.7696,0.0082,0.0634,0.0062,0.0183,0.1197,0.0146,anger
+When I played football I dislocated my shoulder,Injury from sports,Pain,0.0665,0.0491,0.3278,0.0162,0.0821,0.4326,0.0257,sadness
+When I remember her I feel down,Emotional pain,General,0.0013,0.0028,0.0024,0.0007,0.0031,0.9887,0.001,sadness
+When I sneeze very hard I feel ear ache,Ear ache,Pain,0.0179,0.0606,0.0406,0.0054,0.1245,0.7379,0.0132,sadness
+When I stand I feel dizzy I do not know why,Feeling dizzy,Emergency,0.0038,0.0038,0.6985,0.0024,0.0059,0.005,0.2807,fear
+When I stand up too quick my vision is blurry.,Blurry vision,General,0.0613,0.08,0.7066,0.002,0.0632,0.0243,0.0627,fear
+When I stand up too quickly I feel as though I'm going to faint.,Feeling dizzy,Emergency,0.0022,0.0133,0.8611,0.0028,0.0196,0.0873,0.0138,fear
+When I stand up too quickly I start to feel dizzy and light-headed,Feeling dizzy,Emergency,0.003,0.0027,0.8474,0.0017,0.0043,0.0064,0.1345,fear
+"When I stand up, I feel like I'm going to fall down instantly",Feeling dizzy,Emergency,0.0301,0.005,0.6412,0.0106,0.037,0.0077,0.2685,fear
+When I think of my parents I feel pain,Emotional pain,General,0.002,0.0061,0.0103,0.001,0.0079,0.9708,0.0018,sadness
+When I tried to answer the phine call I found that I can't hear the voice of the speaker,Ear ache,Pain,0.0407,0.2079,0.0805,0.0042,0.2656,0.1727,0.2286,neutral
+When I tried to be warm and wear more clothes I found that I was still cold,Feeling cold,Assistance,0.6014,0.1205,0.0712,0.004,0.0573,0.1231,0.0226,anger
+When I tried to take care if my hair I found that it is falling out,Hair falling out,General,0.1023,0.2592,0.0693,0.003,0.1389,0.2749,0.1524,sadness
+When I wake up I am feeling cold,Feeling cold,Assistance,0.9713,0.0028,0.0135,0.0006,0.0011,0.0101,0.0007,anger
+When I wake up in the morning I feel a soreness in my body,Muscle pain,Pain,0.0127,0.0798,0.0646,0.0033,0.0719,0.7505,0.0172,sadness
+When I walk I get a stabbing pain in the top of my foot,Foot ache,Pain,0.8212,0.048,0.0735,0.001,0.0102,0.0393,0.0068,anger
+When I walk it's hard to breath.,Hard to breath,Emergency,0.0183,0.1628,0.5911,0.0028,0.059,0.1507,0.0153,fear
+"When I walk up a flight of stairs, my right knee hurts.",Knee pain,Pain,0.0186,0.0381,0.1575,0.0046,0.0562,0.708,0.017,sadness
+When I was young I had an injury from sports in my knee.,Injury from sports,Pain,0.0118,0.0331,0.651,0.0057,0.0307,0.2544,0.0133,fear
+When I'm tired I feel my head heavy,Head ache,Pain,0.0167,0.019,0.0791,0.0014,0.0061,0.8737,0.004,sadness
+When I'm too high I start to feel dizzy,Feeling dizzy,Emergency,0.0034,0.0042,0.793,0.0021,0.0072,0.0059,0.1842,fear
+When get up I found that I have a stomach ache  and I tried to take medecine but my stomach still hurting me,Stomach ache,Pain,0.0036,0.0041,0.0135,0.0031,0.0095,0.9449,0.0213,sadness
+When i eat i feel my stomach hurts,Stomach ache,Pain,0.0022,0.0017,0.0013,0.0009,0.0034,0.9882,0.0023,sadness
+When i get up i see my skin vague,Skin issue,General,0.0061,0.0016,0.9856,0.0008,0.0003,0.0044,0.0012,fear
+When i'm awake in the morning I feel strange and have vertigo,Feeling dizzy,Emergency,0.0019,0.0052,0.8321,0.0019,0.0044,0.0043,0.1502,fear
+When i'm doing sport I have pain under my skin,Muscle pain,Pain,0.0367,0.0585,0.2017,0.0101,0.0533,0.6248,0.0149,sadness
+When i'm driving my eyes see in double,Blurry vision,General,0.0358,0.0104,0.0687,0.005,0.1217,0.0327,0.7257,surprise
+When my grand father died I felt a hard emotional pain,Emotional pain,General,0.0009,0.0014,0.0017,0.0012,0.0025,0.9907,0.0016,sadness
+Whenever I stand up I feel dizzy.,Feeling dizzy,Emergency,0.0026,0.0037,0.8399,0.0021,0.0056,0.0044,0.1417,fear
+Why is my shoulder aching when I try to pick up the laundry?,Shoulder pain,Pain,0.0026,0.0057,0.0051,0.0009,0.0164,0.9623,0.007,sadness
+Yesterday I had a shouder pain,Shoulder pain,Pain,0.0084,0.0981,0.2621,0.0102,0.0407,0.5665,0.0141,sadness
+"You won't believe me, but this infected wound on my hand is from a paper cut I didn't take seriously.",Infected wound,Emergency,0.3718,0.3657,0.0225,0.0042,0.1321,0.021,0.0827,anger
+"after playing football, i have muscle pain with my both legs.",Muscle pain,Pain,0.0174,0.0275,0.1089,0.0089,0.0299,0.7913,0.0162,sadness
+"can't do any exercise, i feel weak",Body feels weak,Assistance,0.0014,0.0016,0.0401,0.0035,0.0019,0.9504,0.0012,sadness
+chronic disease of hair follicles and sebaceous glands.,Acne,General,0.0281,0.2235,0.1023,0.007,0.2623,0.2828,0.0941,sadness
+cramps along the whole abdomen,Stomach ache,Pain,0.029,0.2039,0.0545,0.0102,0.2796,0.2957,0.1271,sadness
+discomfort or pain that is felt at some point along the front of the body between the neck and upper abdomen.,Internal pain,Pain,0.0058,0.6886,0.0829,0.0028,0.0621,0.1541,0.0036,disgust
+dr. I feel a strange and powerful pain inside my rib cage,Heart hurts,Emergency,0.0028,0.0053,0.7692,0.0021,0.0032,0.0057,0.2118,fear
+fell skull is cracked like nuts,Head ache,Pain,0.1295,0.0503,0.0753,0.004,0.1269,0.5232,0.0908,sadness
+glass broken and wound my leg badly the wound is so wide,Open wound,Emergency,0.1035,0.035,0.107,0.0092,0.0878,0.5111,0.1464,sadness
+having difficulty moving my knee,Knee pain,Pain,0.0144,0.0266,0.5216,0.0041,0.0445,0.3595,0.0292,fear
+heart aches so much,Heart hurts,Emergency,0.0019,0.0031,0.0094,0.0017,0.0236,0.951,0.0094,sadness
+heavy breath with fatigue,Emotional pain,General,0.0761,0.0829,0.1221,0.0024,0.1526,0.5138,0.05,sadness
+"i am feeling so dizzy, body is so fragile.",Body feels weak,Assistance,0.0024,0.0008,0.928,0.0015,0.0009,0.0085,0.058,fear
+i am having problems seeing things feel like a cloud on my eyes everything is blurry,Blurry vision,General,0.0896,0.0029,0.1425,0.0029,0.0031,0.7243,0.0347,sadness
+i can hardly breathe,Hard to breath,Emergency,0.0203,0.0024,0.0339,0.0017,0.0024,0.9243,0.015,sadness
+i can't breath because of  Cough,Cough,General,0.0083,0.0019,0.0149,0.0019,0.005,0.9561,0.0119,sadness
+"i can't move my leg, there is pain in the joint",Joint pain,Pain,0.014,0.0077,0.0415,0.0033,0.0184,0.8936,0.0216,sadness
+i can't move my shoulder because of pain,Shoulder pain,Pain,0.0085,0.002,0.0313,0.0034,0.0061,0.9417,0.0072,sadness
+i can't ride my car at night because i have blurry vision.,Blurry vision,General,0.0024,0.0004,0.9814,0.0014,0.0005,0.0082,0.0057,fear
+i can't rotate my neck,Neck pain,Pain,0.0467,0.0029,0.047,0.0052,0.0112,0.8665,0.0205,sadness
+i can't see well,Blurry vision,General,0.0053,0.0004,0.0159,0.0028,0.0015,0.9666,0.0076,sadness
+"i can't walk, my knee hurts me",Knee pain,Pain,0.0027,0.0011,0.008,0.0018,0.0052,0.9762,0.0051,sadness
+i cant breathe,Cough,General,0.0097,0.0035,0.0094,0.0013,0.0059,0.9636,0.0066,sadness
+i cant sleep because of cold,Injury from sports,Pain,0.0276,0.0006,0.0024,0.0029,0.0026,0.9619,0.002,sadness
+i cant sleep because of cough,Cough,General,0.0039,0.0013,0.0058,0.0015,0.0067,0.9772,0.0036,sadness
+i feel cold,Feeling cold,Assistance,0.9698,0.0008,0.0035,0.0018,0.0005,0.0229,0.0006,anger
+i feel dizzy after severe diarrhea,Feeling dizzy,Emergency,0.0053,0.0015,0.7095,0.0022,0.0017,0.0081,0.2716,fear
+i feel head ache,Head ache,Pain,0.0113,0.0006,0.004,0.0122,0.0013,0.9689,0.0017,sadness
+"i feel hurt, lot of pain in my heart",Emotional pain,General,0.0021,0.0004,0.0004,0.0018,0.0013,0.9922,0.0018,sadness
+i feel pain in my back,Back pain,Pain,0.0027,0.0009,0.0082,0.0041,0.0026,0.9764,0.005,sadness
+i feel pain in my body,Internal pain,Pain,0.0021,0.0004,0.0023,0.0021,0.001,0.9903,0.0017,sadness
+i feel pain in my foot,Foot ache,Pain,0.0044,0.0013,0.0093,0.0047,0.0034,0.97,0.0069,sadness
+i feel pain in my knee,Knee pain,Pain,0.0035,0.0013,0.015,0.0061,0.0033,0.9652,0.0057,sadness
+i feel pain in my neck,Neck pain,Pain,0.0106,0.0016,0.0226,0.0073,0.0042,0.9439,0.0098,sadness
+i feel pain in my stomach,Stomach ache,Pain,0.0039,0.0011,0.0079,0.0037,0.0023,0.9764,0.0047,sadness
+i feel sad,Emotional pain,General,0.0007,0.0004,0.0005,0.0019,0.0014,0.9933,0.0018,sadness
+i feel that is great pain in my left shoulder,Shoulder pain,Pain,0.0038,0.0009,0.0153,0.0338,0.0018,0.941,0.0035,sadness
+i feel that it's hard to breath for me specially after running or making any effort,Hard to breath,Emergency,0.1564,0.0015,0.0974,0.013,0.0011,0.7157,0.0149,sadness
+i feel weak,Body feels weak,Assistance,0.0008,0.0006,0.0071,0.0027,0.001,0.987,0.0008,sadness
+i have a great pain in my foot like thrombing pain with relaxing my pain releif,Foot ache,Pain,0.0019,0.0007,0.0032,0.9477,0.0025,0.0418,0.0021,joy
+i have a great pain in my thorax from heart injury,Heart hurts,Emergency,0.007,0.0006,0.0341,0.0184,0.0025,0.9273,0.0102,sadness
+i have a hard pain in my stomach,Stomach ache,Pain,0.0058,0.0018,0.0232,0.0068,0.0021,0.9547,0.0056,sadness
+i have a knee pain when i walk a lot,Knee pain,Pain,0.0143,0.0015,0.0633,0.0273,0.0025,0.884,0.0072,sadness
+i have a migrain and i took panadol but it doesn√ït help,Head ache,Pain,0.004,0.001,0.0094,0.0068,0.0075,0.9666,0.0047,sadness
+i have a pain in my elbow joint,Joint pain,Pain,0.0103,0.0027,0.0463,0.0094,0.0105,0.9057,0.015,sadness
+i have a pain in my trapes,Muscle pain,Pain,0.008,0.002,0.0289,0.0179,0.0051,0.9285,0.0095,sadness
+i have a problem in my back i cannot extend it,Back pain,Pain,0.0474,0.0024,0.0221,0.005,0.0205,0.8849,0.0177,sadness
+i have a problem in my middle ear made by infection,Ear ache,Pain,0.0529,0.0053,0.0447,0.0103,0.0153,0.842,0.0294,sadness
+i have a problem in seeing objects it is too difficult to see,Blurry vision,General,0.245,0.003,0.1589,0.0153,0.0039,0.5271,0.0468,sadness
+i have a strong shoulder pain,Shoulder pain,Pain,0.0117,0.0007,0.038,0.0225,0.0025,0.9212,0.0035,sadness
+i have a very bad cough,Cough,General,0.0048,0.0013,0.0282,0.0084,0.0049,0.9472,0.0052,sadness
+i have difficulty moving my neck,Neck pain,Pain,0.0283,0.0033,0.4283,0.0104,0.0034,0.5111,0.0152,sadness
+i have disterbance in my emotion,Emotional pain,General,0.1814,0.003,0.0046,0.079,0.004,0.7244,0.0037,sadness
+i have injured myself during the soccer match,Injury from sports,Pain,0.0054,0.0006,0.0093,0.0024,0.0031,0.9745,0.0046,sadness
+i have issue with my skin,Skin issue,General,0.0748,0.001,0.0487,0.0151,0.0056,0.8456,0.0092,sadness
+i have muscle pain at my left leg.,Muscle pain,Pain,0.0117,0.0074,0.0609,0.0091,0.012,0.8875,0.0114,sadness
+"i have muscle pain that my back
+I Have Muscle Pain at my back leg",Foot ache,Pain,0.0102,0.0049,0.059,0.0078,0.0163,0.8834,0.0183,sadness
+i have pain but i can't specify place,Internal pain,Pain,0.0026,0.0014,0.0061,0.0025,0.0035,0.9802,0.0038,sadness
+i have pain like needles in my joints.,Joint pain,Pain,0.0083,0.0038,0.032,0.0061,0.0047,0.9375,0.0077,sadness
+i have severe dry cough,Cough,General,0.0197,0.0007,0.0196,0.0088,0.0035,0.9422,0.0055,sadness
+i have shoulder pain after doing any home work.,Shoulder pain,Pain,0.0108,0.0026,0.0787,0.0097,0.0027,0.8927,0.0029,sadness
+"i have whooping cough with excess mucous, need mucolytic.",Cough,General,0.0209,0.0307,0.0199,0.0137,0.0508,0.852,0.0121,sadness
+i hit the ground when trying to shoot a basketball,Injury from sports,Pain,0.6874,0.0012,0.1289,0.0088,0.0027,0.1385,0.0325,anger
+"i walked a long for 3 km, i feel pain in my foot like foot ache",Foot ache,Pain,0.0038,0.0018,0.0177,0.0056,0.0052,0.9573,0.0086,sadness
+"i was diagnosed with pneumonia, i can't breath easily.",Hard to breath,Emergency,0.0143,0.0053,0.2273,0.0177,0.0104,0.7007,0.0243,sadness
+"i was injured during football match, i was diagnosed with Cruciate ligament",Injury from sports,Pain,0.0028,0.0007,0.0142,0.0031,0.0039,0.9679,0.0074,sadness
+"i was playing basketball yesterday, i have sprained ankle",Injury from sports,Pain,0.0112,0.0018,0.0692,0.0082,0.0144,0.8612,0.0339,sadness
+i was playing football and injuried with joint pain.,Joint pain,Pain,0.012,0.0012,0.0134,0.0061,0.0038,0.9577,0.0059,sadness
+i was travelling by ship and i feel dizzy.,Feeling dizzy,Emergency,0.0044,0.0019,0.6311,0.0031,0.0026,0.0073,0.3496,fear
+i was watching tv and suddenly have blurry vision,Blurry vision,General,0.0189,0.0013,0.3846,0.0051,0.0033,0.01,0.5768,surprise
+i'm disappointed,Emotional pain,General,0.0031,0.0006,0.0006,0.0023,0.0022,0.9827,0.0085,sadness
+i'm injured i can't play sports,Injury from sports,Pain,0.0015,0.0009,0.0035,0.0019,0.0058,0.9835,0.0028,sadness
+is my cut infected or just healing?,Infected wound,Emergency,0.0242,0.0788,0.0286,0.0036,0.6654,0.1135,0.0859,neutral
+itch at front and center of scalp,Hair falling out,General,0.1563,0.066,0.0913,0.0124,0.4526,0.1097,0.1116,neutral
+"laceration, rupture or opening in the skin",Open wound,Emergency,0.2084,0.1484,0.107,0.0089,0.2981,0.1548,0.0744,neutral
+longitudinal burning line across back with hard respiratory movements,Back pain,Pain,0.7406,0.0436,0.0171,0.0018,0.1297,0.0538,0.0135,anger
+my abdominal muscles have great pain since i was at GYM,Muscle pain,Pain,0.0074,0.0307,0.1199,0.0148,0.0377,0.7656,0.024,sadness
+my ankle is hurting me,Joint pain,Pain,0.006,0.0043,0.0312,0.0028,0.0222,0.9228,0.0106,sadness
+my back hurts me a lot,Back pain,Pain,0.004,0.0052,0.0106,0.0029,0.0312,0.9305,0.0157,sadness
+"my cbc report indicate 10 hb, i feel tired of little work.",Body feels weak,Assistance,0.0041,0.0013,0.0016,0.0014,0.006,0.9819,0.0038,sadness
+"my child has cough all night, she can't sleep",Cough,General,0.0168,0.0193,0.0284,0.0018,0.0442,0.8404,0.0492,sadness
+my ear hurts me badly,Ear ache,Pain,0.006,0.0049,0.0155,0.0027,0.0232,0.93,0.0177,sadness
+my hair falling out,Hair falling out,General,0.0608,0.009,0.0357,0.0067,0.0133,0.7348,0.1397,sadness
+my hair isn't well,Hair falling out,General,0.0053,0.0049,0.0099,0.0015,0.0169,0.9506,0.0109,sadness
+my hand open wound got infected,Infected wound,Emergency,0.0506,0.0283,0.0537,0.0073,0.1299,0.637,0.0931,sadness
+my head hurts me badly,Head ache,Pain,0.0053,0.0038,0.0142,0.0022,0.0147,0.9461,0.0137,sadness
+my heart hurts me,Heart hurts,Emergency,0.0017,0.001,0.0015,0.0009,0.0049,0.9869,0.0031,sadness
+my left side aches much,Internal pain,Pain,0.0032,0.0083,0.0164,0.0049,0.0553,0.9011,0.0108,sadness
+my neck hurts me and i can't look down or up,Neck pain,Pain,0.0041,0.0028,0.0215,0.0018,0.0108,0.9502,0.0088,sadness
+my shoulder is hurting me,Shoulder pain,Pain,0.0032,0.0024,0.0148,0.0018,0.0116,0.9595,0.0066,sadness
+my temperature dropped and my body get synosed,Feeling cold,Assistance,0.1197,0.007,0.0721,0.0097,0.047,0.6808,0.0637,sadness
+red flushes accompanied with itchy,Skin issue,General,0.0604,0.0806,0.0052,0.0061,0.0568,0.7821,0.0087,sadness
+"redness, swelling, and difficulty walking",Knee pain,Pain,0.011,0.0364,0.0486,0.003,0.133,0.754,0.0141,sadness
+severe pain in the upper left side of chest and may have pain to back,Heart hurts,Emergency,0.0123,0.0235,0.0921,0.0073,0.1116,0.718,0.0352,sadness
+standing less than five minutes and my back start to ache,Back pain,Pain,0.0161,0.0129,0.0901,0.0041,0.0502,0.8132,0.0135,sadness
+stiffness inability to look right or left except by moving the whole body,Neck pain,Pain,0.0575,0.097,0.2107,0.0052,0.2729,0.3056,0.0511,sadness
+"surgical wounds red, firing pus, painful and hot to the touch",Infected wound,Emergency,0.0672,0.7144,0.0287,0.0018,0.0509,0.1312,0.0057,disgust
+there is a red stain in my skin,Skin issue,General,0.0309,0.674,0.0106,0.0016,0.0453,0.228,0.0096,disgust
+there is acne on my face,Acne,General,0.0424,0.2045,0.0165,0.007,0.2766,0.4064,0.0466,sadness
+there is too much pain when i move my arm,Heart hurts,Emergency,0.0156,0.0267,0.0926,0.0053,0.0728,0.7525,0.0344,sadness
+there pain in my foot,Foot ache,Pain,0.0188,0.0307,0.073,0.0065,0.089,0.7252,0.0569,sadness
+using hair tonic,Hair falling out,General,0.01,0.0053,0.0047,0.0247,0.8148,0.0699,0.0707,neutral
+when i extend my leg there is pain in knee joint,Joint pain,Pain,0.0386,0.0386,0.1456,0.008,0.1158,0.6028,0.0506,sadness
+"when i get up, i feel dizzy and fall down.",Feeling dizzy,Emergency,0.0037,0.002,0.616,0.0031,0.0039,0.0076,0.3637,fear
+when i raise my hand i feel pain in my shoulder.,Shoulder pain,Pain,0.0134,0.0144,0.062,0.0055,0.0136,0.8807,0.0105,sadness
+when i wake up in the morning i feel dizzy,Feeling dizzy,Emergency,0.0035,0.0018,0.7627,0.002,0.0026,0.0102,0.2172,fear
+when i was washing my hair it was falling out heavily,Hair falling out,General,0.2652,0.0485,0.154,0.0046,0.0152,0.4248,0.0877,sadness

@@ -116,3 +116,29 @@ def class_base_priority(req_class: str) -> int:
     if req_class not in CLASS_BASE_PRIORITY:
         raise KeyError(f"Unknown class: {req_class!r}")
     return CLASS_BASE_PRIORITY[req_class]
+
+
+# ---------------------------------------------------------------------------
+# Medication tag: a keyword RULE, deliberately not a learned class.
+#
+# The system design has a Medication request type, but no public corpus labels
+# medication requests: none of the 25 intents in the Medical Speech corpus is
+# one (section 5), and nothing here is synthesised to fake one. So instead of a
+# fifth class, any transcript is tagged by keyword as a sub-label shown under
+# its predicted class ("Pain + medication"). It never changes the class or the
+# priority. Recall is whatever the keyword list covers; it has not been, and
+# cannot yet be, measured.
+# ---------------------------------------------------------------------------
+
+import re  # noqa: E402
+
+MEDICATION_KEYWORDS = ("medicine", "medication", "painkiller", "tablet", "dose",
+                       "injection", "pill")
+
+_MEDICATION_RE = re.compile(
+    r"\b(" + "|".join(MEDICATION_KEYWORDS) + r")(s|es)?\b", re.IGNORECASE)
+
+
+def medication_tag(transcript: str) -> list[str]:
+    """Medication keywords found in the transcript (base forms, sorted); [] if none."""
+    return sorted({m.group(1).lower() for m in _MEDICATION_RE.finditer(transcript or "")})

@@ -28,6 +28,7 @@ CLI, for a smoke test:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import random
@@ -43,7 +44,8 @@ import joblib
 import numpy as np
 import torch
 
-from src.mapping import class_base_priority
+from src.mapping import class_base_priority, medication_tag
+from src.preprocess import SPEECH_GUARD
 from src.preprocess import (ACOUSTIC_CONTRACT, denoise, energy_present, load_audio,
                             load_audio_acoustic, trim)
 from src.rules import CONFIG as RULES_CONFIG
@@ -57,6 +59,10 @@ CONFIG = {
     "whisper_dir": "faster-whisper-small",
     "wavlm_dir": "wavlm-base-plus",
     "bert_dir": "clinicalbert_requestclass",
+    # Pretrained text emotion model (scripts/fetch_models.py). The methodology
+    # diagram has the text branch producing request type AND sentiment; ClinicalBERT
+    # was fine-tuned for request type only, so sentiment comes from this model.
+    "emotion_dir": "emotion-english-distilroberta-base",
     "arousal_head": "arousal_head.joblib",
     "distress_gate": "distress_gate.joblib",
 
@@ -157,6 +163,7 @@ class CareVoicePipeline:
         self._load_acoustic()
         if CONFIG["warmup"]:
             self._warmup()
+        self.model_versions = self._model_versions()
         self.load_ms = _ms(t0)
 
     # ------------------------------------------------------------------ loading
@@ -191,6 +198,15 @@ class CareVoicePipeline:
         if self.bert.config.num_labels != len(self.classes):
             raise ValueError(f"classes.json has {len(self.classes)} classes, model has "
                              f"{self.bert.config.num_labels} outputs")
+
+        emo_dir = self._path("emotion_dir")
+        self.emo_tokenizer = AutoTokenizer.from_pretrained(emo_dir, local_files_only=True)
+        self.emo_model = AutoModelForSequenceClassification.from_pretrained(
+            emo_dir, local_files_only=True).to(self.device).eval()
+        self.emo_labels = [self.emo_model.config.id2label[i]
+                           for i in range(self.emo_model.config.num_labels)]
+        if "anger" not in self.emo_labels:
+            raise ValueError(f"emotion model has no 'anger' label: {self.emo_labels}")
 
     def _load_acoustic(self):
         from transformers import AutoFeatureExtractor, WavLMModel
@@ -242,6 +258,7 @@ class CareVoicePipeline:
         self._acoustic(wav)
         self._transcribe(trim(wav, sr=CONFIG["sr"]))
         self._classify("warm up")
+        self._emotion("warm up")
 
     # ------------------------------------------------------------------ branches
 
@@ -255,6 +272,24 @@ class CareVoicePipeline:
                              max_length=CONFIG["bert_max_length"]).to(self.device)
         probs = torch.softmax(self.bert(**enc).logits, dim=-1)[0].cpu().numpy()
         return {c: float(p) for c, p in zip(self.classes, probs)}
+
+    @torch.no_grad()
+    def _emotion(self, transcript: str) -> dict[str, float]:
+        enc = self.emo_tokenizer(transcript, return_tensors="pt", truncation=True,
+                                 max_length=CONFIG["bert_max_length"]).to(self.device)
+        probs = torch.softmax(self.emo_model(**enc).logits, dim=-1)[0].cpu().numpy()
+        return {c: float(p) for c, p in zip(self.emo_labels, probs)}
+
+    def _model_versions(self) -> dict:
+        """Short content hashes of the trained/downloaded weights, logged with every
+        decision so it can be tied to the exact models that made it."""
+        out = {}
+        for key in ("arousal_head", "distress_gate"):
+            out[key] = hashlib.sha256(self._path(key).read_bytes()).hexdigest()[:12]
+        for key, fname in (("bert_dir", "model.safetensors"), ("emotion_dir", "config.json")):
+            f = self._path(key) / fname
+            out[key] = hashlib.sha256(f.read_bytes()).hexdigest()[:12] if f.exists() else None
+        return out
 
     def _acoustic(self, wav: np.ndarray) -> dict:
         """Both heads on one unpadded embedding. Returns fear (display only),
@@ -341,6 +376,18 @@ class CareVoicePipeline:
             base_priority = RULES_CONFIG["P_NO_SPEECH"]
         lat["text_classifier"] = _ms(t0)
 
+        # Sentiment (text emotion) and the medication keyword tag, on the same
+        # transcript. DISPLAY ONLY: neither changes the class or the priority.
+        # Text anger was tried as a distress-suppression signal and removed:
+        # "I feel cold" scores anger 0.97, a plainly angry sentence 0.67, and 27 of
+        # 706 genuine requests score above 0.5 (see rules.py).
+        t0 = time.perf_counter()
+        sentiment = self._emotion(transcript) if transcript.strip() else {}
+        sentiment_label = max(sentiment, key=sentiment.get) if sentiment else None
+        text_anger = sentiment.get("anger")
+        medication = medication_tag(transcript)
+        lat["sentiment"] = _ms(t0)
+
         # --- the rule ---
         t0 = time.perf_counter()
         decision = apply_rules(
@@ -373,13 +420,23 @@ class CareVoicePipeline:
             "request_class": request_class,
             "class_probs": class_probs,
             "class_confidence": class_confidence,
+            "medication": medication,
+            "sentiment": sentiment,
+            "sentiment_label": sentiment_label,
+            "text_anger": text_anger,
             "base_priority": base_priority,
             "arousal": acoustic["arousal"],
             "distress": acoustic["distress"],
             "distress_fired": decision.distress_fired,
             "final_priority": decision.final_priority,
             "escalated": decision.escalated,
+            "rules_fired": decision.rules_fired,
             "reason": decision.reason,
+            # Everything needed to reconstruct this decision after the config moves.
+            "thresholds": {**{k: v for k, v in RULES_CONFIG.items() if k != "STARVATION_SECONDS"},
+                           "MIN_RAW_RMS": SPEECH_GUARD["MIN_RAW_RMS"],
+                           "acoustic_contract": ACOUSTIC_CONTRACT},
+            "model_versions": self.model_versions,
             "acoustic_contract": ACOUSTIC_CONTRACT,
             "latency_ms": lat,
         }
