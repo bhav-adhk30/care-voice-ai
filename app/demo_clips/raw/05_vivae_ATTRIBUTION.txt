@@ -1,0 +1,12 @@
+Clip 05 candidates (05_vivae_*.wav) are unmodified recordings from:
+
+  Holz, N., Larrouy-Maestri, P., & Poeppel, D. (2020). The Variably Intense
+  Vocalizations of Affect and Emotion Corpus (VIVAE). Zenodo.
+  https://doi.org/10.5281/zenodo.4066235
+
+Licence: CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/).
+Non-commercial research and teaching use only; credit the corpus on the slide
+that plays the clip.
+
+Note: these clips are positives in the distress gate's training set, so the
+gate firing on them is in-sample, not a generalisation result.
