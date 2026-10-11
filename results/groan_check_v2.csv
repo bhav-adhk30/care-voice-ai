@@ -1,0 +1,21 @@
+file,dur,cls,heard,asr,ns,distress,speech,P,reason
+S03_pain_moderate_08.wav,0.58,General,Oh.,-1.04,1.0,0.619,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S06_pain_moderate_05.wav,0.44,General,Ah!,-0.63,1.0,0.985,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S08_pain_low_02.wav,0.58,General,Ah!,-0.5,1.0,0.898,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S03_pain_strong_081.wav,0.81,Pain,Uh-huh.,-0.72,1.0,0.989,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S07_pain_moderate_04.wav,0.42,Emergency,Ah.,-0.61,1.0,0.88,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S02_pain_strong_05.wav,1.68,General,AHHHHHHHHH,-1.16,1.0,0.918,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S04_pain_low_07.wav,0.65,General,Gah!,-1.04,0.0,0.911,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S09_pain_peak_13.wav,0.46,General,Ah!,-0.8,1.0,0.958,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S04_pain_peak_02.wav,1.03,General,Eugh!,-1.23,1.0,0.996,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S02_pain_strong_021.wav,1.44,Unclassified,,-10.0,1.0,0.823,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S03_fear_moderate_04.wav,0.46,Emergency,Mm.,-0.65,0.0,0.984,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S06_fear_peak_04.wav,0.91,Unclassified,,-10.0,1.0,0.987,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S07_fear_moderate_03.wav,0.4,General,Ah!,-0.7,0.993,0.976,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S04_fear_strong_05.wav,0.47,General,AHH!,-0.83,0.0,0.951,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S09_fear_moderate_092.wav,0.58,General,WAH!,-0.98,0.0,0.969,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S03_fear_low_03.wav,0.44,General,Huh!,-0.65,1.0,0.902,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S05_fear_peak_01.wav,1.72,Pain,AHHHHHHHHHHHHH,-1.17,1.0,0.998,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S11_fear_peak_011.wav,1.01,Pain,AHHHHHHHHHHHHHHHHHHHHH,-1.36,1.0,0.891,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S04_fear_peak_05.wav,0.94,Unclassified,,-10.0,1.0,0.899,True,1,ASR confidence below threshold; transcript not trusted; distress detec
+S07_fear_moderate_05.wav,0.4,General,Huh?,-0.89,0.004,0.999,True,1,ASR confidence below threshold; transcript not trusted; distress detec

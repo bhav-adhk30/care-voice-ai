@@ -18,20 +18,36 @@ from typing import Optional
 # ---------------------------------------------------------------------------
 
 CONFIG = {
-    # Arousal head (WavLM + MLP, trained on CREMA-D with augmentation).
-    # At 0.105: 60% fear recall, 3.8% false alarms on calm medical speech.
-    # Chosen from the operating curve in results/operating_curve_augmented.csv —
-    # the acoustic path is a safety net on top of the text branch, so a low
-    # false-alarm rate matters more than recall. Alert fatigue kills these systems.
-    "AROUSAL_HIGH": 0.105,
+    # Distress gate, v2 (notebooks/11_head_refit.ipynb, results/head_refit_v2.json).
+    # WavLM, no padding, mean-pooled over real frames, RMS 0.05 (extraction
+    # contract "no_pad_meanpool_rms0.05"); logistic regression, VIVAE pain/fear
+    # against other VIVAE vocalisations, CREMA-D neutral, ESC-50 ward noise and
+    # silence, VIVAE deduplicated by content hash (480 duplicates removed).
+    # Held-out AUC 0.863 against all negatives, 0.629 within VIVAE alone (pain
+    # versus other intense vocalisations - it cannot tell pain from triumph).
+    # At 0.4028: 63.7% distress recall; false alarms 0.75% on medical speech,
+    # 1.7% on ward noise, 0% on silence (results/operating_curve_distress_v2.csv).
+    #
+    # Replaces 0.0677, which came from a curve whose negatives were a different
+    # corpus (CREMA-D) padded differently: clip duration alone separates VIVAE
+    # from CREMA-D at AUC 0.9965 (results/padding_diagnostic.json), so that
+    # threshold measured corpus identity, not distress, and sat below every
+    # observed score.
+    "DISTRESS_HIGH": 0.4028,
 
-    # Distress gate (WavLM + logistic regression, trained on VIVAE pain/fear
-    # against CREMA-D neutral speech and other VIVAE vocalisations).
-    # At 0.0677: 90% distress recall, 2.4% false alarms.
-    # AUC 0.996 against calm speech, 0.651 against other intense vocalisations —
-    # it detects distress reliably but cannot tell pain from triumph. Irrelevant
-    # in a ward, stated as a limitation.
-    "DISTRESS_HIGH": 0.0677,
+    # Speech guard: the arousal head's non_speech class (7th class, trained on
+    # ESC-50 ward noise and silence against CREMA-D speech; F1 0.988 out of fold
+    # at 0.5). Raised to 0.90 and made one of THREE conditions (speech_guard):
+    # at 0.5 alone it classed 7 of 32 clearly intelligible TTS requests as
+    # non-speech, including "I can't breathe properly", with scores up to 1.000.
+    # The class learned "unlike CREMA-D", not "not speech", so it is never
+    # trusted on its own.
+    "NON_SPEECH_HIGH": 0.90,
+
+    # The arousal head's fear probability does NOT escalate. At a 2% false-alarm
+    # budget on medical speech it recalls 14.5% of fear, against the distress
+    # gate's 63.7% at 0.75% (results/operating_curve_arousal_v2.csv). It is
+    # reported on the dashboard for context only. There is no AROUSAL_HIGH.
 
     # Whisper mean token log-probability, 20th percentile of the corpus.
     # Below it: 18.3% of transcripts are badly wrong (WER > 0.5) and request-type
@@ -40,9 +56,8 @@ CONFIG = {
     # safety failure rather than an accuracy one — hence this gate.
     "ASR_MIN": -0.4934,
 
-    # Priority is floored (made more urgent) at these levels, never raised.
+    # Priority is floored (made more urgent) at this level, never raised.
     "P_IMMEDIATE": 1,
-    "P_URGENT": 2,
 
     # An Emergency classification is never queued worse than P2, however calm
     # the voice sounds.
@@ -61,14 +76,16 @@ CONFIG = {
 }
 
 
-# The distress gate is BINARY, not graded. Its score correlates with annotated
-# intensity only weakly (Spearman rho = 0.16, p < 1e-9, n = 1565), far too
-# weakly to support severity levels. It fires or it doesn't.
+# The distress gate is BINARY, not graded. On the v1 features its score
+# correlated with annotated intensity only weakly (Spearman rho = 0.16,
+# n = 1565 including duplicates); not re-measured on v2. It fires or it doesn't.
 DISTRESS_IS_BINARY = True
 
-# The gate cannot separate anger (mean score 0.510) from pain (0.585).
-# So anger suppression cannot happen acoustically — it has to come from the text
-# branch. See `suppress_anger_escalation` below.
+# The v2 gate still cannot separate anger from distress. Out of fold, anger
+# averages 0.417 against pain 0.465 and fear 0.480, and anger's false-alarm rate
+# is above the overall rate at every threshold. So anger suppression cannot
+# happen acoustically - it has to come from the text branch. See
+# `suppress_anger_escalation` below.
 ANGER_NOT_SEPARABLE_ACOUSTICALLY = True
 
 
@@ -92,10 +109,12 @@ class Decision:
     reason: str
     escalated: bool
     distress_fired: bool
-    arousal_fired: bool
     asr_trusted: bool
     speech_present: bool = True
     acoustic_used: bool = True
+    # Both halves of the speech guard, so the dashboard can show which decided.
+    energy_ok: bool = True
+    non_speech_prob: Optional[float] = None
 
     def to_dict(self):
         return asdict(self)
@@ -103,32 +122,64 @@ class Decision:
 
 def suppress_anger_escalation(request_class: str, class_confidence: float) -> bool:
     """
-    Should acoustic escalation be suppressed for this request?
+    Should the distress gate's escalation be suppressed for this request?
 
     An irritated patient is not a medical emergency, but the distress gate
     cannot tell anger from pain acoustically. So the suppression decision uses
     the text branch instead: if the request is confidently General (the class
-    that holds Emotional pain, Skin issue, Acne and similar), high arousal is
+    that holds Emotional pain, Skin issue, Acne and similar), a firing gate is
     most likely frustration rather than clinical distress.
 
-    Deliberately conservative: only suppresses on a confident General, and never
-    touches the distress gate, which still fires for a genuine wordless cry.
+    Deliberately conservative: only suppresses on a confident General. It never
+    touches Rule 1, so a wordless cry with no trustworthy transcript still
+    escalates.
     """
     return request_class == "General" and class_confidence >= 0.80
+
+
+def speech_guard(energy_ok: bool, non_speech_prob: Optional[float],
+                 transcript: str, asr_confidence: Optional[float],
+                 distress: Optional[float], energy_reason: str = "",
+                 cfg: dict = CONFIG) -> tuple[bool, str]:
+    """
+    Is there speech (or a vocalisation) in this call? Returns (present, reason).
+
+    Conservative by construction: the cost of wrongly calling a real request
+    "no speech" is a lost transcript (an Emergency at P2 instead of P1), so a
+    call is no-speech only when ALL of these agree:
+      1. the arousal head's non_speech class >= NON_SPEECH_HIGH,
+      2. Whisper returned nothing, or a transcript below ASR_MIN,
+      3. the distress gate did not fire (a groan has no words but must escalate).
+    The energy pre-filter (preprocess.energy_present) short-circuits digital
+    silence before anything runs; then there is nothing else to read.
+    """
+    if not energy_ok:
+        return False, energy_reason or "signal level below floor"
+    if non_speech_prob is None or non_speech_prob < cfg["NON_SPEECH_HIGH"]:
+        return True, ""
+    if transcript.strip() and asr_confidence is not None and asr_confidence >= cfg["ASR_MIN"]:
+        return True, ""
+    if distress is not None and distress >= cfg["DISTRESS_HIGH"]:
+        return True, ""
+    heard = (f"untrusted transcript {transcript.strip()!r}" if transcript.strip()
+             else "no transcript")
+    return False, (f"non_speech class {non_speech_prob:.3f} >= {cfg['NON_SPEECH_HIGH']}, "
+                   f"{heard}, distress below threshold")
 
 
 def apply_rules(
     base_priority: int,
     request_class: str,
     class_confidence: float,
-    arousal: float,
     distress: float,
     asr_confidence: Optional[float] = None,
-    speech_present: bool = True,
-    speech_reason: str = "",
+    energy_ok: bool = True,
+    non_speech_prob: Optional[float] = None,
+    energy_reason: str = "",
     cfg: dict = CONFIG,
     *,
     transcript: str,
+    asr_heard: Optional[str] = None,
 ) -> Decision:
     """
     Combine the two branches into a final priority.
@@ -143,12 +194,19 @@ def apply_rules(
     request_class    "Emergency" | "Pain" | "Assistance" | "General", or
                      UNCLASSIFIED exactly when the transcript is empty
     class_confidence softmax probability of the predicted class, 0..1
-    arousal          calibrated arousal-head score, 0..1
-    distress         calibrated distress-gate score, 0..1
+    distress         distress-gate probability, 0..1
     asr_confidence   mean token log-probability from Whisper, or None
-    speech_present   False when preprocess.speech_present found no usable signal
-    speech_reason    why speech_present was False, shown on the dashboard
+    energy_ok        preprocess.energy_present pre-filter result
+    non_speech_prob  arousal head's non_speech probability, or None if the
+                     pre-filter stopped the clip before WavLM ran
+    energy_reason    why the pre-filter failed, shown on the dashboard
     transcript       the ASR output; required, to enforce the invariant below
+    asr_heard        what Whisper decoded before the pipeline blanked a no-speech
+                     transcript; used by the speech guard and its reason string.
+                     Defaults to `transcript`.
+
+    There is no arousal input: the fear probability is displayed by the
+    pipeline but never affects priority (see CONFIG).
     """
     # Invariant, both directions: Unclassified <=> empty transcript. Raised rather
     # than asserted so it also holds under python -O.
@@ -159,14 +217,19 @@ def apply_rules(
             f"{'an empty' if empty else 'a non-empty'} transcript: {UNCLASSIFIED!r} "
             "is required exactly when the transcript is empty")
 
-    # --- Rule 0: no usable speech -------------------------------------------
-    # Short-circuits everything. Both branches are reading noise: the text
-    # branch has no transcript and the acoustic heads were never trained on a
-    # normalised noise floor, where the distress gate scores near 1.0.
+    # --- Rule 0: no speech ---------------------------------------------------
+    # Short-circuits everything: a call with no speech carries no triage
+    # information, so it is routed at P_NO_SPEECH like a conventional call
+    # button, and Rule 1 cannot fire on it.
     #
-    # Routed at P_NO_SPEECH and returned immediately, so Rule 1 (untrusted
-    # transcript + distress -> P1) cannot fire on an empty clip. A wordless
-    # groan still reaches Rule 1, because it passes this guard on energy.
+    # A wordless groan must NOT land here: it has to pass the guard and reach
+    # Rule 1. speech_guard() requires the distress gate to be silent before it
+    # calls anything no-speech, so a groan that fires the gate always gets
+    # through, whatever the non_speech class says about it.
+    heard = transcript if asr_heard is None else asr_heard
+    speech_present, speech_reason = speech_guard(energy_ok, non_speech_prob, heard,
+                                                 asr_confidence, distress,
+                                                 energy_reason, cfg)
     if not speech_present:
         return Decision(
             final_priority=cfg["P_NO_SPEECH"],
@@ -176,10 +239,11 @@ def apply_rules(
                       "conventional call button"),
             escalated=False,
             distress_fired=False,
-            arousal_fired=False,
             asr_trusted=False,
             speech_present=False,
             acoustic_used=False,
+            energy_ok=energy_ok,
+            non_speech_prob=non_speech_prob,
         )
 
     priority = base_priority
@@ -190,11 +254,10 @@ def apply_rules(
         reasons.append("ASR confidence below threshold; transcript not trusted")
 
     distress_fired = distress >= cfg["DISTRESS_HIGH"]
-    arousal_fired = arousal >= cfg["AROUSAL_HIGH"]
 
     suppress = suppress_anger_escalation(request_class, class_confidence)
-    if suppress and (arousal_fired or distress_fired):
-        reasons.append("acoustic escalation suppressed: confident General, "
+    if suppress and distress_fired and asr_trusted:
+        reasons.append("distress escalation suppressed: confident General, "
                        "likely frustration rather than clinical distress")
 
     # --- Rule 1: untrusted transcript plus distress -> immediate -------------
@@ -211,11 +274,8 @@ def apply_rules(
         reasons.append(f"distress gate fired ({distress:.3f} >= "
                        f"{cfg['DISTRESS_HIGH']})")
 
-    # --- Rule 3: high arousal raises by one level ---------------------------
-    elif arousal_fired and not suppress:
-        priority = min(priority, max(cfg["P_URGENT"], base_priority - 1))
-        reasons.append(f"elevated vocal arousal ({arousal:.3f} >= "
-                       f"{cfg['AROUSAL_HIGH']})")
+    # (Rule 3, arousal raises one level, was removed in v2: 14.5% fear recall at
+    # a 2% medical false-alarm budget does not justify an escalation path.)
 
     # --- Rule 4: Emergency floor --------------------------------------------
     # Never queue a predicted Emergency worse than P2, regardless of how the
@@ -234,10 +294,11 @@ def apply_rules(
         reason="; ".join(reasons),
         escalated=priority < base_priority,
         distress_fired=distress_fired,
-        arousal_fired=arousal_fired,
         asr_trusted=asr_trusted,
         speech_present=True,
         acoustic_used=True,
+        energy_ok=energy_ok,
+        non_speech_prob=non_speech_prob,
     )
 
 
@@ -259,29 +320,41 @@ if __name__ == "__main__":
     cases = [
         ("calm knee pain",
          dict(base_priority=3, request_class="Pain", class_confidence=0.95,
-              arousal=0.02, distress=0.01, asr_confidence=-0.2,
+              distress=0.01, non_speech_prob=0.001, asr_confidence=-0.2,
               transcript="my knee hurts when i bend it")),
-        ("same phrase, distressed voice",
+        ("same phrase, distressed voice (gate fires; v2 has no arousal step)",
          dict(base_priority=3, request_class="Pain", class_confidence=0.95,
-              arousal=0.40, distress=0.02, asr_confidence=-0.2,
+              distress=0.55, non_speech_prob=0.001, asr_confidence=-0.2,
               transcript="my knee hurts when i bend it")),
         ("wordless groan, no transcript",
          dict(base_priority=CONFIG["P_NO_SPEECH"], request_class=UNCLASSIFIED,
-              class_confidence=0.0, arousal=0.60, distress=0.85,
+              class_confidence=0.0, distress=0.85, non_speech_prob=0.10,
               asr_confidence=-10.0, transcript="")),
         ("calm chest pain",
          dict(base_priority=1, request_class="Emergency", class_confidence=0.88,
-              arousal=0.01, distress=0.00, asr_confidence=-0.15,
+              distress=0.00, non_speech_prob=0.001, asr_confidence=-0.15,
               transcript="i have chest pain")),
-        ("frustrated but not unwell",
+        ("frustrated, not unwell: gate fires on anger, text suppresses it",
          dict(base_priority=4, request_class="General", class_confidence=0.91,
-              arousal=0.35, distress=0.05, asr_confidence=-0.20,
+              distress=0.45, non_speech_prob=0.001, asr_confidence=-0.20,
               transcript="my skin has been itching all day")),
-        ("button press, no speech",
+        ("button press, digital silence (energy pre-filter)",
          dict(base_priority=CONFIG["P_NO_SPEECH"], request_class=UNCLASSIFIED,
-              class_confidence=0.0, arousal=0.0, distress=0.0, asr_confidence=None,
-              transcript="", speech_present=False,
-              speech_reason="signal level below floor (RMS 1.1e-05 < 2.0e-03)")),
+              class_confidence=0.0, distress=0.0, non_speech_prob=None,
+              asr_confidence=None, transcript="", energy_ok=False,
+              energy_reason="signal level below floor (RMS 0.00e+00 < 1e-04)")),
+        ("ward noise: non_speech high, no transcript, no distress -> no speech",
+         dict(base_priority=CONFIG["P_NO_SPEECH"], request_class=UNCLASSIFIED,
+              class_confidence=0.0, distress=0.02, non_speech_prob=0.97,
+              asr_confidence=-10.0, transcript="")),
+        ("odd voice: non_speech high but a trusted transcript -> speech",
+         dict(base_priority=1, request_class="Emergency", class_confidence=0.9,
+              distress=0.0, non_speech_prob=0.99, asr_confidence=-0.3,
+              transcript="i can't breathe properly")),
+        ("groan the non_speech class claims, but distress fires -> P1",
+         dict(base_priority=CONFIG["P_NO_SPEECH"], request_class=UNCLASSIFIED,
+              class_confidence=0.0, distress=0.80, non_speech_prob=0.99,
+              asr_confidence=-10.0, transcript="")),
     ]
     for name, kw in cases:
         d = apply_rules(**kw)

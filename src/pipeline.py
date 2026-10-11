@@ -4,13 +4,18 @@ CareVoicePipeline: the one entry point (CLAUDE.md section 2.7).
 The Streamlit app and the end-to-end evaluation both import this class. Never write a
 second implementation of the pipeline anywhere else.
 
-    audio -> load_audio -> denoise -> trim
-                                        |-> Whisper small (faster-whisper int8) -> ClinicalBERT -> request class
-                                        |-> WavLM Base+ (frozen, mean-pooled) -> arousal head + distress gate
+    audio -> load_audio (-23 LUFS) -> energy pre-filter
+          -> load_audio_acoustic (RMS 0.05, crop 4 s, no pad) -> WavLM Base+ (frozen,
+             mean-pooled over real frames) -> arousal head (fear, non_speech) + distress gate
+          -> denoise -> trim -> Whisper small (faster-whisper int8)
+          -> speech guard (non_speech AND no trusted transcript AND no distress)
+          -> if speech and a transcript: ClinicalBERT
           -> apply_rules (src/rules.py) -> final priority + reason
 
-The two branches never share anything but the cleaned waveform. They meet only in
+The two branches share nothing but the source file: each has its own loader,
+matching how its model was trained (see preprocess.py). They meet only in
 apply_rules, which is a deterministic rule and not a trained model (section 2.1).
+Both branches run before the speech guard, which needs an output from each.
 
 Why both branches exist: text alone misses 26% of "Heart hurts" and 24% of "Hard to
 breath" clips, because cardiac and respiratory complaints are phrased in pain vocabulary.
@@ -39,9 +44,10 @@ import numpy as np
 import torch
 
 from src.mapping import class_base_priority
-from src.preprocess import denoise, load_audio, pad_or_crop, speech_present, trim
+from src.preprocess import (ACOUSTIC_CONTRACT, denoise, energy_present, load_audio,
+                            load_audio_acoustic, trim)
 from src.rules import CONFIG as RULES_CONFIG
-from src.rules import UNCLASSIFIED, apply_rules
+from src.rules import UNCLASSIFIED, apply_rules, speech_guard
 
 CONFIG = {
     "sr": 16000,
@@ -68,7 +74,7 @@ CONFIG = {
         "temperature": 0.0,
         "condition_on_previous_text": False,
         # Off: a VAD would drop a wordless groan before Whisper sees it. "No speech"
-        # is handled by preprocess.speech_present instead.
+        # is decided by rules.speech_guard instead.
         "vad_filter": False,
     },
     # No speech decoded at all: treat the transcript as maximally untrusted. Any value
@@ -78,11 +84,13 @@ CONFIG = {
     # Text classifier.
     "bert_max_length": 128,
 
-    # The acoustic heads were trained on fixed 4 s windows (cropped from the start,
-    # zero-padded at the end) - see notebooks/04_acoustic_branch.ipynb. Inference must
-    # feed WavLM the same window, or the mean pool averages over a different amount of
-    # padding and the measured thresholds no longer hold.
-    "acoustic_window_s": 4.0,
+    # Acoustic branch, contract "no_pad_meanpool_rms0.05" (notebooks/11_head_refit).
+    # No fixed window: each clip is fed at its own length (cropped to 4 s by
+    # load_audio_acoustic) and mean-pooled over its real frames. The v1 heads
+    # zero/noise-padded to 4 s and the padding carried the label (duration alone
+    # separated the training corpora at AUC 0.9965). Only clips under this length
+    # are padded, to give the encoder enough frames, exactly as in training.
+    "acoustic_min_s": 0.2,
 
     # Run one dummy clip through every stage at load time. Without it the first real
     # call pays for numba JIT in trim() and first-call setup in Whisper and BERT
@@ -117,16 +125,18 @@ def transcribe(asr, wav: np.ndarray) -> tuple[str, float, list]:
 
 
 @torch.no_grad()
-def embed(feature_extractor, wavlm, wav: np.ndarray, device: str = "cpu") -> np.ndarray:
-    """Frozen WavLM Base+, last hidden state mean-pooled over time -> (1, 768).
+def embed_clip(feature_extractor, wavlm, wav: np.ndarray, device: str = "cpu") -> np.ndarray:
+    """Frozen WavLM Base+, last hidden state mean-pooled over the clip's own
+    frames -> (1, 768). `wav` comes from preprocess.load_audio_acoustic.
 
-    Fixed window, cropped from the start and zero-padded at the end - the same
-    window notebook 04 used to train both heads. Note that training then added
-    Gaussian noise over the whole window, padding included (degrade()), so the
-    heads saw noise-filled padding, never digital zeros. notebooks/09 measures
-    what that does to the scores."""
-    win = pad_or_crop(wav, int(round(CONFIG["acoustic_window_s"] * CONFIG["sr"])))
-    inp = feature_extractor(win.astype(np.float32), sampling_rate=CONFIG["sr"],
+    Batch size 1 at natural length, so every frame is real and no attention mask
+    is needed (none is passed: group-norm WavLM was pretrained without one).
+    Named embed_clip, not embed, so code written against the old padded embed()
+    fails loudly instead of silently changing meaning."""
+    min_len = int(round(CONFIG["acoustic_min_s"] * CONFIG["sr"]))
+    if len(wav) < min_len:
+        wav = np.pad(wav, (0, min_len - len(wav)))
+    inp = feature_extractor(wav.astype(np.float32), sampling_rate=CONFIG["sr"],
                             return_tensors="pt")
     h = wavlm(inp.input_values.to(device)).last_hidden_state
     return h.mean(dim=1).float().cpu().numpy()
@@ -194,20 +204,34 @@ class CareVoicePipeline:
             p.requires_grad = False  # FROZEN, section 2.2
 
         arousal = joblib.load(self._path("arousal_head"))
-        self.arousal_model = arousal["model"]
-        self.fear_index = int(arousal["fear_index"])
-        if arousal["classes"][self.fear_index] != "fear":
-            raise ValueError(f"arousal head fear_index={self.fear_index} points at "
-                             f"{arousal['classes'][self.fear_index]!r}, not 'fear'")
-
         distress = joblib.load(self._path("distress_gate"))
+
+        # The extraction contract travels with the heads. Refuse to run heads that
+        # were fitted on differently prepared features: their scores would be
+        # meaningless and nothing downstream could tell.
+        if distress.get("extraction") != ACOUSTIC_CONTRACT:
+            raise ValueError(f"distress_gate.joblib extraction={distress.get('extraction')!r}, "
+                             f"pipeline implements {ACOUSTIC_CONTRACT!r}")
+        if arousal.get("escalates", True) or "non_speech_index" not in arousal:
+            raise ValueError("arousal_head.joblib is not a v2 head (needs escalates=False "
+                             "and a non_speech class)")
+
+        self.arousal_model = arousal["model"]
+        self.arousal_classes = list(arousal["classes"])
+        self.fear_index = int(arousal["fear_index"])
+        self.non_speech_index = int(arousal["non_speech_index"])
+        for idx, name in ((self.fear_index, "fear"), (self.non_speech_index, "non_speech")):
+            if self.arousal_classes[idx] != name:
+                raise ValueError(f"arousal head index {idx} is "
+                                 f"{self.arousal_classes[idx]!r}, expected {name!r}")
+
         self.distress_model = distress["model"]
         self.distress_pos_index = list(self.distress_model.classes_).index(1)
 
         # rules.py is the single source of truth for thresholds. The copies saved with
         # the heads are only checked, never used.
-        for name, saved, key in (("arousal_head", arousal.get("threshold"), "AROUSAL_HIGH"),
-                                 ("distress_gate", distress.get("threshold"), "DISTRESS_HIGH")):
+        for name, saved, key in (("distress_gate", distress.get("threshold"), "DISTRESS_HIGH"),
+                                 ("arousal_head", arousal.get("non_speech_threshold"), "NON_SPEECH_HIGH")):
             if saved is not None and abs(saved - RULES_CONFIG[key]) > 1e-9:
                 warnings.warn(f"{name}.joblib threshold {saved} differs from "
                               f"rules.CONFIG[{key!r}]={RULES_CONFIG[key]}; using rules.py")
@@ -215,10 +239,9 @@ class CareVoicePipeline:
     def _warmup(self):
         rng = np.random.default_rng(CONFIG["seed"])
         wav = (0.05 * rng.standard_normal(CONFIG["sr"])).astype(np.float32)
-        wav = trim(wav, sr=CONFIG["sr"])
-        self._transcribe(wav)
+        self._acoustic(wav)
+        self._transcribe(trim(wav, sr=CONFIG["sr"]))
         self._classify("warm up")
-        self._embed(wav)
 
     # ------------------------------------------------------------------ branches
 
@@ -233,8 +256,16 @@ class CareVoicePipeline:
         probs = torch.softmax(self.bert(**enc).logits, dim=-1)[0].cpu().numpy()
         return {c: float(p) for c, p in zip(self.classes, probs)}
 
-    def _embed(self, wav: np.ndarray) -> np.ndarray:
-        return embed(self.feature_extractor, self.wavlm, wav, self.device)
+    def _acoustic(self, wav: np.ndarray) -> dict:
+        """Both heads on one unpadded embedding. Returns fear (display only),
+        non_speech (the speech guard) and distress (the escalation signal)."""
+        emb = embed_clip(self.feature_extractor, self.wavlm, wav, self.device)
+        ap = self.arousal_model.predict_proba(emb)[0]
+        return {
+            "arousal": float(ap[self.fear_index]),
+            "non_speech_prob": float(ap[self.non_speech_index]),
+            "distress": float(self.distress_model.predict_proba(emb)[0, self.distress_pos_index]),
+        }
 
     # ------------------------------------------------------------------ entry point
 
@@ -242,6 +273,10 @@ class CareVoicePipeline:
         """
         Run one clip through the whole system. Returns every intermediate, not just the
         final priority, so the dashboard can show WHY a call was escalated.
+
+        arousal (fear probability) is reported for display only; it never affects
+        priority. Acoustic values are None when the energy pre-filter stopped the
+        clip before WavLM ran.
         """
         lat = {}
         t_all = time.perf_counter()
@@ -250,35 +285,51 @@ class CareVoicePipeline:
         wav, meta = load_audio(audio_path, target_sr=CONFIG["sr"], return_meta=True)
         lat["load"] = _ms(t0)
         duration_s = len(wav) / CONFIG["sr"]
+        energy_ok, energy_reason = energy_present(meta)
 
-        t0 = time.perf_counter()
-        wav = denoise(wav, sr=CONFIG["sr"])
-        lat["denoise"] = _ms(t0)
+        # --- acoustic branch ---
+        acoustic = {"arousal": None, "non_speech_prob": None, "distress": None}
+        lat["load_acoustic"] = lat["wavlm_and_heads"] = 0.0
+        if energy_ok:
+            t0 = time.perf_counter()
+            wav_ac = load_audio_acoustic(audio_path, target_sr=CONFIG["sr"])
+            lat["load_acoustic"] = _ms(t0)
+            t0 = time.perf_counter()
+            acoustic = self._acoustic(wav_ac)
+            lat["wavlm_and_heads"] = _ms(t0)
 
-        t0 = time.perf_counter()
-        wav = trim(wav, sr=CONFIG["sr"])
-        lat["trim"] = _ms(t0)
-
-        # Energy and duration only, never the transcript: a wordless groan has no
-        # transcript and must still reach the distress gate.
-        has_speech, speech_reason = speech_present(meta, len(wav), sr=CONFIG["sr"])
-
-        # --- text branch ---
-        # ClinicalBERT runs only on a non-empty transcript. On an empty string it is
-        # out of distribution exactly as the distress gate is on silence (it
-        # predicted Emergency), so an empty transcript - no speech at all, or a
-        # wordless groan Whisper cannot decode - is UNCLASSIFIED at P_NO_SPEECH.
-        # The acoustic branch still runs for a groan, so the distress gate can take
-        # it to P1. UNCLASSIFIED is a pipeline sentinel, not a trained class; the
-        # dashboard renders it as a grey badge.
-        if has_speech:
+        # --- ASR: every clip with any signal ---
+        # Whisper's output is one of the three speech-guard conditions, so it runs
+        # before the guard decides (~1.2 s on CPU, accepted).
+        transcript, asr_confidence = "", None
+        lat["denoise"] = lat["trim"] = lat["asr"] = 0.0
+        if energy_ok:
+            t0 = time.perf_counter()
+            wav = denoise(wav, sr=CONFIG["sr"])
+            lat["denoise"] = _ms(t0)
+            t0 = time.perf_counter()
+            wav = trim(wav, sr=CONFIG["sr"])
+            lat["trim"] = _ms(t0)
             t0 = time.perf_counter()
             transcript, asr_confidence = self._transcribe(wav)
             lat["asr"] = _ms(t0)
-        else:
-            transcript, asr_confidence = "", None
-            lat["asr"] = 0.0
 
+        has_speech, speech_reason = speech_guard(
+            energy_ok, acoustic["non_speech_prob"], transcript, asr_confidence,
+            acoustic["distress"], energy_reason)
+        # A no-speech call's transcript is by definition empty or an untrusted
+        # hallucination ("Thank you." on fan noise). Kept for display, never
+        # classified.
+        heard = transcript
+        if not has_speech:
+            transcript = ""
+
+        # --- text branch ---
+        # ClinicalBERT only runs on a non-empty transcript: on "" it is out of
+        # distribution (it predicted Emergency), so an empty transcript - no speech,
+        # or a groan Whisper cannot decode - is UNCLASSIFIED at P_NO_SPEECH and the
+        # distress gate still applies. UNCLASSIFIED is a pipeline sentinel, not a
+        # trained class; the dashboard renders it as a grey badge.
         t0 = time.perf_counter()
         if transcript.strip():
             class_probs = self._classify(transcript)
@@ -290,36 +341,19 @@ class CareVoicePipeline:
             base_priority = RULES_CONFIG["P_NO_SPEECH"]
         lat["text_classifier"] = _ms(t0)
 
-        # --- acoustic branch ---
-        # Skipped entirely when there is no speech. The distress gate scores a WavLM
-        # embedding of pure silence at 0.9996: silence lies outside both of its
-        # training classes and the logistic regression extrapolates confidently in
-        # an arbitrary direction. The dashboard shows 0.0 rather than that number.
-        if has_speech:
-            t0 = time.perf_counter()
-            emb = self._embed(wav)
-            lat["wavlm"] = _ms(t0)
-
-            t0 = time.perf_counter()
-            arousal = float(self.arousal_model.predict_proba(emb)[0, self.fear_index])
-            distress = float(self.distress_model.predict_proba(emb)[0, self.distress_pos_index])
-            lat["acoustic_heads"] = _ms(t0)
-        else:
-            arousal, distress = 0.0, 0.0
-            lat["wavlm"] = lat["acoustic_heads"] = 0.0
-
         # --- the rule ---
         t0 = time.perf_counter()
         decision = apply_rules(
             base_priority=base_priority,
             request_class=request_class,
             class_confidence=class_confidence,
-            arousal=arousal,
-            distress=distress,
+            distress=acoustic["distress"] if acoustic["distress"] is not None else 0.0,
             asr_confidence=asr_confidence,
-            speech_present=has_speech,
-            speech_reason=speech_reason,
+            energy_ok=energy_ok,
+            non_speech_prob=acoustic["non_speech_prob"],
+            energy_reason=energy_reason,
             transcript=transcript,
+            asr_heard=heard,
         )
         lat["rules"] = _ms(t0)
         lat["total"] = _ms(t_all)
@@ -329,21 +363,24 @@ class CareVoicePipeline:
             "bed": bed,
             "duration_s": round(duration_s, 3),
             "transcript": transcript,
+            "asr_heard": heard,
             "asr_confidence": asr_confidence,
             "asr_trusted": decision.asr_trusted,
+            "energy_ok": energy_ok,
+            "non_speech_prob": acoustic["non_speech_prob"],
             "speech_present": has_speech,
             "speech_reason": speech_reason,
             "request_class": request_class,
             "class_probs": class_probs,
             "class_confidence": class_confidence,
             "base_priority": base_priority,
-            "arousal": arousal,
-            "distress": distress,
-            "arousal_fired": decision.arousal_fired,
+            "arousal": acoustic["arousal"],
+            "distress": acoustic["distress"],
             "distress_fired": decision.distress_fired,
             "final_priority": decision.final_priority,
             "escalated": decision.escalated,
             "reason": decision.reason,
+            "acoustic_contract": ACOUSTIC_CONTRACT,
             "latency_ms": lat,
         }
 
