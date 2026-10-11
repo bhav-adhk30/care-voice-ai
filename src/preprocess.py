@@ -54,14 +54,46 @@ CONFIG = {
 # Loading
 # --------------------------------------------------------------------------------------
 
+class AudioLoadError(Exception):
+    """The file could not be read as audio. The message is shown to the nurse and
+    logged, so it says what was wrong in plain words."""
+
+
+# Formats libsndfile reads natively. If one of these fails to decode, the file is
+# corrupt or not audio: fail at once rather than handing it to audioread, which
+# retries every backend (~3 s) and then fails anyway.
+_SOUNDFILE_NATIVE = {".wav", ".wave", ".flac", ".ogg", ".oga", ".aiff", ".aif", ".aifc",
+                     ".au", ".caf", ".mp3", ".w64", ".rf64"}
+
+
 def _read(path: str) -> tuple[np.ndarray, int]:
-    """Read any audio file as float64 (n_samples, n_channels) plus its native sample rate."""
+    """Read any audio file as float64 (n_samples, n_channels) plus its native sample rate.
+
+    Raises AudioLoadError for a missing, empty or undecodable file.
+    """
+    if not os.path.exists(path):
+        raise AudioLoadError(f"file not found: {os.path.basename(path)}")
+    if os.path.getsize(path) == 0:
+        raise AudioLoadError(f"file is empty (0 bytes): {os.path.basename(path)}")
     try:
         data, sr = sf.read(path, dtype="float64", always_2d=True)
-    except (RuntimeError, sf.LibsndfileError):
-        # Formats libsndfile cannot decode: fall back to librosa (audioread/ffmpeg).
-        data, sr = librosa.load(path, sr=None, mono=False, dtype=np.float64)
+    except (RuntimeError, sf.LibsndfileError) as e:
+        if os.path.splitext(path)[1].lower() in _SOUNDFILE_NATIVE:
+            # libsndfile prefixes the full path ("Error opening '/tmp/...': ");
+            # keep only the cause, the nurse sees this string.
+            cause = str(e).rsplit("': ", 1)[-1].strip().rstrip(".")
+            raise AudioLoadError(f"not a readable audio file: {os.path.basename(path)} "
+                                 f"({cause})") from e
+        # Containers libsndfile cannot open at all (.m4a voice memos, .webm from a
+        # browser mic): fall back to librosa (audioread/ffmpeg).
+        try:
+            data, sr = librosa.load(path, sr=None, mono=False, dtype=np.float64)
+        except Exception as e2:
+            raise AudioLoadError(f"could not decode {os.path.basename(path)} "
+                                 f"({type(e2).__name__})") from e2
         data = np.atleast_2d(data).T  # librosa returns (channels, samples)
+    if data.size == 0:
+        raise AudioLoadError(f"file contains no audio samples: {os.path.basename(path)}")
     return data, int(sr)
 
 

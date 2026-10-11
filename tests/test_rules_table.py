@@ -38,15 +38,16 @@ R0, R1, R2, R4 = "R0_no_speech", "R1_distress_untrusted_transcript", "R2_distres
 
 # (class, distress fired, ASR trusted, speech present) -> (final priority, rules fired)
 TABLE = {
-    # Emergency: base P1, floor P2 never needed; distress cannot go above P1
+    # Emergency: base P1, floor P2 never needed; distress cannot go above P1, and
+    # Rule 0 may not demote it (min(base, P_NO_SPEECH))
     ("Emergency", True,  True,  True):  (1, [R2]),
     ("Emergency", True,  False, True):  (1, [R1]),
     ("Emergency", False, True,  True):  (1, []),
     ("Emergency", False, False, True):  (1, []),
-    ("Emergency", True,  True,  False): (2, [R0]),
-    ("Emergency", True,  False, False): (2, [R0]),
-    ("Emergency", False, True,  False): (2, [R0]),
-    ("Emergency", False, False, False): (2, [R0]),
+    ("Emergency", True,  True,  False): (1, [R0]),
+    ("Emergency", True,  False, False): (1, [R0]),
+    ("Emergency", False, True,  False): (1, [R0]),
+    ("Emergency", False, False, False): (1, [R0]),
     # Assistance: base P2
     ("Assistance", True,  True,  True):  (1, [R2]),
     ("Assistance", True,  False, True):  (1, [R1]),
@@ -107,6 +108,19 @@ def test_unclassified_rows(kw, want_p, want_rules):
     d = apply_rules(base_priority=CONFIG["P_NO_SPEECH"], request_class=UNCLASSIFIED,
                     class_confidence=0.0, transcript="", **kw)
     assert (d.final_priority, d.rules_fired) == (want_p, want_rules), d.reason
+
+
+def test_audio_error_routes_like_a_call_button():
+    d = apply_rules(CONFIG["P_NO_SPEECH"], UNCLASSIFIED, 0.0, 0.0, transcript="",
+                    audio_error="file not found: x.wav")
+    assert (d.final_priority, d.rules_fired) == (2, ["R0_audio_error"])
+    assert "file not found" in d.reason and not d.escalated
+
+
+def test_absent_asr_confidence_is_untrusted():
+    d = apply_rules(3, "Pain", 0.9, 0.0, asr_confidence=None, non_speech_prob=0.0,
+                    transcript="my knee hurts")
+    assert d.asr_trusted is False
 
 
 def test_unclassified_invariant_both_directions():
