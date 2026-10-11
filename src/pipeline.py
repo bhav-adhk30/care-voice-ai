@@ -7,7 +7,7 @@ second implementation of the pipeline anywhere else.
     audio -> load_audio (-23 LUFS) -> energy pre-filter
           -> load_audio_acoustic (RMS 0.05, crop 4 s, no pad) -> WavLM Base+ (frozen,
              mean-pooled over real frames) -> arousal head (fear, non_speech) + distress gate
-          -> denoise -> trim -> Whisper small (faster-whisper int8)
+          -> denoise (DISABLED, see preprocess.CONFIG) -> trim -> Whisper small (faster-whisper int8)
           -> speech guard (non_speech AND no trusted transcript AND no distress)
           -> if speech and a transcript: ClinicalBERT
           -> apply_rules (src/rules.py) -> final priority + reason
@@ -48,7 +48,8 @@ import torch
 
 from src.mapping import class_base_priority, medication_tag
 from src.preprocess import SPEECH_GUARD
-from src.preprocess import AudioLoadError
+from src.preprocess import CONFIG as PREPROCESS_CONFIG
+from src.preprocess import DENOISE_DISABLED_REASON, AudioLoadError
 from src.preprocess import (ACOUSTIC_CONTRACT, denoise, energy_present, load_audio,
                             load_audio_acoustic, trim)
 from src.rules import CONFIG as RULES_CONFIG
@@ -182,6 +183,10 @@ class CareVoicePipeline:
                 "CareVoicePipeline cannot start, missing model files: " + ", ".join(missing)
                 + ". Run `python scripts/fetch_models.py` for Whisper/WavLM/emotion; the "
                   "trained heads and ClinicalBERT come from the Kaggle jobs.")
+
+        # Say so once, at startup, rather than let a disabled stage look active.
+        if not PREPROCESS_CONFIG["enable_denoise"]:
+            log.warning("denoising disabled: %s", DENOISE_DISABLED_REASON)
 
         self._load_asr()
         self._load_text()
@@ -516,6 +521,7 @@ class CareVoicePipeline:
             # Everything needed to reconstruct this decision after the config moves.
             "thresholds": {**{k: v for k, v in RULES_CONFIG.items() if k != "STARVATION_SECONDS"},
                            "MIN_RAW_RMS": SPEECH_GUARD["MIN_RAW_RMS"],
+                           "denoise_enabled": PREPROCESS_CONFIG["enable_denoise"],
                            "acoustic_contract": ACOUSTIC_CONTRACT},
             "model_versions": self.model_versions,
             "acoustic_contract": ACOUSTIC_CONTRACT,

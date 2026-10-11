@@ -47,7 +47,18 @@ CONFIG = {
     "active_frame_ms": 25,       # frame length for speech-power estimation in SNR mixing
     "active_threshold_db": -40.0,# frames this far below the loudest frame are ignored for SNR power
     "ffmpeg_bin": "ffmpeg",
+    # DeepFilterNet denoising: specified in the design, NOT evaluated, OFF.
+    # deepfilterlib (its native core, latest 0.5.6) ships wheels only for Python
+    # 3.8-3.11; this project runs 3.12 and building from source needs Rust. Every
+    # number in results/ was measured without denoising. It used to default to on
+    # and silently return its input when the import failed - a no-op claiming to
+    # be on - so the default is now explicit, CareVoicePipeline logs it at
+    # startup, and enabling it without DeepFilterNet installed raises.
+    "enable_denoise": False,
+    "enable_trim": True,
 }
+
+DENOISE_DISABLED_REASON = "deepfilterlib has no wheel for Python 3.12"
 
 
 # --------------------------------------------------------------------------------------
@@ -378,17 +389,17 @@ _DF_STATE = None
 
 
 def _init_deepfilternet():
-    """Load DeepFilterNet once and cache it. Returns (model, state) or (None, None)."""
+    """Load DeepFilterNet once and cache it. Raises if it cannot be loaded: denoising
+    that was asked for must happen or fail loudly, never silently pass audio through."""
     global _DF_MODEL, _DF_STATE
     if _DF_MODEL is None:
         try:
             from df.enhance import init_df
-            _DF_MODEL, _DF_STATE, _ = init_df()
-        except Exception as e:
-            print(f"[preprocess] DeepFilterNet unavailable, denoise is a no-op: {e}")
-            _DF_MODEL, _DF_STATE = False, False
-    if _DF_MODEL is False:
-        return None, None
+        except ImportError as e:
+            raise RuntimeError(
+                "CONFIG['enable_denoise'] is True but DeepFilterNet is not installed "
+                f"({e}). {DENOISE_DISABLED_REASON}; set enable_denoise to False.") from e
+        _DF_MODEL, _DF_STATE, _ = init_df()
     return _DF_MODEL, _DF_STATE
 
 
@@ -397,15 +408,16 @@ def denoise(wav, sr=16000):
     DeepFilterNet3 denoising. Same sample rate and length in and out.
 
     DeepFilterNet runs natively at 48 kHz, so the signal is resampled up,
-    enhanced, and resampled back. If the package is missing, the input is
-    returned unchanged so the pipeline still runs.
+    enhanced, and resampled back.
+
+    Disabled by default (CONFIG["enable_denoise"], see the comment there): then the
+    input is returned unchanged, and CareVoicePipeline has said so at startup. When
+    enabled, a missing DeepFilterNet raises rather than passing audio through.
     """
-    if not CONFIG.get("enable_denoise", True):
+    if not CONFIG["enable_denoise"]:
         return wav
 
     model, state = _init_deepfilternet()
-    if model is None:
-        return wav
 
     import torch
     from df.enhance import enhance
@@ -428,7 +440,7 @@ def trim(wav, sr=16000, top_db=None, keep_pad_ms=None):
     Returns the input unchanged if trimming would leave almost nothing, which
     happens on very quiet clips and would otherwise destroy the sample.
     """
-    if not CONFIG.get("enable_trim", True):
+    if not CONFIG["enable_trim"]:
         return wav
 
     top_db = top_db if top_db is not None else CONFIG.get("trim_top_db", 30)
