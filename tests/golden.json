@@ -5,6 +5,7 @@
     "asr_confidence": -0.2677625207340016,
     "asr_heard": "I have a severe pain in the upper left side of my chest.",
     "asr_trusted": true,
+    "audio_error": null,
     "base_priority": 1,
     "class_confidence": 0.9763430953025818,
     "class_probs": {
@@ -44,7 +45,8 @@
       "NON_SPEECH_HIGH": 0.9,
       "P_IMMEDIATE": 1,
       "P_NO_SPEECH": 2,
-      "acoustic_contract": "no_pad_meanpool_rms0.05"
+      "acoustic_contract": "no_pad_meanpool_rms0.05",
+      "denoise_enabled": false
     },
     "transcript": "I have a severe pain in the upper left side of my chest."
   },
@@ -54,6 +56,7 @@
     "asr_confidence": -10.0,
     "asr_heard": "",
     "asr_trusted": false,
+    "audio_error": null,
     "base_priority": 2,
     "class_confidence": 0.0,
     "class_probs": {},
@@ -90,7 +93,8 @@
       "NON_SPEECH_HIGH": 0.9,
       "P_IMMEDIATE": 1,
       "P_NO_SPEECH": 2,
-      "acoustic_contract": "no_pad_meanpool_rms0.05"
+      "acoustic_contract": "no_pad_meanpool_rms0.05",
+      "denoise_enabled": false
     },
     "transcript": ""
   },
@@ -100,6 +104,7 @@
     "asr_confidence": -0.30699263513088226,
     "asr_heard": "my knee hurts when I bend it",
     "asr_trusted": true,
+    "audio_error": null,
     "base_priority": 3,
     "class_confidence": 0.981315553188324,
     "class_probs": {
@@ -139,7 +144,8 @@
       "NON_SPEECH_HIGH": 0.9,
       "P_IMMEDIATE": 1,
       "P_NO_SPEECH": 2,
-      "acoustic_contract": "no_pad_meanpool_rms0.05"
+      "acoustic_contract": "no_pad_meanpool_rms0.05",
+      "denoise_enabled": false
     },
     "transcript": "my knee hurts when I bend it"
   },
@@ -149,6 +155,7 @@
     "asr_confidence": -0.9618158340454102,
     "asr_heard": "You",
     "asr_trusted": false,
+    "audio_error": null,
     "base_priority": 2,
     "class_confidence": 0.0,
     "class_probs": {},
@@ -185,7 +192,8 @@
       "NON_SPEECH_HIGH": 0.9,
       "P_IMMEDIATE": 1,
       "P_NO_SPEECH": 2,
-      "acoustic_contract": "no_pad_meanpool_rms0.05"
+      "acoustic_contract": "no_pad_meanpool_rms0.05",
+      "denoise_enabled": false
     },
     "transcript": ""
   },
@@ -195,6 +203,7 @@
     "asr_confidence": null,
     "asr_heard": "",
     "asr_trusted": false,
+    "audio_error": null,
     "base_priority": 2,
     "class_confidence": 0.0,
     "class_probs": {},
@@ -231,7 +240,8 @@
       "NON_SPEECH_HIGH": 0.9,
       "P_IMMEDIATE": 1,
       "P_NO_SPEECH": 2,
-      "acoustic_contract": "no_pad_meanpool_rms0.05"
+      "acoustic_contract": "no_pad_meanpool_rms0.05",
+      "denoise_enabled": false
     },
     "transcript": ""
   },
@@ -241,6 +251,7 @@
     "asr_confidence": -0.9232921600341797,
     "asr_heard": "You",
     "asr_trusted": false,
+    "audio_error": null,
     "base_priority": 2,
     "class_confidence": 0.0,
     "class_probs": {},
@@ -277,7 +288,8 @@
       "NON_SPEECH_HIGH": 0.9,
       "P_IMMEDIATE": 1,
       "P_NO_SPEECH": 2,
-      "acoustic_contract": "no_pad_meanpool_rms0.05"
+      "acoustic_contract": "no_pad_meanpool_rms0.05",
+      "denoise_enabled": false
     },
     "transcript": ""
   }

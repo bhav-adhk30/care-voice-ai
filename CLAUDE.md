@@ -108,7 +108,7 @@ Bedside unit (button press / wake word)
         ↓
 VAD + audio capture — 16 kHz mono, 16-bit PCM
         ↓
-Preprocessing: DeepFilterNet denoise → AGC → silence trim
+Preprocessing: DeepFilterNet denoise (specified, not evaluated, OFF) → AGC → silence trim
         ↓
         ├─────────────────────────────┬────────────────────────────┐
         ↓                             ↓                            │
@@ -134,7 +134,7 @@ General  → base priority              │                            │
 |---|---|---|---|
 | Wake word | openWakeWord (optional; button is fine for demo) | small | No |
 | VAD | Silero VAD | 1.8 MB | No |
-| Denoise | DeepFilterNet3 | ~2 M | No |
+| Denoise | DeepFilterNet3 — **specified, not evaluated, disabled** (see §9) | ~2 M | No |
 | AGC | pyloudnorm, target −23 LUFS | – | No |
 | ASR | Whisper small (`openai/whisper-small`), faster-whisper int8 at runtime | 244 M | No |
 | Text classifier | `emilyalsentzer/Bio_ClinicalBERT` + 4-class head | 110 M | **Yes** |
@@ -467,6 +467,20 @@ Assume no internet in the room.
 - Prefer file upload over live microphone as the primary path. Mic permissions and audio
   drivers fail more often than anything else in the system.
 - Record a screen capture of a successful full run as a last-resort backup.
+
+### Denoising: specified but unevaluated
+
+DeepFilterNet3 is in the design but has never run. Its native core, `deepfilterlib`
+(latest 0.5.6), ships wheels only for Python 3.8–3.11; the project runs Python 3.12, and
+building from source needs a Rust toolchain. `preprocess.CONFIG["enable_denoise"]` is
+`False`, `CareVoicePipeline` logs "denoising disabled: deepfilterlib has no wheel for
+Python 3.12" at startup, and the audit log records `denoise_enabled` with every decision.
+Every number in `results/` was measured without denoising. Report it as specified but
+unevaluated; do not describe the system as denoising.
+
+Until this was made explicit, `enable_denoise` defaulted to on and `denoise()` silently
+returned its input when the import failed. Enabling it now without DeepFilterNet
+installed raises instead.
 
 ### Memory on the 8 GB demo machine
 
