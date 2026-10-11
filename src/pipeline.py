@@ -31,6 +31,7 @@ from __future__ import annotations
 import gc
 import hashlib
 import json
+import logging
 import os
 import random
 import time
@@ -47,10 +48,16 @@ import torch
 
 from src.mapping import class_base_priority, medication_tag
 from src.preprocess import SPEECH_GUARD
+from src.preprocess import AudioLoadError
 from src.preprocess import (ACOUSTIC_CONTRACT, denoise, energy_present, load_audio,
                             load_audio_acoustic, trim)
 from src.rules import CONFIG as RULES_CONFIG
 from src.rules import UNCLASSIFIED, apply_rules, speech_guard
+
+log = logging.getLogger(__name__)
+
+# Every model file the pipeline cannot run without, checked before anything loads.
+REQUIRED_MODELS = ("whisper_dir", "bert_dir", "wavlm_dir", "arousal_head", "distress_gate")
 
 CONFIG = {
     "sr": 16000,
@@ -162,6 +169,19 @@ class CareVoicePipeline:
         random.seed(CONFIG["seed"])
         np.random.seed(CONFIG["seed"])
         torch.manual_seed(CONFIG["seed"])
+
+        # Refuse to start, at once and naming every missing file, rather than
+        # loading 1 GB of other models first or running without the distress gate.
+        # A nurse-call system missing a model must fail at startup, loudly, never
+        # mid-shift on a call.
+        required = REQUIRED_MODELS + (("emotion_dir",) if load_emotion else ())
+        missing = [str(self.model_dir / CONFIG[k]) for k in required
+                   if not (self.model_dir / CONFIG[k]).exists()]
+        if missing:
+            raise FileNotFoundError(
+                "CareVoicePipeline cannot start, missing model files: " + ", ".join(missing)
+                + ". Run `python scripts/fetch_models.py` for Whisper/WavLM/emotion; the "
+                  "trained heads and ClinicalBERT come from the Kaggle jobs.")
 
         self._load_asr()
         self._load_text()
@@ -356,22 +376,37 @@ class CareVoicePipeline:
         lat = {}
         t_all = time.perf_counter()
 
+        # A missing, empty or corrupt recording must still produce a routed call:
+        # someone pressed the button. The error becomes the decision's reason.
+        audio_error = None
         t0 = time.perf_counter()
-        wav, meta = load_audio(audio_path, target_sr=CONFIG["sr"], return_meta=True)
+        try:
+            wav, meta = load_audio(audio_path, target_sr=CONFIG["sr"], return_meta=True)
+            energy_ok, energy_reason = energy_present(meta)
+        except AudioLoadError as e:
+            audio_error = str(e)
+            log.warning("bed %s: %s; routing at P%d", bed, audio_error, RULES_CONFIG["P_NO_SPEECH"])
+            wav, energy_ok, energy_reason = np.zeros(0, dtype=np.float32), False, ""
         lat["load"] = _ms(t0)
         duration_s = len(wav) / CONFIG["sr"]
-        energy_ok, energy_reason = energy_present(meta)
 
         # --- acoustic branch ---
         acoustic = {"arousal": None, "non_speech_prob": None, "distress": None}
         lat["load_acoustic"] = lat["wavlm_and_heads"] = 0.0
         if energy_ok:
             t0 = time.perf_counter()
-            wav_ac = load_audio_acoustic(audio_path, target_sr=CONFIG["sr"])
+            try:
+                wav_ac = load_audio_acoustic(audio_path, target_sr=CONFIG["sr"])
+            except Exception as e:  # readable by soundfile above but not here: report it
+                audio_error = f"acoustic loader failed ({type(e).__name__}: {e})"
+                log.warning("bed %s: %s; routing at P%d", bed, audio_error,
+                            RULES_CONFIG["P_NO_SPEECH"])
+                energy_ok = False
             lat["load_acoustic"] = _ms(t0)
-            t0 = time.perf_counter()
-            acoustic = self._acoustic(wav_ac)
-            lat["wavlm_and_heads"] = _ms(t0)
+            if audio_error is None:
+                t0 = time.perf_counter()
+                acoustic = self._acoustic(wav_ac)
+                lat["wavlm_and_heads"] = _ms(t0)
 
         # --- ASR: every clip with any signal ---
         # Whisper's output is one of the three speech-guard conditions, so it runs
@@ -392,6 +427,8 @@ class CareVoicePipeline:
         has_speech, speech_reason = speech_guard(
             energy_ok, acoustic["non_speech_prob"], transcript, asr_confidence,
             acoustic["distress"], energy_reason)
+        if audio_error:
+            speech_reason = f"audio could not be read ({audio_error})"
         # A no-speech call's transcript is by definition empty or an untrusted
         # hallucination ("Thank you." on fan noise). Kept for display, never
         # classified.
@@ -442,6 +479,7 @@ class CareVoicePipeline:
             energy_reason=energy_reason,
             transcript=transcript,
             asr_heard=heard,
+            audio_error=audio_error,
         )
         lat["rules"] = _ms(t0)
         lat["total"] = _ms(t_all)
@@ -450,6 +488,7 @@ class CareVoicePipeline:
             "audio_path": str(audio_path),
             "bed": bed,
             "duration_s": round(duration_s, 3),
+            "audio_error": audio_error,
             "transcript": transcript,
             "asr_heard": heard,
             "asr_confidence": asr_confidence,

@@ -70,6 +70,7 @@ UNCLASSIFIED_STYLE = ("#757575", "#ffffff")
 # Plain-language versions of the rule ids in rules.Decision.rules_fired.
 RULE_WORDS = {
     "R0_no_speech": "No words or voice detected: treated like a plain call-button press",
+    "R0_audio_error": "Recording missing or unreadable: treated like a plain call-button press",
     "R1_distress_untrusted_transcript": "Sounds distressed and the words are unclear: go now",
     "R2_distress": "Voice sounds distressed: raised to immediate",
     "R4_emergency_floor": "Emergency request: kept urgent however calm it sounds",

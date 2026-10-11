@@ -175,6 +175,7 @@ def apply_rules(
     *,
     transcript: str,
     asr_heard: Optional[str] = None,
+    audio_error: Optional[str] = None,
 ) -> Decision:
     """
     Combine the two branches into a final priority.
@@ -190,12 +191,15 @@ def apply_rules(
                      UNCLASSIFIED exactly when the transcript is empty
     class_confidence softmax probability of the predicted class, 0..1
     distress         distress-gate probability, 0..1
-    asr_confidence   mean token log-probability from Whisper, or None
+    asr_confidence   mean token log-probability from Whisper, or None when ASR did
+                     not run; None is UNTRUSTED here and in speech_guard alike
     energy_ok        preprocess.energy_present pre-filter result
     non_speech_prob  arousal head's non_speech probability, or None if the
                      pre-filter stopped the clip before WavLM ran
     energy_reason    why the pre-filter failed, shown on the dashboard
     transcript       the ASR output; required, to enforce the invariant below
+    audio_error      set when the file could not be read at all; the call is
+                     routed like Rule 0 with this as its reason
     asr_heard        what Whisper decoded before the pipeline blanked a no-speech
                      transcript; used by the speech guard and its reason string.
                      Defaults to `transcript`.
@@ -221,13 +225,29 @@ def apply_rules(
     # Rule 1. speech_guard() requires the distress gate to be silent before it
     # calls anything no-speech, so a groan that fires the gate always gets
     # through, whatever the non_speech class says about it.
+    # --- Rule 0a: unreadable audio -------------------------------------------
+    # Someone pressed the button; the recording is missing, empty or corrupt.
+    # Route it like a plain call button, never drop it, never crash the station.
+    if audio_error:
+        return Decision(
+            final_priority=min(base_priority, cfg["P_NO_SPEECH"]),
+            base_priority=base_priority,
+            reason=(f"audio could not be read ({audio_error}); routed as an unclassified "
+                    "call, equivalent to a conventional call button"),
+            escalated=False, distress_fired=False, asr_trusted=False,
+            speech_present=False, acoustic_used=False, energy_ok=False,
+            non_speech_prob=None, rules_fired=["R0_audio_error"],
+        )
+
     heard = transcript if asr_heard is None else asr_heard
     speech_present, speech_reason = speech_guard(energy_ok, non_speech_prob, heard,
                                                  asr_confidence, distress,
                                                  energy_reason, cfg)
     if not speech_present:
         return Decision(
-            final_priority=cfg["P_NO_SPEECH"],
+            # min(): Rule 0 routes a no-speech call at P2 but may never make a
+            # call less urgent than it arrived (an Emergency stays P1).
+            final_priority=min(base_priority, cfg["P_NO_SPEECH"]),
             base_priority=base_priority,
             reason=("no speech detected" + (f" ({speech_reason})" if speech_reason else "")
                     + "; routed as an unclassified call, equivalent to a "
@@ -245,7 +265,9 @@ def apply_rules(
     priority = base_priority
     reasons, fired = [], []
 
-    asr_trusted = asr_confidence is None or asr_confidence >= cfg["ASR_MIN"]
+    # No measurement is not a good measurement: an absent confidence is untrusted,
+    # consistently with speech_guard.
+    asr_trusted = asr_confidence is not None and asr_confidence >= cfg["ASR_MIN"]
     if not asr_trusted:
         reasons.append("ASR confidence below threshold; transcript not trusted")
 

@@ -52,20 +52,23 @@ def test_unreadable_format(pipe, tmp_path, caplog):
     assert_routed_with_reason(r, caplog)
 
 
-def test_missing_model_file(tmp_path, caplog):
-    """A missing model must not stop the station: the pipeline loads what it can,
-    and every call is routed at P2 with a reason naming the missing model."""
+def test_missing_model_file_refuses_to_start(tmp_path, monkeypatch):
+    """Unlike bad audio, a missing model is a deployment fault: a pipeline without
+    its distress gate must refuse to start - immediately, before loading anything
+    else, naming the file - rather than run a silently weaker triage all shift."""
     from src.pipeline import CareVoicePipeline
     models = tmp_path / "models"
     models.mkdir()
     for p in MODELS.iterdir():
         if p.name != "distress_gate.joblib":
             os.symlink(p, models / p.name)
-    pipe = CareVoicePipeline(model_dir=str(models))      # must not raise
-    r = pipe.process(FIXTURES / "tts_chest_pain.wav")
-    assert r["final_priority"] <= RULES["P_NO_SPEECH"], r["reason"]
-    assert "distress_gate" in r["reason"], r["reason"]
-    assert [rec for rec in caplog.records if rec.levelno >= logging.WARNING]
+
+    def must_not_load(self):
+        raise AssertionError("loaded a model before checking all model files exist")
+    monkeypatch.setattr(CareVoicePipeline, "_load_asr", must_not_load)
+
+    with pytest.raises(FileNotFoundError, match="distress_gate.joblib"):
+        CareVoicePipeline(model_dir=str(models))
 
 
 def test_sixty_second_clip(pipe, tmp_path):
