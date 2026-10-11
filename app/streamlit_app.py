@@ -196,8 +196,11 @@ def render_breakdown(r: dict):
     with left:
         st.markdown("##### Text branch")
         if not r["speech_present"]:
-            st.info(f"No speech detected ({r['speech_reason']}). Both branches skipped.")
+            st.info(f"No speech detected ({r['speech_reason']}). Text branch skipped.")
         st.markdown(f"**Transcript:** {r['transcript'] or '*(empty)*'}")
+        if not r["speech_present"] and r.get("asr_heard"):
+            st.caption(f"Whisper heard {r['asr_heard']!r}; discarded as an untrusted "
+                       "hallucination on a no-speech call.")
         conf = r["asr_confidence"]
         st.markdown(f"**ASR confidence:** {'n/a' if conf is None else f'{conf:.3f}'} "
                     f"(threshold {RULES['ASR_MIN']}) — "
@@ -210,11 +213,17 @@ def render_breakdown(r: dict):
                         "(empty transcript, ClinicalBERT not run)", unsafe_allow_html=True)
     with right:
         st.markdown("##### Acoustic branch")
-        for label, key, thr, fired in (("Arousal (P(fear))", "arousal", RULES["AROUSAL_HIGH"], r["arousal_fired"]),
-                                       ("Distress gate", "distress", RULES["DISTRESS_HIGH"], r["distress_fired"])):
-            st.markdown(f"**{label}:** {r[key]:.4f} (threshold {thr}) "
-                        f"{'— 🔴 **fired**' if fired else ''}")
-            st.progress(min(1.0, r[key]))
+        if r["distress"] is None:
+            st.caption("Not run: the energy pre-filter found no signal.")
+        else:
+            st.markdown(f"**Distress gate:** {r['distress']:.4f} (threshold {RULES['DISTRESS_HIGH']}) "
+                        f"{'— 🔴 **fired**' if r['distress_fired'] else ''}")
+            st.progress(min(1.0, r["distress"]))
+            st.markdown(f"**Non-speech (speech guard):** {r['non_speech_prob']:.4f} "
+                        f"(threshold {RULES['NON_SPEECH_HIGH']})")
+            st.progress(min(1.0, r["non_speech_prob"]))
+            st.markdown(f"**Fear probability:** {r['arousal']:.4f} — display only, "
+                        "does not affect priority")
         lat = pd.Series(r["latency_ms"], name="ms")
         st.markdown(f"##### Latency: {lat['total']:.0f} ms")
         st.dataframe(lat.drop("total").to_frame(), height=320)
@@ -346,14 +355,27 @@ def tab_results():
     gate = _read_json("distress_gate_results.json")
     if gate:
         st.markdown("#### Acoustic branch")
-        st.warning("Under review: notebook 10 is testing how much of these numbers comes from "
-                   "how the 4 s window was padded rather than from distress. Do not quote yet.")
+        st.error("Superseded. These v1 numbers measured padding and corpus identity, not "
+                 "distress (results/padding_diagnostic.json). The v2 refit is below.")
         c = st.columns(3)
         c[0].metric("Distress AUC vs calm speech", gate["auc_vs_calm_speech"])
         c[1].metric("Distress AUC vs other vocalisations", gate["auc_vs_other_vocalisations"])
         op = gate["operating_point"]
         c[2].metric("Operating point", f"{op['recall']:.0%} recall", f"{op['false_alarm']:.1%} false alarms",
                     delta_color="off")
+
+    v2 = _read_json("head_refit_v2.json")
+    if v2:
+        st.markdown("#### Acoustic branch v2 (unpadded, deduplicated, noise and silence negatives)")
+        c = st.columns(4)
+        c[0].metric("Distress AUC, held out", f"{v2['distress_heldout_auc_all_negatives']:.3f}",
+                    help=f"Within VIVAE only: {v2['distress_withincorpus_auc']:.3f}")
+        c[1].metric("Distress recall", f"{v2['distress_recall']:.1%}",
+                    help=f"at DISTRESS_HIGH = {v2['DISTRESS_HIGH_new']}")
+        c[2].metric("False alarms, medical speech", f"{v2['distress_fa_medical']:.2%}",
+                    help=f"ward noise {v2['distress_fa_ward_noise']:.1%}, silence {v2['distress_fa_silence']:.0%}")
+        c[3].metric("Fear recall at 2% FA", f"{v2['arousal_recall_at_2pct_medical_fa']:.1%}",
+                    help="Too low to escalate on; fear is displayed only")
 
     figs = sorted(res.glob("**/*.png"))
     if figs:

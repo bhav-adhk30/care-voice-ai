@@ -1,0 +1,16 @@
+{
+  "distress_heldout_auc_all_negatives": 0.8632,
+  "distress_withincorpus_auc": 0.6293,
+  "DISTRESS_HIGH_old": 0.0677,
+  "DISTRESS_HIGH_new": 0.4028,
+  "distress_recall": 0.637,
+  "distress_fa_medical": 0.0075,
+  "distress_fa_ward_noise": 0.017,
+  "distress_fa_silence": 0.0,
+  "arousal_macro_f1": 0.687,
+  "arousal_fear_f1": 0.552,
+  "arousal_non_speech_f1": 0.988,
+  "arousal_escalation": "removed",
+  "arousal_recall_at_2pct_medical_fa": 0.145,
+  "vivae_duplicates_removed": 480
+}

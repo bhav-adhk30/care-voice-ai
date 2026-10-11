@@ -151,7 +151,7 @@ def load_audio(path, target_sr=16000, target_lufs=-23.0, max_seconds=None,
 
     return_meta : bool
         If True, also return a dict of raw (pre-normalisation) signal statistics for
-        `speech_present`. Default False, so existing callers are unaffected.
+        `energy_present`. Default False, so existing callers are unaffected.
 
     Returns
     -------
@@ -417,39 +417,80 @@ def trim(wav, sr=16000, top_db=None, keep_pad_ms=None):
 
 
 # ---------------------------------------------------------------------------
-# Minimum-speech guard
+# Acoustic-branch loader
 #
-# Thresholds below are placeholders. Run scripts/calibrate_speech_guard.py and
-# replace them with the measured values before using this in any result.
+# There are two loaders, and that is section 2.5 satisfied rather than violated.
+# The rule exists so that every clip reaching a model has been prepared exactly
+# as that model's training data was. The two branches were trained differently:
+#
+#   load_audio           -23 LUFS, natural length. Whisper (pretrained, any level)
+#                        and the ASR_MIN measurement use this.
+#   load_audio_acoustic  RMS 0.05, gain capped at 10x, peak 0.99, crop to 4 s,
+#                        never pad. Bit-for-bit the loader the acoustic heads were
+#                        fitted on in notebooks/11_head_refit.ipynb (load_norm),
+#                        recorded in the joblibs as extraction contract
+#                        "no_pad_meanpool_rms0.05". WavLM has do_normalize=False,
+#                        so input level reaches the features directly; feeding the
+#                        heads LUFS-normalised audio would move their scores.
+#
+# No denoise and no trim on this path: notebook 11 applied neither, so the
+# heads have never seen trimmed or denoised audio. Both definitions live here,
+# next to each other, and nowhere else.
 # ---------------------------------------------------------------------------
 
-SPEECH_GUARD = {
-    # UNMEASURED PLACEHOLDER. Pre-normalisation RMS floor. Set below the minimum
-    # observed across all four corpora, with margin.
-    "MIN_RAW_RMS": 2.0e-3,
-    # UNMEASURED PLACEHOLDER. Seconds of audio surviving trim(). A VIVAE groan is
-    # ~1 s; a button press with no speech leaves almost nothing.
-    "MIN_TRIMMED_S": 0.35,
+ACOUSTIC_CONTRACT = "no_pad_meanpool_rms0.05"
+
+ACOUSTIC_CONFIG = {
+    "target_rms": 0.05,
+    "max_gain": 10.0,
+    "peak_ceiling": 0.99,
+    "rms_floor": 1e-8,       # below this the clip is left unscaled, as in training
+    "max_seconds": 4.0,      # crop from the start; shorter clips keep their length
 }
 
 
-def speech_present(meta: dict, trimmed_samples: int, sr: int = 16000,
-                   cfg: dict = SPEECH_GUARD) -> tuple[bool, str]:
+def load_audio_acoustic(path, target_sr: int = 16000, cfg: dict = ACOUSTIC_CONFIG) -> np.ndarray:
+    """Load for the WavLM branch under contract ACOUSTIC_CONTRACT.
+
+    librosa load at 16 kHz mono -> RMS-normalise to 0.05 (gain capped at 10x)
+    -> peak-limit to 0.99 -> crop to 4 s. Never pads: a short clip stays short and
+    is mean-pooled over its own frames. Returns float32.
     """
-    Is there enough signal here for either branch to mean anything?
+    wav, _ = librosa.load(os.fspath(path), sr=target_sr, mono=True)
+    rms = float(np.sqrt(np.mean(wav ** 2))) if len(wav) else 0.0
+    if rms > cfg["rms_floor"]:
+        wav = wav * min(cfg["target_rms"] / rms, cfg["max_gain"])
+        peak = float(np.abs(wav).max())
+        if peak > cfg["peak_ceiling"]:
+            wav = wav * (cfg["peak_ceiling"] / peak)
+    return wav[: int(round(cfg["max_seconds"] * target_sr))].astype(np.float32)
 
-    Returns (present, reason). `meta` is the dict from load_audio(return_meta=True),
-    `trimmed_samples` is len(wav) after trim().
 
-    Checks energy and duration, never the transcript - a wordless cry has no
-    transcript and must still be treated as a real call.
+# ---------------------------------------------------------------------------
+# Energy pre-filter for the speech guard
+#
+# The speech decision itself is the arousal head's non_speech class (rules.py,
+# NON_SPEECH_HIGH), which was trained on ward noise and silence. This check only
+# saves running WavLM on clips with essentially no signal, so it is set at
+# digital-silence level: it must never be the reason a quiet real call is lost.
+# ---------------------------------------------------------------------------
+
+SPEECH_GUARD = {
+    # Pre-normalisation RMS, about -80 dBFS. Deliberately far below any real
+    # recording; everything above it is decided by the non_speech class.
+    "MIN_RAW_RMS": 1.0e-4,
+}
+
+
+def energy_present(meta: dict, cfg: dict = SPEECH_GUARD) -> tuple[bool, str]:
     """
-    trimmed_s = trimmed_samples / sr
+    Cheap pre-filter: is there any signal at all? Returns (present, reason).
+    `meta` is the dict from load_audio(return_meta=True).
 
+    Energy only, never the transcript - a wordless cry has no transcript and
+    must still reach the acoustic branch.
+    """
     if meta["raw_rms"] < cfg["MIN_RAW_RMS"]:
         return False, (f"signal level below floor "
-                       f"(RMS {meta['raw_rms']:.2e} < {cfg['MIN_RAW_RMS']:.2e})")
-    if trimmed_s < cfg["MIN_TRIMMED_S"]:
-        return False, (f"too little audio after silence trimming "
-                       f"({trimmed_s:.2f}s < {cfg['MIN_TRIMMED_S']}s)")
+                       f"(RMS {meta['raw_rms']:.2e} < {cfg['MIN_RAW_RMS']:.0e})")
     return True, ""
