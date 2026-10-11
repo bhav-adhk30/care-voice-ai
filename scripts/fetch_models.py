@@ -15,6 +15,11 @@ WavLM Base+
     microsoft/wavlm-base-plus, config + feature-extractor config + weights only. Used
     FROZEN (CLAUDE.md section 2.2).
 
+Text emotion
+    j-hartmann/emotion-english-distilroberta-base (82 M), pretrained, not fine-tuned
+    here. An emotion model rather than positive/negative sentiment: anger and pain are
+    both "negative", and anger suppression needs to tell them apart.
+
 Run once, with internet, before going anywhere the network cannot be trusted.
 """
 
@@ -40,9 +45,16 @@ CONFIG = {
             "microsoft/wavlm-base-plus",
             ["config.json", "preprocessor_config.json"],
         ),
+        # Text emotion (anger/disgust/fear/joy/neutral/sadness/surprise), used for
+        # the dashboard's sentiment and for anger suppression in rules.py.
+        "emotion-english-distilroberta-base": (
+            "j-hartmann/emotion-english-distilroberta-base",
+            ["config.json", "tokenizer_config.json"],
+        ),
     },
     # Never download README/.gitattributes/TF/Flax weights; disk is tight.
-    "skip_suffixes": (".md", ".gitattributes", ".h5", ".msgpack", ".onnx", ".ot"),
+    "skip_suffixes": (".md", ".gitattributes", ".h5", ".msgpack", ".onnx", ".ot",
+                      "training_args.bin"),
 }
 
 

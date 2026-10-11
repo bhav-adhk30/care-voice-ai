@@ -14,24 +14,48 @@
     "request_class": "Unclassified",
     "class_probs": {},
     "class_confidence": 0.0,
+    "medication": [],
+    "sentiment": {},
+    "sentiment_label": null,
+    "text_anger": null,
     "base_priority": 2,
     "arousal": null,
     "distress": null,
     "distress_fired": false,
     "final_priority": 2,
     "escalated": false,
+    "rules_fired": [
+      "R0_no_speech"
+    ],
     "reason": "no speech detected (signal level below floor (RMS 0.00e+00 < 1e-04)); routed as an unclassified call, equivalent to a conventional call button",
+    "thresholds": {
+      "DISTRESS_HIGH": 0.4028,
+      "NON_SPEECH_HIGH": 0.9,
+      "ASR_MIN": -0.4934,
+      "P_IMMEDIATE": 1,
+      "EMERGENCY_FLOOR": 2,
+      "P_NO_SPEECH": 2,
+      "MIN_RAW_RMS": 0.0001,
+      "acoustic_contract": "no_pad_meanpool_rms0.05"
+    },
+    "model_versions": {
+      "arousal_head": "4110fcded375",
+      "distress_gate": "8d584beba811",
+      "bert_dir": "b43fc117d948",
+      "emotion_dir": "ab16b3e561e9"
+    },
     "acoustic_contract": "no_pad_meanpool_rms0.05",
     "latency_ms": {
-      "load": 9.7,
+      "load": 7.5,
       "load_acoustic": 0.0,
       "wavlm_and_heads": 0.0,
       "denoise": 0.0,
       "trim": 0.0,
       "asr": 0.0,
       "text_classifier": 0.0,
+      "sentiment": 0.2,
       "rules": 0.0,
-      "total": 9.8
+      "total": 8.1
     }
   }
 }

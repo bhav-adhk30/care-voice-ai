@@ -8,3 +8,4 @@ __pycache__/
 .venv/
 jobs/*/*.ipynb
 app/calls.db
+app/audit_log.db

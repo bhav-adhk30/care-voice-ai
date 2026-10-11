@@ -9,7 +9,7 @@ a clinical system is also easier to audit than learned weights.
 Every threshold below was measured, not chosen. Provenance is in the comments.
 """
 
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from typing import Optional
 
 
@@ -83,9 +83,18 @@ DISTRESS_IS_BINARY = True
 
 # The v2 gate still cannot separate anger from distress. Out of fold, anger
 # averages 0.417 against pain 0.465 and fear 0.480, and anger's false-alarm rate
-# is above the overall rate at every threshold. So anger suppression cannot
-# happen acoustically - it has to come from the text branch. See
-# `suppress_anger_escalation` below.
+# is above the overall rate at every threshold, so anger cannot be filtered out
+# acoustically.
+#
+# There is NO anger suppression. A text-emotion suppressor was tried and removed:
+# the pretrained emotion model (j-hartmann/emotion-english-distilroberta-base)
+# scores "I feel cold" as anger 0.97 but a plainly angry sentence ("This is
+# ridiculous, I have been pressing this button for twenty minutes!") only 0.67,
+# and 27 of 706 genuine medical requests score anger above 0.5
+# (results/text_emotion_on_phrases.csv). Any of those 27 would have lost its distress
+# escalation had the gate fired. Its output is displayed on the dashboard and never affects
+# priority. The accepted cost: an angry patient whose voice fires the distress
+# gate is escalated - a false alarm inside the measured budget, not a miss.
 ANGER_NOT_SEPARABLE_ACOUSTICALLY = True
 
 
@@ -115,26 +124,12 @@ class Decision:
     # Both halves of the speech guard, so the dashboard can show which decided.
     energy_ok: bool = True
     non_speech_prob: Optional[float] = None
+    # Which rules fired, as stable ids (R0..R4), so the dashboard and the audit
+    # log can say exactly which branch of this function decided.
+    rules_fired: list = field(default_factory=list)
 
     def to_dict(self):
         return asdict(self)
-
-
-def suppress_anger_escalation(request_class: str, class_confidence: float) -> bool:
-    """
-    Should the distress gate's escalation be suppressed for this request?
-
-    An irritated patient is not a medical emergency, but the distress gate
-    cannot tell anger from pain acoustically. So the suppression decision uses
-    the text branch instead: if the request is confidently General (the class
-    that holds Emotional pain, Skin issue, Acne and similar), a firing gate is
-    most likely frustration rather than clinical distress.
-
-    Deliberately conservative: only suppresses on a confident General. It never
-    touches Rule 1, so a wordless cry with no trustworthy transcript still
-    escalates.
-    """
-    return request_class == "General" and class_confidence >= 0.80
 
 
 def speech_guard(energy_ok: bool, non_speech_prob: Optional[float],
@@ -244,21 +239,17 @@ def apply_rules(
             acoustic_used=False,
             energy_ok=energy_ok,
             non_speech_prob=non_speech_prob,
+            rules_fired=["R0_no_speech"],
         )
 
     priority = base_priority
-    reasons = []
+    reasons, fired = [], []
 
     asr_trusted = asr_confidence is None or asr_confidence >= cfg["ASR_MIN"]
     if not asr_trusted:
         reasons.append("ASR confidence below threshold; transcript not trusted")
 
     distress_fired = distress >= cfg["DISTRESS_HIGH"]
-
-    suppress = suppress_anger_escalation(request_class, class_confidence)
-    if suppress and distress_fired and asr_trusted:
-        reasons.append("distress escalation suppressed: confident General, "
-                       "likely frustration rather than clinical distress")
 
     # --- Rule 1: untrusted transcript plus distress -> immediate -------------
     # The text branch cannot be relied on and the acoustic path is the only
@@ -267,12 +258,15 @@ def apply_rules(
     if not asr_trusted and distress_fired:
         priority = min(priority, cfg["P_IMMEDIATE"])
         reasons.append("distress detected with an unreliable transcript")
+        fired.append("R1_distress_untrusted_transcript")
 
     # --- Rule 2: distress gate ----------------------------------------------
-    elif distress_fired and not suppress:
+    # No anger suppression: see ANGER_NOT_SEPARABLE_ACOUSTICALLY above.
+    elif distress_fired:
         priority = min(priority, cfg["P_IMMEDIATE"])
         reasons.append(f"distress gate fired ({distress:.3f} >= "
                        f"{cfg['DISTRESS_HIGH']})")
+        fired.append("R2_distress")
 
     # (Rule 3, arousal raises one level, was removed in v2: 14.5% fear recall at
     # a 2% medical false-alarm budget does not justify an escalation path.)
@@ -283,6 +277,7 @@ def apply_rules(
     if request_class == "Emergency":
         if priority > cfg["EMERGENCY_FLOOR"]:
             reasons.append("Emergency class floor applied")
+            fired.append("R4_emergency_floor")
         priority = min(priority, cfg["EMERGENCY_FLOOR"])
 
     if not reasons:
@@ -299,6 +294,7 @@ def apply_rules(
         acoustic_used=True,
         energy_ok=energy_ok,
         non_speech_prob=non_speech_prob,
+        rules_fired=fired,
     )
 
 
@@ -334,10 +330,11 @@ if __name__ == "__main__":
          dict(base_priority=1, request_class="Emergency", class_confidence=0.88,
               distress=0.00, non_speech_prob=0.001, asr_confidence=-0.15,
               transcript="i have chest pain")),
-        ("frustrated, not unwell: gate fires on anger, text suppresses it",
-         dict(base_priority=4, request_class="General", class_confidence=0.91,
+        ("angry, not unwell: gate fires, escalates (accepted false alarm)",
+         dict(base_priority=3, request_class="General", class_confidence=0.60,
               distress=0.45, non_speech_prob=0.001, asr_confidence=-0.20,
-              transcript="my skin has been itching all day")),
+              transcript="this is ridiculous, i have been pressing this button for "
+                         "twenty minutes")),
         ("button press, digital silence (energy pre-filter)",
          dict(base_priority=CONFIG["P_NO_SPEECH"], request_class=UNCLASSIFIED,
               class_confidence=0.0, distress=0.0, non_speech_prob=None,
@@ -361,4 +358,4 @@ if __name__ == "__main__":
         print(f"\n{name}")
         print(f"  P{d.base_priority} -> P{d.final_priority}"
               f"{'  [ESCALATED]' if d.escalated else ''}")
-        print(f"  {d.reason}")
+        print(f"  {d.reason}   {d.rules_fired}")

@@ -76,11 +76,22 @@ Never do preprocessing inline in a notebook or in the app. If the corpora drift 
 sample rate or loudness, the cross-corpus design silently breaks and the failure is very
 hard to find.
 
-### 2.6 Anger does NOT escalate
+### 2.6 Anger is not filtered out, and nothing suppresses escalation
 
-Fear and pain escalate priority. Anger does not. An irritated patient is not a medical
-emergency, and CREMA-D's anger class is large enough to flood the high-arousal bucket if
-allowed through.
+Only the distress gate escalates (arousal/fear was removed as an escalation path in v2:
+14.5% fear recall at a 2% false-alarm budget). The gate cannot separate anger from
+distress: out of fold, anger averages 0.417 against pain 0.465 and fear 0.480.
+
+Suppressing anger from the text was tried and removed. The pretrained emotion model
+scores "I feel cold" as anger 0.97 but a plainly angry sentence ("This is ridiculous, I
+have been pressing this button for twenty minutes!") only 0.67, and 27 of 706 genuine
+medical requests score anger above 0.5 (`results/text_emotion_on_phrases.csv`). A
+suppressor built on it would have removed real escalations. The emotion output is shown
+on the dashboard and never affects priority.
+
+Accepted consequence: an angry patient whose voice fires the distress gate is escalated.
+That is a false alarm within the measured budget, not a missed emergency. Do not add a
+suppressor back without labelled angry-but-well calls to measure it on.
 
 ### 2.7 The demo imports the evaluated code
 
@@ -271,7 +282,7 @@ Rules, applied in order:
    the voice is.
 4. If `asr_confidence < ASR_MIN` and `distress > DISTRESS_MED`, treat as P1 — the
    transcript cannot be trusted and the acoustic path is the only signal left.
-5. Anger alone never escalates. Only fear and pain feed the escalation path.
+5. Nothing suppresses the distress gate, including anger (see §2.6).
 
 Thresholds live in a config dict at the top of `rules.py`, not scattered through the code.
 Every escalation must return a human-readable `reason` string; the dashboard displays it.
@@ -485,7 +496,8 @@ sharp pain in my stomach". This is a safety failure, not an accuracy failure, an
 - Do not claim, anywhere in code comments or output, that fusion beats text alone. That
   comparison requires joint labels we do not have and cannot be measured.
 - Do not invent a Medication class or synthesise data for it without being asked.
-- Do not let anger escalate priority.
+- Do not add anger suppression back without labelled angry-but-well calls to measure it
+  on (§2.6). Text emotion is display-only.
 - Do not write a second implementation of the pipeline for the app.
 - Do not put preprocessing logic anywhere except `src/preprocess.py`.
 
