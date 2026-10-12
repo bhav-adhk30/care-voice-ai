@@ -142,3 +142,51 @@ _MEDICATION_RE = re.compile(
 def medication_tag(transcript: str) -> list[str]:
     """Medication keywords found in the transcript (base forms, sorted); [] if none."""
     return sorted({m.group(1).lower() for m in _MEDICATION_RE.finditer(transcript or "")})
+
+
+# ---------------------------------------------------------------------------
+# Care-request tag: a keyword RULE for toileting and mobility help.
+#
+# The most common real reasons for pressing a call button - getting to the
+# toilet, getting up, being moved - are not in the training data at all: the
+# Medical Speech corpus's 25 intents are symptom complaints, not care requests.
+# ClinicalBERT therefore files "I need to go to the washroom, can somebody get
+# me there" under General (0.93, found with a real team recording), because the
+# category does not exist for it. No public corpus labels these requests, so,
+# like the medication tag, this is deliberately a rule and not a learned class.
+#
+# Unlike the medication tag it changes priority: rules.py Rule 5 floors a tagged
+# call at P_CARE_REQUEST (P2, the Assistance level). The predicted class is left
+# as the classifier said, so the audit shows both.
+#
+# Measured: 0 of the 706 dataset phrases match (none is a care request, so every
+# match would be a false positive). Mobility phrases match only when they ask for
+# help ("help me up", "need help getting out of bed"), not symptoms ("my knee
+# hurts when I get up"). Recall on real care requests is unmeasured: there is no
+# data to measure it on.
+# ---------------------------------------------------------------------------
+
+_TOILET_RE = re.compile(
+    r"\b(toilet|washroom|bathroom|restroom|loo|lavatory|bedpan|commode)s?\b", re.IGNORECASE)
+_HELP_RE = re.compile(
+    r"\b(help|take|get|bring|walk|lift|move|turn)\s+me\b"
+    r"|\b(need|want)\s+(some\s+)?help\s+(to|with|getting|going|moving|standing|walking)\b"
+    r"|\bhelp\s+(getting|going|moving|standing|walking|sitting)\b"
+    r"|\bcan(\s+some(one|body)|\s+you|\s+i\s+get\s+some(one|body))\s+(help|take|get|move|lift|walk|turn)\b",
+    re.IGNORECASE)
+_MOBILITY_RE = re.compile(
+    r"\b(up|out of bed|into bed|to bed|stand|sit up|sit|walk|move|turn over|wheelchair|chair|"
+    r"shower|wash|dressed)\b", re.IGNORECASE)
+
+
+def care_request_tag(transcript: str) -> list[str]:
+    """Care-request keywords in the transcript: the toileting word found, and/or
+    "mobility" for an explicit request for help moving. [] if none."""
+    t = transcript or ""
+    hits = []
+    m = _TOILET_RE.search(t)
+    if m:
+        hits.append(m.group(1).lower())
+    if _HELP_RE.search(t) and _MOBILITY_RE.search(t):
+        hits.append("mobility")
+    return hits

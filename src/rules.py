@@ -73,6 +73,11 @@ CONFIG = {
     # bottom of the queue nor escalated on an acoustic score computed from a
     # noise floor.
     "P_NO_SPEECH": 2,
+
+    # A care request (toileting / mobility help, mapping.care_request_tag) is
+    # floored at this level: the Assistance priority. Those requests are absent
+    # from the training corpus, so the classifier cannot route them itself.
+    "P_CARE_REQUEST": 2,
 }
 
 
@@ -176,6 +181,7 @@ def apply_rules(
     transcript: str,
     asr_heard: Optional[str] = None,
     audio_error: Optional[str] = None,
+    care_request: Optional[list] = None,
 ) -> Decision:
     """
     Combine the two branches into a final priority.
@@ -198,6 +204,8 @@ def apply_rules(
                      pre-filter stopped the clip before WavLM ran
     energy_reason    why the pre-filter failed, shown on the dashboard
     transcript       the ASR output; required, to enforce the invariant below
+    care_request     mapping.care_request_tag(transcript): toileting / mobility
+                     words found; non-empty floors the call at P_CARE_REQUEST
     audio_error      set when the file could not be read at all; the call is
                      routed like Rule 0 with this as its reason
     asr_heard        what Whisper decoded before the pipeline blanked a no-speech
@@ -292,6 +300,17 @@ def apply_rules(
 
     # (Rule 3, arousal raises one level, was removed in v2: 14.5% fear recall at
     # a 2% medical false-alarm budget does not justify an escalation path.)
+
+    # --- Rule 5: care request ------------------------------------------------
+    # Toileting and mobility help is absent from the training data, so the
+    # classifier files it under General. A keyword rule floors it at the
+    # Assistance level. Only applied to a real transcript; it can only raise.
+    if care_request and transcript.strip():
+        if priority > cfg["P_CARE_REQUEST"]:
+            reasons.append(f"care request ({', '.join(care_request)}): raised to "
+                           f"P{cfg['P_CARE_REQUEST']}")
+            fired.append("R5_care_request")
+        priority = min(priority, cfg["P_CARE_REQUEST"])
 
     # --- Rule 4: Emergency floor --------------------------------------------
     # Never queue a predicted Emergency worse than P2, regardless of how the
