@@ -3,9 +3,10 @@ Append-only audit log: one row per call, enough to reconstruct the decision.
 
 Every row stores the inputs the rule saw (transcript, ASR confidence, class
 probabilities, every acoustic score), what it decided (base and final priority,
-rules fired, reason) and the THRESHOLDS IN FORCE at decision time, plus short
+rules fired, reason), the prosodic inputs (HNR, sample rate, the bed's baseline
+size, the z-score) and the THRESHOLDS IN FORCE at decision time, plus short
 hashes of the model files. Thresholds in rules.CONFIG change as the heads are
-refit (DISTRESS_HIGH moved 0.0677 -> 0.4028); without the snapshot an old
+refit (DISTRESS_HIGH moved 0.0677 -> 0.4028, then to the prosodic score); without the snapshot an old
 decision could not be explained once the config moved on.
 
 Append-only is enforced by the database, not by convention: SQLite triggers
@@ -28,7 +29,8 @@ COLUMNS = (
     "energy_ok", "speech_present", "speech_reason",
     "request_class", "class_probs", "class_confidence", "medication",
     "sentiment_label", "text_anger", "sentiment",
-    "non_speech_prob", "fear_prob_display_only", "distress", "distress_fired",
+    "non_speech_prob", "fear_prob_display_only", "hnr", "prosody_sr", "baseline_n",
+    "distress_z", "distress", "distress_fired",
     "base_priority", "final_priority", "escalated", "rules_fired", "reason",
     "thresholds", "model_versions", "latency_total_ms",
 )
@@ -38,6 +40,7 @@ CREATE TABLE IF NOT EXISTS audit_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     {", ".join(f"{c} TEXT" if c not in ("asr_confidence", "class_confidence", "text_anger",
                                         "non_speech_prob", "fear_prob_display_only", "distress",
+                                        "hnr", "prosody_sr", "baseline_n", "distress_z",
                                         "latency_total_ms", "base_priority", "final_priority",
                                         "asr_trusted", "energy_ok", "speech_present",
                                         "distress_fired", "escalated")
@@ -59,6 +62,12 @@ class AuditLog:
         self.path = Path(db_path)
         self.con = sqlite3.connect(self.path, check_same_thread=False)
         self.con.executescript(_SCHEMA)
+        # Columns added after a log was created are appended with ALTER TABLE ADD
+        # COLUMN (allowed: the triggers only forbid UPDATE and DELETE of rows).
+        have = {r[1] for r in self.con.execute("PRAGMA table_info(audit_log)")}
+        for c in COLUMNS:
+            if c not in have:
+                self.con.execute(f"ALTER TABLE audit_log ADD COLUMN {c}")
         self.con.commit()
 
     def append(self, result: dict, *, bed, audio_name: str, audio_bytes: bytes,
@@ -79,6 +88,8 @@ class AuditLog:
             "sentiment": j(result["sentiment"]),
             "non_speech_prob": result["non_speech_prob"],
             "fear_prob_display_only": result["arousal"],
+            "hnr": result.get("hnr"), "prosody_sr": result.get("prosody_sr"),
+            "baseline_n": result.get("baseline_n"), "distress_z": result.get("distress_z"),
             "distress": result["distress"], "distress_fired": result["distress_fired"],
             "base_priority": result["base_priority"], "final_priority": result["final_priority"],
             "escalated": result["escalated"], "rules_fired": j(result["rules_fired"]),

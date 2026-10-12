@@ -511,6 +511,25 @@ def load_audio_acoustic(path, target_sr: int = 16000, cfg: dict = ACOUSTIC_CONFI
 
 
 # ---------------------------------------------------------------------------
+# Native-rate loader for the prosodic distress feature
+#
+# The third loader, and the one that must NOT resample. Harmonics-to-noise ratio
+# (src/prosody.py) changes by 4-8 dB when 48 kHz audio is resampled to 16 kHz,
+# and for some speakers the calm-vs-distress difference disappears entirely
+# (Bhavishya, chest: +3.4 dB at 48 kHz, -0.2 dB at 16 kHz). So HNR is computed on
+# the audio at its native rate, before anything downsamples it for Whisper or
+# WavLM. No loudness normalisation either: HNR is a ratio, level-invariant.
+# ---------------------------------------------------------------------------
+
+
+def load_audio_native(path) -> tuple[np.ndarray, int]:
+    """Mono float32 at the file's own sample rate, untouched otherwise.
+    Raises AudioLoadError like load_audio."""
+    data, sr = _read(os.fspath(path))
+    return to_mono(data).astype(np.float32), sr
+
+
+# ---------------------------------------------------------------------------
 # Energy pre-filter for the speech guard
 #
 # The speech decision itself is the arousal head's non_speech class (rules.py,
