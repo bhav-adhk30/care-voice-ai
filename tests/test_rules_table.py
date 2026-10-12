@@ -192,3 +192,49 @@ def test_starvation_single_step_never_raises_number():
         for waited in (0, 59, 61, 299, 301, 899, 901, 1799, 1801, 10**6):
             new_p, bumped = apply_starvation_timer(p, waited)
             assert new_p <= p and bumped == (new_p < p)
+
+
+# ----------------------------------------------------------------- Rule 5: care requests
+
+from src.mapping import care_request_tag  # noqa: E402
+
+CARE = ["washroom"]
+
+
+@pytest.mark.parametrize("cls,base,want", [
+    ("General", 3, 2), ("Pain", 3, 2), ("Assistance", 2, 2), ("Emergency", 1, 1)])
+def test_care_request_floors_at_p2_never_lowers(cls, base, want):
+    d = apply_rules(base, cls, 0.9, 0.0, asr_confidence=-0.3, non_speech_prob=0.0,
+                    transcript="i need to go to the washroom", care_request=CARE)
+    assert d.final_priority == want, d.reason
+    assert ("R5_care_request" in d.rules_fired) == (want < base)
+
+
+def test_care_request_ignored_without_transcript():
+    d = apply_rules(CONFIG["P_NO_SPEECH"], UNCLASSIFIED, 0.0, 0.0, asr_confidence=-10.0,
+                    non_speech_prob=0.99, transcript="", care_request=CARE)
+    assert "R5_care_request" not in d.rules_fired
+
+
+@pytest.mark.parametrize("text", [
+    "I need to go to washroom can somebody get me there", "Can someone help me to the toilet",
+    "I need help getting out of bed", "Please help me up", "I need a bedpan", "Help me sit up please"])
+def test_care_request_tag_catches_requests(text):
+    assert care_request_tag(text), text
+
+
+@pytest.mark.parametrize("text", [
+    "My knee hurts when I get up", "It hurts when I walk", "I have a severe pain in my chest",
+    "Could I get some water", "Can I have my painkillers please"])
+def test_care_request_tag_ignores_symptoms(text):
+    assert not care_request_tag(text), text
+
+
+def test_care_request_tag_no_false_positives_on_corpus():
+    """None of the 706 corpus phrases is a care request, so any match changes a
+    symptom's priority by mistake. Measured at 0 when the rule was written."""
+    import pandas as pd
+    from tests.conftest import ROOT
+    ph = pd.read_csv(ROOT / "results" / "phrases.csv")
+    hits = [p for p in ph.phrase if care_request_tag(p)]
+    assert not hits, hits[:5]

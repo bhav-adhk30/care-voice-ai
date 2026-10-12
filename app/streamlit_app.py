@@ -74,6 +74,7 @@ RULE_WORDS = {
     "R1_distress_untrusted_transcript": "Sounds distressed and the words are unclear: go now",
     "R2_distress": "Voice sounds distressed: raised to immediate",
     "R4_emergency_floor": "Emergency request: kept urgent however calm it sounds",
+    "R5_care_request": "Asked for help to the toilet or to move: raised to urgent",
 }
 
 st.set_page_config(page_title="Care-Voice AI", page_icon="🔔", layout="wide")
@@ -92,7 +93,8 @@ def priority_badge(p: int, short: bool = False) -> str:
     return _badge(f"P{p}" if short else label, bg, fg)
 
 
-def class_badge(request_class: str, medication: list | None = None) -> str:
+def class_badge(request_class: str, medication: list | None = None,
+                care: list | None = None) -> str:
     # Unclassified is a pipeline sentinel, not one of the four trained classes: grey,
     # never a priority colour.
     if request_class == UNCLASSIFIED:
@@ -103,6 +105,9 @@ def class_badge(request_class: str, medication: list | None = None) -> str:
     if medication:
         # Keyword rule, not a class (src/mapping.py): a sub-label under the class.
         html += "<br>" + _badge("💊 medication", "#4527a0", "#ffffff", small=True)
+    if care:
+        # Keyword rule (src/mapping.py), floors the call at P2 (rules.py Rule 5).
+        html += "<br>" + _badge("🚻 care request", "#00695c", "#ffffff", small=True)
     return html
 
 
@@ -246,7 +251,8 @@ def tab_nurse_station():
             row[0].markdown(badge, unsafe_allow_html=True)
             row[1].markdown(f"**{c['bed']}**")
             row[2].markdown(f"`{fmt_wait(c['waited'])}`")
-            row[3].markdown(class_badge(c["request_class"], c.get("medication")), unsafe_allow_html=True)
+            row[3].markdown(class_badge(c["request_class"], c.get("medication"), c.get("care_request")),
+                            unsafe_allow_html=True)
             row[4].markdown(c["transcript"] or "*(no words)*")
             row[5].markdown(plain_reason(c, c["bumps"], c["waited"]), unsafe_allow_html=True)
             if row[6].button("✓", key=f"ans_{c['qid']}", help="Mark answered"):
@@ -275,7 +281,7 @@ def render_breakdown(r: dict):
     c = st.columns(5)
     c[0].markdown(f"**Final**<br>{priority_badge(r['final_priority'])}", unsafe_allow_html=True)
     c[1].markdown(f"**Base**<br>{priority_badge(r['base_priority'])}", unsafe_allow_html=True)
-    c[2].markdown(f"**Request**<br>{class_badge(r['request_class'], r['medication'])}",
+    c[2].markdown(f"**Request**<br>{class_badge(r['request_class'], r['medication'], r.get('care_request'))}",
                   unsafe_allow_html=True)
     c[3].markdown(f"**Rule fired**<br>{', '.join(r['rules_fired']) or 'none'}", unsafe_allow_html=True)
     c[4].markdown(f"**Latency**<br>{r['latency_ms']['total']:.0f} ms", unsafe_allow_html=True)
@@ -301,6 +307,9 @@ def render_breakdown(r: dict):
         else:
             st.markdown(f"**Request type:** {class_badge(UNCLASSIFIED)} (no transcript, ClinicalBERT "
                         "not run)", unsafe_allow_html=True)
+        st.markdown(f"**Care request:** {', '.join(r.get('care_request') or []) or 'none'} "
+                    "<span style='font-size:0.8em'>(keyword rule; floors at P2)</span>",
+                    unsafe_allow_html=True)
         st.markdown(f"**Medication tag:** {', '.join(r['medication']) or 'none'} "
                     "<span style='font-size:0.8em'>(keyword rule, not a class)</span>",
                     unsafe_allow_html=True)

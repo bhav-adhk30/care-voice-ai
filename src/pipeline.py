@@ -46,7 +46,7 @@ import joblib
 import numpy as np
 import torch
 
-from src.mapping import class_base_priority, medication_tag
+from src.mapping import care_request_tag, class_base_priority, medication_tag
 from src.preprocess import SPEECH_GUARD
 from src.preprocess import CONFIG as PREPROCESS_CONFIG
 from src.preprocess import DENOISE_DISABLED_REASON, AudioLoadError
@@ -469,6 +469,7 @@ class CareVoicePipeline:
         sentiment_label = max(sentiment, key=sentiment.get) if sentiment else None
         text_anger = sentiment.get("anger")
         medication = medication_tag(transcript)
+        care_request = care_request_tag(transcript)
         lat["sentiment"] = _ms(t0)
 
         # --- the rule ---
@@ -485,6 +486,7 @@ class CareVoicePipeline:
             transcript=transcript,
             asr_heard=heard,
             audio_error=audio_error,
+            care_request=care_request,
         )
         lat["rules"] = _ms(t0)
         lat["total"] = _ms(t_all)
@@ -506,6 +508,7 @@ class CareVoicePipeline:
             "class_probs": class_probs,
             "class_confidence": class_confidence,
             "medication": medication,
+            "care_request": care_request,
             "sentiment": sentiment,
             "sentiment_label": sentiment_label,
             "sentiment_enabled": self.emo_model is not None,

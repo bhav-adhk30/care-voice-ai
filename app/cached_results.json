@@ -3,6 +3,7 @@
     "audio_path": "09_button_press_no_speech.wav",
     "bed": null,
     "duration_s": 2.0,
+    "audio_error": null,
     "transcript": "",
     "asr_heard": "",
     "asr_confidence": null,
@@ -15,6 +16,7 @@
     "class_probs": {},
     "class_confidence": 0.0,
     "medication": [],
+    "care_request": [],
     "sentiment": {},
     "sentiment_label": null,
     "sentiment_enabled": false,
@@ -36,7 +38,9 @@
       "P_IMMEDIATE": 1,
       "EMERGENCY_FLOOR": 2,
       "P_NO_SPEECH": 2,
+      "P_CARE_REQUEST": 2,
       "MIN_RAW_RMS": 0.0001,
+      "denoise_enabled": false,
       "acoustic_contract": "no_pad_meanpool_rms0.05"
     },
     "model_versions": {
@@ -47,7 +51,7 @@
     },
     "acoustic_contract": "no_pad_meanpool_rms0.05",
     "latency_ms": {
-      "load": 7.7,
+      "load": 7.8,
       "load_acoustic": 0.0,
       "wavlm_and_heads": 0.0,
       "denoise": 0.0,
@@ -56,7 +60,7 @@
       "text_classifier": 0.0,
       "sentiment": 0.0,
       "rules": 0.0,
-      "total": 7.8
+      "total": 7.9
     }
   }
 }
