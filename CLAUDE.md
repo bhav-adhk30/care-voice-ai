@@ -133,6 +133,26 @@ same bed's previous calls (`src/prosody.py`, `src/baseline.py`).
 - **Status:** `rules.CONFIG["DISTRESS_SCORE"]` and `["DISTRESS_HIGH"]` are `None`: no
   acoustic escalation until a score and threshold are chosen deliberately.
 
+### 2.9 Distress in words (Rule 6) complements the voice
+
+`mapping.distress_words` flags four cues in the transcript: an opening interjection ("Oh,
+my knee…", "Oh no!"), a plea ("please come", "help me", "come fast"), an exclamation mark
+(Whisper writes "!" for emphatic speech), and immediate repetition ("please, please").
+Rule 6 floors a flagged call with speech at `P_TEXT_DISTRESS` (P2 — words are weaker
+evidence than an Emergency classification). Measured (`results/text_distress_cues.json`):
+
+| | distress caught | own calm flagged | calm medical speech flagged |
+|---|---|---|---|
+| words | 7/12 | 0/39 | 26/6,661 (0.39%) |
+| voice (one-sided z, LOSO) | 7/12 | 2/39 | — |
+| either | 8/12 | 2/39 | — |
+
+Words and voice catch nearly the same takes: the speakers who improvised ("please come",
+"oh no!") are the ones whose voices also moved. Neither catches distress spoken in an
+ordinary sentence with an ordinary voice (Bhavishya 0/4 on both). The own-voice recall is
+optimistic — the cue list was chosen after reading those transcripts; the 0.39% is out of
+sample.
+
 ### 2.7 The demo imports the evaluated code
 
 `app/streamlit_app.py` must import `CareVoicePipeline` from `src/pipeline.py`. The

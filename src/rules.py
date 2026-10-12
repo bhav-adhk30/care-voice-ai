@@ -87,6 +87,14 @@ CONFIG = {
     # floored at this level: the Assistance priority. Those requests are absent
     # from the training corpus, so the classifier cannot route them itself.
     "P_CARE_REQUEST": 2,
+
+    # Distress in words (mapping.distress_words: interjection, plea, "!",
+    # repetition) floors a call with speech at this level. P2, not P1: words are
+    # weaker evidence than an Emergency classification, and the rule flags 0.39%
+    # of calm medical recordings (26/6,661), mostly genuinely urgent-sounding ones.
+    # On the team's recordings: 7/12 distressed takes, 0/39 calm (cue list chosen
+    # after seeing those transcripts, so optimistic). results/text_distress_cues.json
+    "P_TEXT_DISTRESS": 2,
 }
 
 
@@ -197,6 +205,7 @@ def apply_rules(
     asr_heard: Optional[str] = None,
     audio_error: Optional[str] = None,
     care_request: Optional[list] = None,
+    distress_words: Optional[list] = None,
 ) -> Decision:
     """
     Combine the two branches into a final priority.
@@ -220,6 +229,8 @@ def apply_rules(
                      pre-filter stopped the clip before WavLM ran
     energy_reason    why the pre-filter failed, shown on the dashboard
     transcript       the ASR output; required, to enforce the invariant below
+    distress_words   mapping.distress_words(transcript): distress cues in the
+                     words; non-empty floors the call at P_TEXT_DISTRESS
     care_request     mapping.care_request_tag(transcript): toileting / mobility
                      words found; non-empty floors the call at P_CARE_REQUEST
     audio_error      set when the file could not be read at all; the call is
@@ -327,6 +338,18 @@ def apply_rules(
                            f"P{cfg['P_CARE_REQUEST']}")
             fired.append("R5_care_request")
         priority = min(priority, cfg["P_CARE_REQUEST"])
+
+    # --- Rule 6: distress in words ------------------------------------------
+    # Interjections, pleas, "!" and repetition in what was said. Complements the
+    # prosodic score: it catches distress a patient puts into words, never
+    # distress spoken in an ordinary sentence. Only with speech (Rule 0 already
+    # returned otherwise); it can only raise.
+    if distress_words and heard.strip():
+        if priority > cfg["P_TEXT_DISTRESS"]:
+            reasons.append(f"distress in words ({', '.join(distress_words)}): raised to "
+                           f"P{cfg['P_TEXT_DISTRESS']}")
+            fired.append("R6_distress_words")
+        priority = min(priority, cfg["P_TEXT_DISTRESS"])
 
     # --- Rule 4: Emergency floor --------------------------------------------
     # Never queue a predicted Emergency worse than P2, regardless of how the

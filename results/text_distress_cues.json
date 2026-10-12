@@ -1,0 +1,612 @@
+{
+ "rule": "mapping.distress_words: interjection | plea | exclamation | repetition",
+ "caveat": "cue list chosen after reading the own-voice transcripts: own-voice recall is in-sample and optimistic; the medical false-alarm rate is out of sample",
+ "own_voices": {
+  "distress_flagged_text": "7/12",
+  "calm_flagged_text": "0/39",
+  "distress_flagged_voice_loso": "7/12",
+  "distress_flagged_either": "8/12",
+  "calm_flagged_either": "2/39"
+ },
+ "calm_medical_whisper_transcripts": {
+  "n": 6661,
+  "flagged": 26,
+  "rate": 0.0039,
+  "examples": [
+   " Have a good day, call and go!",
+   " Oh my heart hurts me. I tried to be calm and I can't.",
+   " I fell through a window while I was cleaning it and I have a shot of glass stuck in my left eye. I think it is pretty serious. Please help.",
+   " Oh",
+   " I fell through a window while I was cleaning it and I have a shard of glass stuck in my left eye. I think it is very serious. Please help.",
+   " Oh my heart, I have a pain-",
+   " Oh, my heart hurts me. I tried to be calm and I can't.",
+   " My necrotics like it is raining mong mong when I go home.",
+   " I have to hurry with pain in my head.",
+   " Oh, my heart hurts me. I tried to be calm and I can't."
+  ]
+ },
+ "typed_corpus_phrases": {
+  "n": 706,
+  "flagged": 3
+ },
+ "takes": [
+  {
+   "speaker": "bhavishya",
+   "what": "bathroom",
+   "label": "calm",
+   "transcript": "I'd like to go to the bathroom.",
+   "asr_logprob": -0.315,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.845,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "blanket",
+   "label": "calm",
+   "transcript": "I need help with the blanket.",
+   "asr_logprob": -0.462,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.585,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "chest",
+   "label": "calm",
+   "transcript": "I have a severe pain in my chest",
+   "asr_logprob": -0.397,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -4.178,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "chest",
+   "label": "distress",
+   "transcript": "I have severe pain in my chest.",
+   "asr_logprob": -0.362,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.559,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "dizzy",
+   "label": "calm",
+   "transcript": "I feel really dizzy. I feel like I am going to faint.",
+   "asr_logprob": -0.31,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.081,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "dizzy",
+   "label": "distress",
+   "transcript": "I feel really dizzy. I feel I'm going to faint.",
+   "asr_logprob": -0.334,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -1.197,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "doctor",
+   "label": "calm",
+   "transcript": "Is the doctor coming today?",
+   "asr_logprob": -0.37,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.432,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "glasses",
+   "label": "calm",
+   "transcript": "Could someone pass me my glasses?",
+   "asr_logprob": -0.386,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.549,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "groan",
+   "label": "distress",
+   "transcript": "out",
+   "asr_logprob": -0.748,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -2.373,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "knee",
+   "label": "calm",
+   "transcript": "My knee hurts when I bend it.",
+   "asr_logprob": -0.407,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.815,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "knee",
+   "label": "distress",
+   "transcript": "My knee hurts when I bend it.",
+   "asr_logprob": -0.6,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.27,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "light",
+   "label": "calm",
+   "transcript": "Can you turn the light down?",
+   "asr_logprob": -0.365,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 1.165,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "medication",
+   "label": "calm",
+   "transcript": "What time is my next medication?",
+   "asr_logprob": -0.404,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.521,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "pillow",
+   "label": "calm",
+   "transcript": "Can I have another pillow?",
+   "asr_logprob": -0.389,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.659,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "situp",
+   "label": "calm",
+   "transcript": "I'd like to sit up for a bit.",
+   "asr_logprob": -0.33,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.96,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "water",
+   "label": "calm",
+   "transcript": "Could I have some water?",
+   "asr_logprob": -0.426,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -1.236,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "bhavishya",
+   "what": "window",
+   "label": "calm",
+   "transcript": "Can you close the window?",
+   "asr_logprob": -0.403,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.979,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "sumayah",
+   "what": "blanket",
+   "label": "calm",
+   "transcript": "I need help with the blanket.",
+   "asr_logprob": -0.459,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.236,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "sumayah",
+   "what": "chest",
+   "label": "calm",
+   "transcript": "I have a severe pain in my chest.",
+   "asr_logprob": -0.376,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.767,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "sumayah",
+   "what": "chest",
+   "label": "distress",
+   "transcript": "I have really severe pain in my chest.",
+   "asr_logprob": -0.338,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 1.658,
+   "voice_flag_loso": true
+  },
+  {
+   "speaker": "sumayah",
+   "what": "dizzy",
+   "label": "calm",
+   "transcript": "I feel really dizzy. I'm feeling like I'm going to faint.",
+   "asr_logprob": -0.377,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 1.066,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "sumayah",
+   "what": "dizzy",
+   "label": "distress",
+   "transcript": "I feel really dizzy, I feel like I'm going to faint, please come.",
+   "asr_logprob": -0.33,
+   "text_cues": [
+    "plea"
+   ],
+   "text_flag": true,
+   "voice_z": 0.759,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "sumayah",
+   "what": "doctor",
+   "label": "calm",
+   "transcript": "Is the doctor coming today?",
+   "asr_logprob": -0.364,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.652,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "sumayah",
+   "what": "glasses",
+   "label": "calm",
+   "transcript": "Could someone pass me my glasses?",
+   "asr_logprob": -0.4,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.051,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "sumayah",
+   "what": "groan",
+   "label": "distress",
+   "transcript": "Please come, please, please come fast.",
+   "asr_logprob": -0.705,
+   "text_cues": [
+    "plea",
+    "repetition"
+   ],
+   "text_flag": true,
+   "voice_z": 1.238,
+   "voice_flag_loso": true
+  },
+  {
+   "speaker": "sumayah",
+   "what": "knee",
+   "label": "calm",
+   "transcript": "My knee hurts when I bend it.",
+   "asr_logprob": -0.438,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.089,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "sumayah",
+   "what": "knee",
+   "label": "distress",
+   "transcript": "Oh, my knee hurts when I bend it.",
+   "asr_logprob": -0.431,
+   "text_cues": [
+    "interjection"
+   ],
+   "text_flag": true,
+   "voice_z": 1.741,
+   "voice_flag_loso": true
+  },
+  {
+   "speaker": "sumayah",
+   "what": "light",
+   "label": "calm",
+   "transcript": "Could you turn the light down?",
+   "asr_logprob": -0.478,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.574,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "sumayah",
+   "what": "medication",
+   "label": "calm",
+   "transcript": "One time is my next medication.",
+   "asr_logprob": -0.471,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -2.813,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "sumayah",
+   "what": "pillow",
+   "label": "calm",
+   "transcript": "Can I have another pillow?",
+   "asr_logprob": -0.316,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.398,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "sumayah",
+   "what": "situp",
+   "label": "calm",
+   "transcript": "I would like to sit up a bit",
+   "asr_logprob": -0.272,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.038,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "sumayah",
+   "what": "washroom",
+   "label": "calm",
+   "transcript": "I'd like to go to the washroom",
+   "asr_logprob": -0.203,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.546,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "sumayah",
+   "what": "water",
+   "label": "calm",
+   "transcript": "Could I have some water?",
+   "asr_logprob": -0.348,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 1.586,
+   "voice_flag_loso": true
+  },
+  {
+   "speaker": "sumayah",
+   "what": "window",
+   "label": "calm",
+   "transcript": "Can you close the window?",
+   "asr_logprob": -0.247,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -1.589,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "bathroom",
+   "label": "calm",
+   "transcript": "I would like to go to the bathroom.",
+   "asr_logprob": -0.239,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.087,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "blanket",
+   "label": "calm",
+   "transcript": "I need help with the blanket.",
+   "asr_logprob": -0.3,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -2.792,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "chest",
+   "label": "calm",
+   "transcript": "I have severance pain in my chest.",
+   "asr_logprob": -0.482,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -1.216,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "chest",
+   "label": "distress",
+   "transcript": "Oh no! I have several pain in my chest!",
+   "asr_logprob": -0.412,
+   "text_cues": [
+    "interjection",
+    "exclamation"
+   ],
+   "text_flag": true,
+   "voice_z": 3.73,
+   "voice_flag_loso": true
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "dizzy",
+   "label": "calm",
+   "transcript": "I feel dizzy. I feel like I'm going to faint.",
+   "asr_logprob": -0.32,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.658,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "dizzy",
+   "label": "distress",
+   "transcript": "Oh no, I really feel busy. I think I'm going to faint.",
+   "asr_logprob": -0.345,
+   "text_cues": [
+    "interjection"
+   ],
+   "text_flag": true,
+   "voice_z": 2.756,
+   "voice_flag_loso": true
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "doctor",
+   "label": "calm",
+   "transcript": "Is the doctor coming today?",
+   "asr_logprob": -0.332,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.345,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "glasses",
+   "label": "calm",
+   "transcript": "Could someone pass me my glasses?",
+   "asr_logprob": -0.406,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.929,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "groan",
+   "label": "distress",
+   "transcript": "Ah, ah, no, no.",
+   "asr_logprob": -0.708,
+   "text_cues": [
+    "interjection",
+    "repetition"
+   ],
+   "text_flag": true,
+   "voice_z": 4.762,
+   "voice_flag_loso": true
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "knee",
+   "label": "calm",
+   "transcript": "My knee hurts when I bend it.",
+   "asr_logprob": -0.345,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.883,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "knee",
+   "label": "distress",
+   "transcript": "Ah, my knee hurts when I bend it.",
+   "asr_logprob": -0.492,
+   "text_cues": [
+    "interjection"
+   ],
+   "text_flag": true,
+   "voice_z": 2.303,
+   "voice_flag_loso": true
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "light",
+   "label": "calm",
+   "transcript": "Could you turn the light down?",
+   "asr_logprob": -0.357,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.682,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "medication",
+   "label": "calm",
+   "transcript": "What time is my next medication?",
+   "asr_logprob": -0.266,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -1.886,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "pillow",
+   "label": "calm",
+   "transcript": "Can I have another pillow?",
+   "asr_logprob": -0.315,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 1.225,
+   "voice_flag_loso": true
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "situp",
+   "label": "calm",
+   "transcript": "I would like to sit up a bit",
+   "asr_logprob": -0.332,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.532,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "water",
+   "label": "calm",
+   "transcript": "Could I have some water?",
+   "asr_logprob": -0.304,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": -0.429,
+   "voice_flag_loso": false
+  },
+  {
+   "speaker": "vinuthna",
+   "what": "window",
+   "label": "calm",
+   "transcript": "Can you close the window?",
+   "asr_logprob": -0.318,
+   "text_cues": [],
+   "text_flag": false,
+   "voice_z": 0.911,
+   "voice_flag_loso": false
+  }
+ ]
+}
