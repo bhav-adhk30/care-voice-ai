@@ -190,3 +190,37 @@ def care_request_tag(transcript: str) -> list[str]:
     if _HELP_RE.search(t) and _MOBILITY_RE.search(t):
         hits.append("mobility")
     return hits
+
+
+# ---------------------------------------------------------------------------
+# Distress in words: a keyword RULE over the transcript.
+#
+# The prosodic gate (rules.py, src/prosody.py) reads distress from the voice; this
+# reads it from what was said and how Whisper punctuated it. Four cues:
+#   - an opening interjection: "Oh, my knee...", "Oh no!", "Ah...", "Ouch"
+#   - a plea: "please come", "please hurry", "help me", "come fast/quick/now", "hurry"
+#   - an exclamation mark (Whisper writes "!" for emphatic speech)
+#   - an immediate repetition: "please, please", "no, no"
+# Measured (results/text_distress_cues.json): on the team's own recordings it flags
+# 7 of 12 distressed takes and 0 of 39 calm ones - but the cue list was chosen after
+# reading those transcripts, so that recall is optimistic. Out of sample, it flags
+# 26 of 6,661 calm medical recordings (0.39%), mostly urgent-sounding sentences
+# ("Oh, my heart hurts me..."). It cannot catch distress that adds no words: a
+# patient who says the same sentence calmly and in pain looks identical here.
+# rules.py Rule 6 floors a flagged call at P_TEXT_DISTRESS.
+# ---------------------------------------------------------------------------
+
+_DISTRESS_CUES = {
+    "interjection": re.compile(r"^\s*(oh no|oh god|oh my god|oh|ah+|aa+h+|ow+|ouch)\b", re.IGNORECASE),
+    "plea": re.compile(r"\bplease\s+(come|hurry|help)\b|\bhurry\b|\bhelp me\b"
+                       r"|\bcome\s+(fast|quick(ly)?|now)\b", re.IGNORECASE),
+    "exclamation": re.compile(r"!"),
+    "repetition": re.compile(r"\b(\w+)\W+\1\b", re.IGNORECASE),
+}
+
+
+def distress_words(transcript: str) -> list[str]:
+    """Which distress cues the transcript contains (interjection, plea,
+    exclamation, repetition), in that order; [] if none."""
+    t = transcript or ""
+    return [name for name, rx in _DISTRESS_CUES.items() if rx.search(t)]

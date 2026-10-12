@@ -47,7 +47,7 @@ import joblib
 import numpy as np
 import torch
 
-from src.mapping import care_request_tag, class_base_priority, medication_tag
+from src.mapping import care_request_tag, class_base_priority, distress_words, medication_tag
 from src.preprocess import SPEECH_GUARD
 from src.preprocess import CONFIG as PREPROCESS_CONFIG
 from src import prosody
@@ -487,6 +487,7 @@ class CareVoicePipeline:
         text_anger = sentiment.get("anger")
         medication = medication_tag(transcript)
         care_request = care_request_tag(transcript)
+        words_distress = distress_words(transcript)
         lat["sentiment"] = _ms(t0)
 
         # --- the rule ---
@@ -504,6 +505,7 @@ class CareVoicePipeline:
             asr_heard=heard,
             audio_error=audio_error,
             care_request=care_request,
+            distress_words=words_distress,
         )
         lat["rules"] = _ms(t0)
 
@@ -535,6 +537,7 @@ class CareVoicePipeline:
             "class_confidence": class_confidence,
             "medication": medication,
             "care_request": care_request,
+            "distress_words": words_distress,
             "sentiment": sentiment,
             "sentiment_label": sentiment_label,
             "sentiment_enabled": self.emo_model is not None,

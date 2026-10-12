@@ -266,3 +266,50 @@ def test_cold_start_none_score_never_fires():
     d = rules(3, "Pain", 0.9, None, asr_confidence=-0.9, non_speech_prob=0.0,
               transcript="my knee hurts")
     assert not d.distress_fired and d.final_priority == 3
+
+
+# ----------------------------------------------------------------- Rule 6: distress in words
+
+from src.mapping import distress_words  # noqa: E402
+
+
+@pytest.mark.parametrize("cls,base,want", [
+    ("General", 3, 2), ("Pain", 3, 2), ("Assistance", 2, 2), ("Emergency", 1, 1)])
+def test_distress_words_floor_at_p2_never_lower(cls, base, want):
+    d = rules(base, cls, 0.9, None, asr_confidence=-0.3, non_speech_prob=0.0,
+              transcript="oh no, please come", distress_words=["interjection", "plea"])
+    assert d.final_priority == want, d.reason
+    assert ("R6_distress_words" in d.rules_fired) == (want < base)
+
+
+def test_distress_words_ignored_for_no_speech():
+    d = rules(CONFIG["P_NO_SPEECH"], UNCLASSIFIED, 0.0, None, asr_confidence=-10.0,
+              non_speech_prob=0.99, transcript="", distress_words=["interjection"])
+    assert d.rules_fired == ["R0_no_speech"]
+
+
+@pytest.mark.parametrize("text,cues", [
+    ("Oh, my knee hurts when I bend it.", ["interjection"]),
+    ("Please come, please, please come fast.", ["plea", "repetition"]),
+    ("Oh no! I have several pain in my chest!", ["interjection", "exclamation"]),
+    ("Ah, ah, no, no.", ["interjection", "repetition"]),
+    ("Help me, it hurts", ["plea"])])
+def test_distress_words_catches(text, cues):
+    assert distress_words(text) == cues
+
+
+@pytest.mark.parametrize("text", [
+    "My knee hurts when I bend it.", "When I stand up too quickly I feel dizzy",
+    "Could I have some water?", "I have a severe pain in my chest.", "Can I have another pillow?"])
+def test_distress_words_ignores_calm(text):
+    assert distress_words(text) == []
+
+
+def test_distress_words_false_alarm_rate_on_calm_medical_speech():
+    """Out-of-sample cost of the rule: Whisper's transcripts of 6,661 calm medical
+    recordings. Measured 26 (0.39%) when the rule was written; pinned so a later
+    keyword edit cannot raise it unnoticed."""
+    import pandas as pd
+    from tests.conftest import ROOT
+    med = pd.read_csv(ROOT / "results" / "transcripts.csv").whisper.fillna("").astype(str)
+    assert sum(bool(distress_words(t)) for t in med) <= 26
