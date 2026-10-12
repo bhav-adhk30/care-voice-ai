@@ -20,7 +20,8 @@ from src.pipeline import CareVoicePipeline  # noqa: E402
 CONFIG = {
     "demo_dir": ROOT / "app" / "demo_clips",
     "out": ROOT / "app" / "cached_results.json",
-    "audio_suffixes": {".wav", ".mp3", ".flac", ".ogg", ".m4a", ".aiff", ".aif"},
+    "audio_suffixes": {".wav", ".mp3", ".m4a", ".mp4", ".mov", ".qta", ".aac", ".flac", ".ogg",
+                       ".opus", ".webm", ".aiff", ".aif", ".caf", ".3gp", ".amr"},
 }
 
 

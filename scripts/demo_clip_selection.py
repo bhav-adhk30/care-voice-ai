@@ -23,7 +23,8 @@ from src.pipeline import CareVoicePipeline  # noqa: E402
 CONFIG = {
     "raw_dir": ROOT / "app" / "demo_clips" / "raw",
     "out": ROOT / "results" / "demo_clip_selection.csv",
-    "audio_suffixes": {".wav", ".m4a", ".mp3", ".aiff", ".aif", ".flac", ".ogg", ".caf"},
+    "audio_suffixes": {".wav", ".mp3", ".m4a", ".mp4", ".mov", ".qta", ".aac", ".flac", ".ogg",
+                       ".opus", ".webm", ".aiff", ".aif", ".caf", ".3gp", ".amr"},
     # What each clip is meant to show. Display only: the table records what happened.
     "expected": {
         "01": "Assistance P2",
