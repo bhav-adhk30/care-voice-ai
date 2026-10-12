@@ -53,7 +53,10 @@ CONFIG = {
     "results_dir": ROOT / "results",
     "queue_refresh_s": 1,          # the waiting timer ticks every second
     "mic_sample_rate": 16000,      # capture at the pipeline's rate; process() still resamples
-    "audio_types": ["wav", "mp3", "flac", "ogg", "m4a", "aiff", "aif", "webm"],
+    # Everything phones, QuickTime and browsers produce. All decode through
+    # src/preprocess.py (libsndfile, else ffmpeg); a video's audio track is used.
+    "audio_types": ["wav", "mp3", "m4a", "mp4", "mov", "qta", "aac", "flac", "ogg", "opus",
+                    "webm", "aiff", "aif", "caf", "3gp", "amr"],
     "beds": [str(b) for b in range(1, 31)],
     "demo_clock": [1, 10, 60],     # waiting time multiplier, so starvation is visible on stage
     "keep_warm_s": 30,             # dummy-inference interval when the keep-warm switch is on
