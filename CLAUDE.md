@@ -58,7 +58,8 @@ plus a small head transfers far better.
 
 - Text branch trains on Medical Speech Intent (has request-type labels, no emotion).
 - Acoustic branch trains on CREMA-D (has emotion labels, no request types).
-- Distress gate trains on VIVAE (has pain/fear, no words at all).
+- ~~Distress gate trains on VIVAE~~ — retired: it never fired on real voices. Distress is
+  now prosodic (§2.8) and has no training set; it is scored against each bed's own calls.
 
 They never appear in the same training loop. There is no label schema to reconcile. They
 meet only at inference, as calibrated scores.
@@ -78,9 +79,10 @@ hard to find.
 
 ### 2.6 Anger is not filtered out, and nothing suppresses escalation
 
-Only the distress gate escalates (arousal/fear was removed as an escalation path in v2:
-14.5% fear recall at a 2% false-alarm budget). The gate cannot separate anger from
-distress: out of fold, anger averages 0.417 against pain 0.465 and fear 0.480.
+Only prosodic distress (§2.8) can escalate acoustically, and its threshold is currently
+unset, so nothing escalates on the voice yet. (Arousal/fear was removed as an escalation
+path in v2: 14.5% fear recall at a 2% false-alarm budget. The retired WavLM gate could not
+separate anger from distress either: anger 0.417 against pain 0.465 and fear 0.480.)
 
 Suppressing anger from the text was tried and removed. The pretrained emotion model
 scores "I feel cold" as anger 0.97 but a plainly angry sentence ("This is ridiculous, I
@@ -89,9 +91,47 @@ medical requests score anger above 0.5 (`results/text_emotion_on_phrases.csv`). 
 suppressor built on it would have removed real escalations. The emotion output is shown
 on the dashboard and never affects priority.
 
-Accepted consequence: an angry patient whose voice fires the distress gate is escalated.
+Accepted consequence, once a threshold is set: an angry patient whose voice crosses it is
+escalated.
 That is a false alarm within the measured budget, not a missed emergency. Do not add a
 suppressor back without labelled angry-but-well calls to measure it on.
+
+### 2.8 Prosodic distress replaced the WavLM distress gate
+
+The WavLM distress gate (logistic regression on 768-d embeddings, trained on VIVAE pain/fear)
+never fired on the team's real voices: distressed speech from two speakers scored about a
+millionth of its threshold, and a real groan scored 0.0001. It had learned VIVAE's recording
+conditions, not distress. It is retired; WavLM stays only for the arousal head's
+`non_speech` class (the speech guard).
+
+Its replacement is one interpretable feature: openSMILE eGeMAPSv02
+`HNRdBACF_sma3nz_amean` (mean harmonics-to-noise ratio), scored as a z-score against the
+same bed's previous calls (`src/prosody.py`, `src/baseline.py`).
+
+- **Native sample rate is an architectural requirement.** HNR moves 4–8 dB when 48 kHz
+  audio is resampled to 16 kHz, and for some speakers the calm/distress difference vanishes
+  (Bhavishya, chest: +3.4 dB at 48 kHz, −0.2 dB at 16 kHz). HNR is computed on
+  `preprocess.load_audio_native` output, before anything downsamples for Whisper or WavLM,
+  and the app captures at 48 kHz. Baselines are keyed by bed *and* sample rate.
+- **Per-bed baseline.** Last 50 calls per bed that had speech, a measurable HNR, were not
+  escalated and were not Emergency. Fewer than 5 → cold start: no score, no acoustic
+  escalation, "building baseline (n/5)" on the dashboard.
+- **Measured** on 51 clips, 3 speakers, phone mic, 48 kHz; baseline = each speaker's other
+  calm clips; threshold chosen leave-one-speaker-out; all 12 distress clips positive, no
+  grading, no exclusions:
+
+  | score | AUC | recall | false alarm | per speaker |
+  |---|---|---|---|---|
+  | one-sided z | 0.733 | 7/12 (58%) | 2/39 (5.1%) | 0/4, 3/4, 4/4 |
+  | two-sided \|z\| | 0.765 | 3/12 (25%) | 3/39 (7.7%) | 0/4, 0/4, 3/4 |
+
+  Two speakers' distress raises HNR (pressed voice); one speaker's lowers it (breathier),
+  and stays inside calm variability in either direction. A one-sided rule misses that
+  presentation entirely; a two-sided one loses the others to calm variability. Subtle
+  distress is not caught at all. An earlier figure of AUC 0.974 / 88% recall excluded the
+  speaker it fails on — do not quote it.
+- **Status:** `rules.CONFIG["DISTRESS_SCORE"]` and `["DISTRESS_HIGH"]` are `None`: no
+  acoustic escalation until a score and threshold are chosen deliberately.
 
 ### 2.7 The demo imports the evaluated code
 
@@ -106,7 +146,7 @@ implementation of the pipeline for the app.
 ```
 Bedside unit (button press / wake word)
         ↓
-VAD + audio capture — 16 kHz mono, 16-bit PCM
+VAD + audio capture — 48 kHz mono (the prosodic feature needs it; ASR/WavLM get 16 kHz copies)
         ↓
 Preprocessing: DeepFilterNet denoise (specified, not evaluated, OFF) → AGC → silence trim
         ↓
@@ -114,7 +154,7 @@ Preprocessing: DeepFilterNet denoise (specified, not evaluated, OFF) → AGC →
         ↓                             ↓                            │
 ASR: Whisper small            Acoustic: WavLM (frozen)             │
         ↓                             ↓                            │
-   Transcript              Arousal head + Distress gate            │
+   Transcript     Arousal head (speech guard) + HNR vs bed baseline│
         ↓                             ↓                            │
 ClinicalBERT → Request Type           │                            │
 Emergency / Pain / Assistance /       │                            │
@@ -140,7 +180,8 @@ General  → base priority              │                            │
 | Text classifier | `emilyalsentzer/Bio_ClinicalBERT` + 4-class head | 110 M | **Yes** |
 | Acoustic encoder | `microsoft/wavlm-base-plus` | 94.7 M | No, FROZEN |
 | Arousal head | MLP 768→256→out | ~200 K | **Yes** |
-| Distress gate | MLP / logistic regression on 768-d | ~200 K | **Yes** |
+| ~~Distress gate~~ | ~~logistic regression on 768-d~~ — retired (§2.8) | – | – |
+| Prosodic distress | openSMILE eGeMAPS HNR, z vs per-bed baseline (§2.8) | – | No — threshold unset |
 | Calibration | Platt scaling (sklearn) | – | Yes, trivial |
 | Fusion | Rule | – | **No — not a model** |
 | Overrides | Lookup table | – | No |
@@ -271,7 +312,7 @@ def apply_rules(base_priority, request_class, class_confidence, distress,
     """
 ```
 
-Rules, applied in order (thresholds: `DISTRESS_HIGH` 0.4028, `NON_SPEECH_HIGH` 0.90,
+Rules, applied in order (thresholds: `DISTRESS_HIGH` **unset** (prosodic, §2.8), `NON_SPEECH_HIGH` 0.90,
 `ASR_MIN` -0.4934; provenance in `rules.py`):
 
 0. **No speech** → P2 (`P_NO_SPEECH`), routed like a plain call button, and nothing else
@@ -299,10 +340,9 @@ Thresholds live in a config dict at the top of `rules.py`, not scattered through
 Every escalation must return a human-readable `reason` string; the dashboard displays it.
 
 **Calibration.** The plan was a Platt scaler per head. In practice the branches never
-meet on a common scale: only the distress gate reaches the rule, as a binary decision at
-a threshold chosen on its own held-out operating curve
-(`results/operating_curve_distress_v2.csv`). The shipped heads are uncalibrated
-probabilities; if a second acoustic score ever feeds the rule again, calibrate first.
+meet on a common scale: the only acoustic score that can reach the rule is the prosodic
+z-score (§2.8), already normalised per bed, as a binary decision at a threshold. The
+arousal head's probabilities are uncalibrated and feed only the speech guard.
 
 ---
 
@@ -444,15 +484,16 @@ latency.
 ### Demo clips
 
 Prepare about eight clips in `app/demo_clips/`, named so the running order is obvious.
-Three moments matter:
+The moments, as they stand after real-voice testing:
 
-1. **A pain phrase spoken calmly** → classified Pain, P3. Then **the same phrase spoken
-   distressed** → escalated to P2. This shows the acoustic branch doing something the text
-   cannot, with the transcript held constant.
-2. **A wordless groan from VIVAE** → no usable transcript, but the distress gate fires and
-   the override pushes it to P1. The most memorable moment in the demo; make sure it works.
-3. **A calm "I have chest pain"** → shows the Emergency class catching something the voice
-   does not betray.
+1. ~~Same phrase calm → P3, distressed → escalated~~ — not supported: acoustic escalation
+   is disabled (§2.8). Do not stage it.
+2. **A wordless groan** → no usable transcript, routed as a no-speech call at P2, never
+   dropped. Do not use a VIVAE clip as evidence of distress detection: it is training data
+   for the retired gate.
+3. **A calm "I have chest pain"** → Emergency P1 from the words alone.
+4. **"I need to go to the washroom"** → General from the classifier, raised to P2 by the
+   care-request rule (R5): the dataset has no care-request intents.
 
 ### Demo reliability
 

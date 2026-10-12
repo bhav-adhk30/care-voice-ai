@@ -1,0 +1,517 @@
+{
+ "feature": "openSMILE eGeMAPSv02 HNRdBACF_sma3nz_amean, native 48 kHz",
+ "data": "care-voice-own-voices v2: 51 clips (39 calm, 12 distress incl. 3 groans), 3 speakers, phone mic; 2 room-noise clips excluded",
+ "baseline": "per speaker, median and sample std (ddof=1) of that speaker's calm clips, leave-one-out (a clip never in its own baseline)",
+ "threshold": "95th percentile of calm scores of the OTHER two speakers (leave-one-speaker-out); all 12 distress positive, no grading or exclusions",
+ "results": {
+  "abs_z": {
+   "auc_all_51": 0.765,
+   "loso_recall": 0.25,
+   "loso_false_alarm": 0.077,
+   "loso_counts": "recall 3/12, false alarm 3/39",
+   "per_held_out_speaker": {
+    "bhavishya": {
+     "threshold": 2.565,
+     "recall": "0/4",
+     "false_alarm": "1/13"
+    },
+    "sumayah": {
+     "threshold": 2.565,
+     "recall": "0/4",
+     "false_alarm": "1/13"
+    },
+    "vinuthna": {
+     "threshold": 2.507,
+     "recall": "3/4",
+     "false_alarm": "1/13"
+    }
+   },
+   "threshold_all_3_speakers_calm_p95": 2.794
+  },
+  "one_sided_z": {
+   "auc_all_51": 0.733,
+   "loso_recall": 0.583,
+   "loso_false_alarm": 0.051,
+   "loso_counts": "recall 7/12, false alarm 2/39",
+   "per_held_out_speaker": {
+    "bhavishya": {
+     "threshold": 1.185,
+     "recall": "0/4",
+     "false_alarm": "0/13"
+    },
+    "sumayah": {
+     "threshold": 1.119,
+     "recall": "3/4",
+     "false_alarm": "1/13"
+    },
+    "vinuthna": {
+     "threshold": 1.14,
+     "recall": "4/4",
+     "false_alarm": "1/13"
+    }
+   },
+   "threshold_all_3_speakers_calm_p95": 1.171
+  }
+ },
+ "clips": [
+  {
+   "file": "bhavishya_bathroom_calm_1.wav",
+   "spk": "bhavishya",
+   "what": "bathroom",
+   "lab": "calm",
+   "hnr": 7.0192,
+   "z": -0.8449,
+   "n_base": 12
+  },
+  {
+   "file": "bhavishya_blanket_calm_1.wav",
+   "spk": "bhavishya",
+   "what": "blanket",
+   "lab": "calm",
+   "hnr": 8.8589,
+   "z": 0.5847,
+   "n_base": 12
+  },
+  {
+   "file": "bhavishya_chest_calm_1.wav",
+   "spk": "bhavishya",
+   "what": "chest",
+   "lab": "calm",
+   "hnr": 3.7846,
+   "z": -4.1784,
+   "n_base": 12
+  },
+  {
+   "file": "bhavishya_chest_distress_1.wav",
+   "spk": "bhavishya",
+   "what": "chest",
+   "lab": "distress",
+   "hnr": 7.1919,
+   "z": -0.5589,
+   "n_base": 13
+  },
+  {
+   "file": "bhavishya_dizzy_calm_1.wav",
+   "spk": "bhavishya",
+   "what": "dizzy",
+   "lab": "calm",
+   "hnr": 8.0914,
+   "z": -0.0813,
+   "n_base": 12
+  },
+  {
+   "file": "bhavishya_dizzy_distress_1.wav",
+   "spk": "bhavishya",
+   "what": "dizzy",
+   "lab": "distress",
+   "hnr": 6.1649,
+   "z": -1.1969,
+   "n_base": 13
+  },
+  {
+   "file": "bhavishya_doctor_calm_1.wav",
+   "spk": "bhavishya",
+   "what": "doctor",
+   "lab": "calm",
+   "hnr": 7.6987,
+   "z": -0.4316,
+   "n_base": 12
+  },
+  {
+   "file": "bhavishya_glasses_calm_1.wav",
+   "spk": "bhavishya",
+   "what": "glasses",
+   "lab": "calm",
+   "hnr": 8.8013,
+   "z": 0.5486,
+   "n_base": 12
+  },
+  {
+   "file": "bhavishya_groan_distress_1.wav",
+   "spk": "bhavishya",
+   "what": "groan",
+   "lab": "distress",
+   "hnr": 4.2709,
+   "z": -2.3735,
+   "n_base": 13
+  },
+  {
+   "file": "bhavishya_knee_calm_1.wav",
+   "spk": "bhavishya",
+   "what": "knee",
+   "lab": "calm",
+   "hnr": 7.0669,
+   "z": -0.8151,
+   "n_base": 12
+  },
+  {
+   "file": "bhavishya_knee_distress_1.wav",
+   "spk": "bhavishya",
+   "what": "knee",
+   "lab": "distress",
+   "hnr": 7.6575,
+   "z": -0.2696,
+   "n_base": 13
+  },
+  {
+   "file": "bhavishya_light_calm_1.wav",
+   "spk": "bhavishya",
+   "what": "light",
+   "lab": "calm",
+   "hnr": 9.7239,
+   "z": 1.1649,
+   "n_base": 12
+  },
+  {
+   "file": "bhavishya_medication_calm_1.wav",
+   "spk": "bhavishya",
+   "what": "medication",
+   "lab": "calm",
+   "hnr": 8.757,
+   "z": 0.5209,
+   "n_base": 12
+  },
+  {
+   "file": "bhavishya_pillow_calm_1.wav",
+   "spk": "bhavishya",
+   "what": "pillow",
+   "lab": "calm",
+   "hnr": 8.9771,
+   "z": 0.6595,
+   "n_base": 12
+  },
+  {
+   "file": "bhavishya_situp_calm_1.wav",
+   "spk": "bhavishya",
+   "what": "situp",
+   "lab": "calm",
+   "hnr": 6.8369,
+   "z": -0.96,
+   "n_base": 12
+  },
+  {
+   "file": "bhavishya_water_calm_1.wav",
+   "spk": "bhavishya",
+   "what": "water",
+   "lab": "calm",
+   "hnr": 6.4168,
+   "z": -1.2364,
+   "n_base": 12
+  },
+  {
+   "file": "bhavishya_window_calm_1.wav",
+   "spk": "bhavishya",
+   "what": "window",
+   "lab": "calm",
+   "hnr": 9.4612,
+   "z": 0.9794,
+   "n_base": 12
+  },
+  {
+   "file": "sumayah_blanket_calm_1.wav",
+   "spk": "sumayah",
+   "what": "blanket",
+   "lab": "calm",
+   "hnr": 4.6859,
+   "z": -0.2356,
+   "n_base": 12
+  },
+  {
+   "file": "sumayah_chest_calm_1.wav",
+   "spk": "sumayah",
+   "what": "chest",
+   "lab": "calm",
+   "hnr": 3.6268,
+   "z": -0.7668,
+   "n_base": 12
+  },
+  {
+   "file": "sumayah_chest_distress_1.wav",
+   "spk": "sumayah",
+   "what": "chest",
+   "lab": "distress",
+   "hnr": 8.3431,
+   "z": 1.6582,
+   "n_base": 13
+  },
+  {
+   "file": "sumayah_dizzy_calm_1.wav",
+   "spk": "sumayah",
+   "what": "dizzy",
+   "lab": "calm",
+   "hnr": 7.1367,
+   "z": 1.0658,
+   "n_base": 12
+  },
+  {
+   "file": "sumayah_dizzy_distress_1.wav",
+   "spk": "sumayah",
+   "what": "dizzy",
+   "lab": "distress",
+   "hnr": 6.5752,
+   "z": 0.7591,
+   "n_base": 13
+  },
+  {
+   "file": "sumayah_doctor_calm_1.wav",
+   "spk": "sumayah",
+   "what": "doctor",
+   "lab": "calm",
+   "hnr": 6.3814,
+   "z": 0.6525,
+   "n_base": 12
+  },
+  {
+   "file": "sumayah_glasses_calm_1.wav",
+   "spk": "sumayah",
+   "what": "glasses",
+   "lab": "calm",
+   "hnr": 5.0653,
+   "z": -0.0507,
+   "n_base": 12
+  },
+  {
+   "file": "sumayah_groan_distress_1.wav",
+   "spk": "sumayah",
+   "what": "groan",
+   "lab": "distress",
+   "hnr": 7.5171,
+   "z": 1.2381,
+   "n_base": 13
+  },
+  {
+   "file": "sumayah_knee_calm_1.wav",
+   "spk": "sumayah",
+   "what": "knee",
+   "lab": "calm",
+   "hnr": 5.2562,
+   "z": 0.0888,
+   "n_base": 12
+  },
+  {
+   "file": "sumayah_knee_distress_1.wav",
+   "spk": "sumayah",
+   "what": "knee",
+   "lab": "distress",
+   "hnr": 8.5059,
+   "z": 1.741,
+   "n_base": 13
+  },
+  {
+   "file": "sumayah_light_calm_1.wav",
+   "spk": "sumayah",
+   "what": "light",
+   "lab": "calm",
+   "hnr": 6.2303,
+   "z": 0.5742,
+   "n_base": 12
+  },
+  {
+   "file": "sumayah_medication_calm_1.wav",
+   "spk": "sumayah",
+   "what": "medication",
+   "lab": "calm",
+   "hnr": 0.7426,
+   "z": -2.8129,
+   "n_base": 12
+  },
+  {
+   "file": "sumayah_pillow_calm_1.wav",
+   "spk": "sumayah",
+   "what": "pillow",
+   "lab": "calm",
+   "hnr": 5.8828,
+   "z": 0.3979,
+   "n_base": 12
+  },
+  {
+   "file": "sumayah_situp_calm_1.wav",
+   "spk": "sumayah",
+   "what": "situp",
+   "lab": "calm",
+   "hnr": 5.0825,
+   "z": -0.0381,
+   "n_base": 12
+  },
+  {
+   "file": "sumayah_washroom_calm_1.wav",
+   "spk": "sumayah",
+   "what": "washroom",
+   "lab": "calm",
+   "hnr": 4.0582,
+   "z": -0.5461,
+   "n_base": 12
+  },
+  {
+   "file": "sumayah_water_calm_1.wav",
+   "spk": "sumayah",
+   "what": "water",
+   "lab": "calm",
+   "hnr": 7.9639,
+   "z": 1.5856,
+   "n_base": 12
+  },
+  {
+   "file": "sumayah_window_calm_1.wav",
+   "spk": "sumayah",
+   "what": "window",
+   "lab": "calm",
+   "hnr": 2.2056,
+   "z": -1.5893,
+   "n_base": 12
+  },
+  {
+   "file": "vinuthna_bathroom_calm_1.wav",
+   "spk": "vinuthna",
+   "what": "bathroom",
+   "lab": "calm",
+   "hnr": 8.9737,
+   "z": 0.0869,
+   "n_base": 12
+  },
+  {
+   "file": "vinuthna_blanket_calm_1.wav",
+   "spk": "vinuthna",
+   "what": "blanket",
+   "lab": "calm",
+   "hnr": 6.0885,
+   "z": -2.7916,
+   "n_base": 12
+  },
+  {
+   "file": "vinuthna_chest_calm_1.wav",
+   "spk": "vinuthna",
+   "what": "chest",
+   "lab": "calm",
+   "hnr": 7.5169,
+   "z": -1.2158,
+   "n_base": 12
+  },
+  {
+   "file": "vinuthna_chest_distress_1.wav",
+   "spk": "vinuthna",
+   "what": "chest",
+   "lab": "distress",
+   "hnr": 13.7544,
+   "z": 3.73,
+   "n_base": 13
+  },
+  {
+   "file": "vinuthna_dizzy_calm_1.wav",
+   "spk": "vinuthna",
+   "what": "dizzy",
+   "lab": "calm",
+   "hnr": 9.6015,
+   "z": 0.6579,
+   "n_base": 12
+  },
+  {
+   "file": "vinuthna_dizzy_distress_1.wav",
+   "spk": "vinuthna",
+   "what": "dizzy",
+   "lab": "distress",
+   "hnr": 12.5062,
+   "z": 2.7561,
+   "n_base": 13
+  },
+  {
+   "file": "vinuthna_doctor_calm_1.wav",
+   "spk": "vinuthna",
+   "what": "doctor",
+   "lab": "calm",
+   "hnr": 9.2019,
+   "z": 0.3454,
+   "n_base": 12
+  },
+  {
+   "file": "vinuthna_glasses_calm_1.wav",
+   "spk": "vinuthna",
+   "what": "glasses",
+   "lab": "calm",
+   "hnr": 7.8642,
+   "z": -0.9292,
+   "n_base": 12
+  },
+  {
+   "file": "vinuthna_groan_distress_1.wav",
+   "spk": "vinuthna",
+   "what": "groan",
+   "lab": "distress",
+   "hnr": 15.0771,
+   "z": 4.7619,
+   "n_base": 13
+  },
+  {
+   "file": "vinuthna_knee_calm_1.wav",
+   "spk": "vinuthna",
+   "what": "knee",
+   "lab": "calm",
+   "hnr": 9.8747,
+   "z": 0.8831,
+   "n_base": 12
+  },
+  {
+   "file": "vinuthna_knee_distress_1.wav",
+   "spk": "vinuthna",
+   "what": "knee",
+   "lab": "distress",
+   "hnr": 11.9251,
+   "z": 2.3027,
+   "n_base": 13
+  },
+  {
+   "file": "vinuthna_light_calm_1.wav",
+   "spk": "vinuthna",
+   "what": "light",
+   "lab": "calm",
+   "hnr": 8.1804,
+   "z": -0.6817,
+   "n_base": 12
+  },
+  {
+   "file": "vinuthna_medication_calm_1.wav",
+   "spk": "vinuthna",
+   "what": "medication",
+   "lab": "calm",
+   "hnr": 6.8063,
+   "z": -1.886,
+   "n_base": 12
+  },
+  {
+   "file": "vinuthna_pillow_calm_1.wav",
+   "spk": "vinuthna",
+   "what": "pillow",
+   "lab": "calm",
+   "hnr": 10.26,
+   "z": 1.2253,
+   "n_base": 12
+  },
+  {
+   "file": "vinuthna_situp_calm_1.wav",
+   "spk": "vinuthna",
+   "what": "situp",
+   "lab": "calm",
+   "hnr": 9.4427,
+   "z": 0.5318,
+   "n_base": 12
+  },
+  {
+   "file": "vinuthna_water_calm_1.wav",
+   "spk": "vinuthna",
+   "what": "water",
+   "lab": "calm",
+   "hnr": 8.5137,
+   "z": -0.429,
+   "n_base": 12
+  },
+  {
+   "file": "vinuthna_window_calm_1.wav",
+   "spk": "vinuthna",
+   "what": "window",
+   "lab": "calm",
+   "hnr": 9.9071,
+   "z": 0.9106,
+   "n_base": 12
+  }
+ ]
+}

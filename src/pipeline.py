@@ -6,7 +6,8 @@ second implementation of the pipeline anywhere else.
 
     audio -> load_audio (-23 LUFS) -> energy pre-filter
           -> load_audio_acoustic (RMS 0.05, crop 4 s, no pad) -> WavLM Base+ (frozen,
-             mean-pooled over real frames) -> arousal head (fear, non_speech) + distress gate
+             mean-pooled over real frames) -> arousal head (fear, non_speech)
+          -> load_audio_native (no resampling) -> HNR -> z vs this bed's baseline (prosodic distress)
           -> denoise (DISABLED, see preprocess.CONFIG) -> trim -> Whisper small (faster-whisper int8)
           -> speech guard (non_speech AND no trusted transcript AND no distress)
           -> if speech and a transcript: ClinicalBERT
@@ -49,7 +50,9 @@ import torch
 from src.mapping import care_request_tag, class_base_priority, medication_tag
 from src.preprocess import SPEECH_GUARD
 from src.preprocess import CONFIG as PREPROCESS_CONFIG
-from src.preprocess import DENOISE_DISABLED_REASON, AudioLoadError
+from src import prosody
+from src.baseline import BedBaseline
+from src.preprocess import DENOISE_DISABLED_REASON, AudioLoadError, load_audio_native
 from src.preprocess import (ACOUSTIC_CONTRACT, denoise, energy_present, load_audio,
                             load_audio_acoustic, trim)
 from src.rules import CONFIG as RULES_CONFIG
@@ -58,7 +61,9 @@ from src.rules import UNCLASSIFIED, apply_rules, speech_guard
 log = logging.getLogger(__name__)
 
 # Every model file the pipeline cannot run without, checked before anything loads.
-REQUIRED_MODELS = ("whisper_dir", "bert_dir", "wavlm_dir", "arousal_head", "distress_gate")
+# The WavLM distress gate is retired (never fired on real voices); distress is now
+# prosodic (src/prosody.py) and needs no model file.
+REQUIRED_MODELS = ("whisper_dir", "bert_dir", "wavlm_dir", "arousal_head")
 
 CONFIG = {
     "sr": 16000,
@@ -73,7 +78,6 @@ CONFIG = {
     # was fine-tuned for request type only, so sentiment comes from this model.
     "emotion_dir": "emotion-english-distilroberta-base",
     "arousal_head": "arousal_head.joblib",
-    "distress_gate": "distress_gate.joblib",
 
     # ASR. int8 on CPU is ~4x faster than the HF pipeline (CLAUDE.md section 9).
     "whisper_compute_type": "int8",
@@ -158,7 +162,7 @@ def embed_clip(feature_extractor, wavlm, wav: np.ndarray, device: str = "cpu") -
 
 
 class CareVoicePipeline:
-    def __init__(self, model_dir="models", device="cpu", load_emotion=False):
+    def __init__(self, model_dir="models", device="cpu", load_emotion=False, baseline_db=None):
         """load_emotion: the text-emotion model is display-only (it never affects
         priority) and costs 313 MB of weights, so it is off by default and not
         loaded at all. set_emotion() turns it on or off in a running pipeline."""
@@ -166,6 +170,9 @@ class CareVoicePipeline:
         self.model_dir = Path(model_dir)
         self.device = device
         self.emo_model = self.emo_tokenizer = self.emo_labels = None
+        # Per-bed prosodic baseline (SQLite). Without one - tests, batch evaluation -
+        # every bed is permanently in cold start: no prosodic score, no escalation.
+        self.baseline = BedBaseline(baseline_db) if baseline_db else None
 
         random.seed(CONFIG["seed"])
         np.random.seed(CONFIG["seed"])
@@ -255,14 +262,9 @@ class CareVoicePipeline:
             p.requires_grad = False  # FROZEN, section 2.2
 
         arousal = joblib.load(self._path("arousal_head"))
-        distress = joblib.load(self._path("distress_gate"))
 
-        # The extraction contract travels with the heads. Refuse to run heads that
-        # were fitted on differently prepared features: their scores would be
+        # Refuse a head fitted on differently prepared features: its scores would be
         # meaningless and nothing downstream could tell.
-        if distress.get("extraction") != ACOUSTIC_CONTRACT:
-            raise ValueError(f"distress_gate.joblib extraction={distress.get('extraction')!r}, "
-                             f"pipeline implements {ACOUSTIC_CONTRACT!r}")
         if arousal.get("escalates", True) or "non_speech_index" not in arousal:
             raise ValueError("arousal_head.joblib is not a v2 head (needs escalates=False "
                              "and a non_speech class)")
@@ -276,13 +278,9 @@ class CareVoicePipeline:
                 raise ValueError(f"arousal head index {idx} is "
                                  f"{self.arousal_classes[idx]!r}, expected {name!r}")
 
-        self.distress_model = distress["model"]
-        self.distress_pos_index = list(self.distress_model.classes_).index(1)
-
-        # rules.py is the single source of truth for thresholds. The copies saved with
-        # the heads are only checked, never used.
-        for name, saved, key in (("distress_gate", distress.get("threshold"), "DISTRESS_HIGH"),
-                                 ("arousal_head", arousal.get("non_speech_threshold"), "NON_SPEECH_HIGH")):
+        # rules.py is the single source of truth for thresholds. The copy saved with
+        # the head is only checked, never used.
+        for name, saved, key in (("arousal_head", arousal.get("non_speech_threshold"), "NON_SPEECH_HIGH"),):
             if saved is not None and abs(saved - RULES_CONFIG[key]) > 1e-9:
                 warnings.warn(f"{name}.joblib threshold {saved} differs from "
                               f"rules.CONFIG[{key!r}]={RULES_CONFIG[key]}; using rules.py")
@@ -293,6 +291,7 @@ class CareVoicePipeline:
         self._acoustic(wav)
         self._transcribe(trim(wav, sr=CONFIG["sr"]))
         self._classify("warm up")
+        prosody.hnr_db(np.tile(wav, 3), CONFIG["sr"])          # loads openSMILE once
         if self.emo_model is not None:
             self._emotion("warm up")
 
@@ -346,7 +345,7 @@ class CareVoicePipeline:
         """Short content hashes of the trained/downloaded weights, logged with every
         decision so it can be tied to the exact models that made it."""
         out = {}
-        for key in ("arousal_head", "distress_gate"):
+        for key in ("arousal_head",):
             out[key] = hashlib.sha256(self._path(key).read_bytes()).hexdigest()[:12]
         f = self._path("bert_dir") / "model.safetensors"
         out["bert_dir"] = hashlib.sha256(f.read_bytes()).hexdigest()[:12] if f.exists() else None
@@ -357,14 +356,13 @@ class CareVoicePipeline:
         return out
 
     def _acoustic(self, wav: np.ndarray) -> dict:
-        """Both heads on one unpadded embedding. Returns fear (display only),
-        non_speech (the speech guard) and distress (the escalation signal)."""
+        """The arousal head on one unpadded embedding: fear (display only) and
+        non_speech (the speech guard). Distress is prosodic, see process()."""
         emb = embed_clip(self.feature_extractor, self.wavlm, wav, self.device)
         ap = self.arousal_model.predict_proba(emb)[0]
         return {
             "arousal": float(ap[self.fear_index]),
             "non_speech_prob": float(ap[self.non_speech_index]),
-            "distress": float(self.distress_model.predict_proba(emb)[0, self.distress_pos_index]),
         }
 
     # ------------------------------------------------------------------ entry point
@@ -396,7 +394,7 @@ class CareVoicePipeline:
         duration_s = len(wav) / CONFIG["sr"]
 
         # --- acoustic branch ---
-        acoustic = {"arousal": None, "non_speech_prob": None, "distress": None}
+        acoustic = {"arousal": None, "non_speech_prob": None}
         lat["load_acoustic"] = lat["wavlm_and_heads"] = 0.0
         if energy_ok:
             t0 = time.perf_counter()
@@ -412,6 +410,25 @@ class CareVoicePipeline:
                 t0 = time.perf_counter()
                 acoustic = self._acoustic(wav_ac)
                 lat["wavlm_and_heads"] = _ms(t0)
+
+        # --- prosodic distress: HNR at the native rate vs this bed's baseline ---
+        hnr = native_sr = z = None
+        stats = None
+        lat["prosody"] = 0.0
+        if energy_ok:
+            t0 = time.perf_counter()
+            try:
+                wav_native, native_sr = load_audio_native(audio_path)
+                hnr = prosody.hnr_db(wav_native, native_sr)
+            except Exception as e:  # a failed feature must never block the call
+                log.warning("bed %s: prosody failed (%s: %s); no distress score", bed,
+                            type(e).__name__, e)
+            if self.baseline is not None and bed is not None and native_sr:
+                stats = self.baseline.stats(bed, native_sr)
+                if stats.ready:
+                    z = prosody.distress_z(hnr, stats.median, stats.std)
+            lat["prosody"] = _ms(t0)
+        distress = prosody.distress_score(z, RULES_CONFIG["DISTRESS_SCORE"])
 
         # --- ASR: every clip with any signal ---
         # Whisper's output is one of the three speech-guard conditions, so it runs
@@ -431,7 +448,7 @@ class CareVoicePipeline:
 
         has_speech, speech_reason = speech_guard(
             energy_ok, acoustic["non_speech_prob"], transcript, asr_confidence,
-            acoustic["distress"], energy_reason)
+            distress, energy_reason)
         if audio_error:
             speech_reason = f"audio could not be read ({audio_error})"
         # A no-speech call's transcript is by definition empty or an untrusted
@@ -478,7 +495,7 @@ class CareVoicePipeline:
             base_priority=base_priority,
             request_class=request_class,
             class_confidence=class_confidence,
-            distress=acoustic["distress"] if acoustic["distress"] is not None else 0.0,
+            distress=distress,
             asr_confidence=asr_confidence,
             energy_ok=energy_ok,
             non_speech_prob=acoustic["non_speech_prob"],
@@ -489,6 +506,15 @@ class CareVoicePipeline:
             care_request=care_request,
         )
         lat["rules"] = _ms(t0)
+
+        # A call joins its bed's baseline only if it is an ordinary call: speech,
+        # a measurable HNR, not escalated, not Emergency. An alarming call must
+        # never become the new normal for that bed.
+        baseline_joined = bool(
+            self.baseline is not None and bed is not None and hnr is not None
+            and has_speech and not decision.escalated and request_class != "Emergency")
+        if baseline_joined:
+            self.baseline.add(bed, native_sr, hnr)
         lat["total"] = _ms(t_all)
 
         return {
@@ -515,7 +541,14 @@ class CareVoicePipeline:
             "text_anger": text_anger,
             "base_priority": base_priority,
             "arousal": acoustic["arousal"],
-            "distress": acoustic["distress"],
+            "hnr": hnr,
+            "prosody_sr": native_sr,
+            "baseline_n": stats.n if stats else 0,
+            "baseline_min": RULES_CONFIG["BASELINE_MIN_CALLS"],
+            "baseline_ready": bool(stats and stats.ready),
+            "baseline_joined": baseline_joined,
+            "distress_z": z,
+            "distress": distress,
             "distress_fired": decision.distress_fired,
             "final_priority": decision.final_priority,
             "escalated": decision.escalated,

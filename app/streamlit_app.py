@@ -52,7 +52,11 @@ CONFIG = {
     "audit_db": ROOT / "app" / "audit_log.db",
     "results_dir": ROOT / "results",
     "queue_refresh_s": 1,          # the waiting timer ticks every second
-    "mic_sample_rate": 16000,      # capture at the pipeline's rate; process() still resamples
+    # 48 kHz, not 16 kHz: the prosodic distress feature (HNR) is computed at the
+    # native rate and loses 4-8 dB - and for some speakers the whole calm/distress
+    # difference - when audio is captured or resampled at 16 kHz. Whisper and WavLM
+    # get their own 16 kHz copies inside process().
+    "mic_sample_rate": 48000,
     # Everything phones, QuickTime and browsers produce. All decode through
     # src/preprocess.py (libsndfile, else ffmpeg); a video's audio track is used.
     "audio_types": ["wav", "mp3", "m4a", "mp4", "mov", "qta", "aac", "flac", "ogg", "opus",
@@ -75,7 +79,7 @@ RULE_WORDS = {
     "R0_no_speech": "No words or voice detected: treated like a plain call-button press",
     "R0_audio_error": "Recording missing or unreadable: treated like a plain call-button press",
     "R1_distress_untrusted_transcript": "Sounds distressed and the words are unclear: go now",
-    "R2_distress": "Voice sounds distressed: raised to immediate",
+    "R2_distress": "Voice sounds distressed compared with this bed's usual voice: raised to immediate",
     "R4_emergency_floor": "Emergency request: kept urgent however calm it sounds",
     "R5_care_request": "Asked for help to the toilet or to move: raised to urgent",
 }
@@ -112,6 +116,19 @@ def class_badge(request_class: str, medication: list | None = None,
         # Keyword rule (src/mapping.py), floors the call at P2 (rules.py Rule 5).
         html += "<br>" + _badge("🚻 care request", "#00695c", "#ffffff", small=True)
     return html
+
+
+def prosody_text(r: dict) -> str:
+    """One line for the prosodic distress state of a call."""
+    hnr = "n/a" if r.get("hnr") is None else f"{r['hnr']:.2f} dB at {r.get('prosody_sr')} Hz"
+    if not r.get("baseline_ready"):
+        return (f"building baseline ({r.get('baseline_n', 0)}/{r.get('baseline_min', RULES['BASELINE_MIN_CALLS'])})"
+                f" — no acoustic escalation for this bed yet · HNR {hnr}")
+    z = "n/a" if r.get("distress_z") is None else f"z {r['distress_z']:+.2f}"
+    if RULES["DISTRESS_HIGH"] is None:
+        return f"{z} against this bed's baseline · threshold not set, no escalation · HNR {hnr}"
+    fired = " — 🔴 **fired**" if r.get("distress_fired") else ""
+    return f"{z} (threshold {RULES['DISTRESS_HIGH']}){fired} · HNR {hnr}"
 
 
 def fmt_wait(seconds: float) -> str:
@@ -182,7 +199,9 @@ def waiting_queue(clock: float) -> list[dict]:
 def load_pipeline():
     from src.pipeline import CareVoicePipeline
     # Emotion model never loaded here: it follows the sidebar toggle via set_emotion().
-    pipe = CareVoicePipeline(model_dir=str(CONFIG["model_dir"]), device="cpu", load_emotion=False)
+    # The per-bed prosodic baseline lives next to the queue in app/calls.db.
+    pipe = CareVoicePipeline(model_dir=str(CONFIG["model_dir"]), device="cpu", load_emotion=False,
+                             baseline_db=str(CONFIG["queue_db"]))
     st.session_state["pipeline_loaded"] = True
     return pipe
 
@@ -257,7 +276,11 @@ def tab_nurse_station():
             row[3].markdown(class_badge(c["request_class"], c.get("medication"), c.get("care_request")),
                             unsafe_allow_html=True)
             row[4].markdown(c["transcript"] or "*(no words)*")
-            row[5].markdown(plain_reason(c, c["bumps"], c["waited"]), unsafe_allow_html=True)
+            why = plain_reason(c, c["bumps"], c["waited"])
+            if c.get("speech_present") and not c.get("baseline_ready", False):
+                why += (f"<br><span style='font-size:0.8em;opacity:0.7'>building baseline "
+                        f"({c.get('baseline_n', 0)}/{c.get('baseline_min', RULES['BASELINE_MIN_CALLS'])})</span>")
+            row[5].markdown(why, unsafe_allow_html=True)
             if row[6].button("✓", key=f"ans_{c['qid']}", help="Mark answered"):
                 answer(c["qid"])
                 st.rerun(scope="fragment")
@@ -325,12 +348,10 @@ def render_breakdown(r: dict):
                                              else "off (sidebar: Text emotion)"))
     with right:
         st.markdown("##### Acoustic branch")
-        if r["distress"] is None:
+        if r["non_speech_prob"] is None:
             st.caption("Not run: the energy pre-filter found no signal (digital silence).")
         else:
-            st.markdown(f"**Distress gate:** {fmt(r['distress'], 4)} (DISTRESS_HIGH "
-                        f"{RULES['DISTRESS_HIGH']}) {'— 🔴 **fired**' if r['distress_fired'] else ''}")
-            st.progress(min(1.0, r["distress"]))
+            st.markdown(f"**Prosodic distress:** {prosody_text(r)}")
             st.markdown(f"**Non-speech:** {fmt(r['non_speech_prob'], 4)} (NON_SPEECH_HIGH "
                         f"{RULES['NON_SPEECH_HIGH']}) — speech guard: "
                         f"{'speech present' if r['speech_present'] else '**no speech**'}")
@@ -425,7 +446,20 @@ def tab_results():
 
     v2 = _json("head_refit_v2.json")
     if v2:
-        st.markdown("#### Acoustic branch (v2: unpadded, deduplicated, noise and silence negatives)")
+        st.markdown("#### Prosodic distress (current): HNR against the bed's own baseline")
+        st.markdown(
+            "Measured on the team's own recordings: 51 clips, 3 speakers, phone mic, 48 kHz, "
+            "threshold chosen leave-one-speaker-out, all 12 distress clips positive.")
+        st.dataframe(pd.DataFrame([
+            {"score": "one-sided z", "AUC": 0.733, "recall": "7/12 (58%)", "false alarm": "2/39 (5.1%)",
+             "per speaker": "0/4 · 3/4 · 4/4"},
+            {"score": "two-sided |z|", "AUC": 0.765, "recall": "3/12 (25%)", "false alarm": "3/39 (7.7%)",
+             "per speaker": "0/4 · 0/4 · 3/4"}]), hide_index=True, width="stretch")
+        st.warning("Threshold not set: no acoustic escalation in the app yet. One speaker's distress "
+                   "lowers HNR while the others' raise it, and stays inside calm variability.")
+        st.markdown("#### Retired: WavLM distress gate (v2)")
+        st.caption("Never fired on the team's real voices (distressed speech, a real groan). "
+                   "Kept for the record; the arousal head still serves the speech guard.")
         c = st.columns(4)
         c[0].metric("Distress AUC, held out", f"{v2['distress_heldout_auc_all_negatives']:.3f}",
                     help=f"Within VIVAE only (pain vs other vocalisations): {v2['distress_withincorpus_auc']:.3f}")
@@ -442,8 +476,8 @@ def tab_results():
                 st.line_chart(curve.set_index("recall")[["fa_medical", "fa_ward_noise", "fa_vivae_other"]],
                               height=260)
             with right:
-                st.markdown(f"**At DISTRESS_HIGH = {RULES['DISTRESS_HIGH']}**")
-                row = curve[curve.threshold.round(4) == round(RULES["DISTRESS_HIGH"], 4)]
+                st.markdown(f"**At its old threshold {v2['DISTRESS_HIGH_new']}**")
+                row = curve[curve.threshold.round(4) == round(v2["DISTRESS_HIGH_new"], 4)]
                 st.dataframe(row.T.set_axis(["value"], axis=1), width="stretch")
         groan = _csv("groan_check_v2.csv")
         if groan is not None:

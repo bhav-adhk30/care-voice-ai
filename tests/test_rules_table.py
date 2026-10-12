@@ -18,16 +18,27 @@ import pytest
 from src.rules import (CONFIG, UNCLASSIFIED, apply_rules, apply_starvation_timer,
                        starvation_priority)
 
-T = CONFIG["DISTRESS_HIGH"]
+# The shipped config leaves the prosodic threshold unset (no acoustic escalation),
+# which would leave the escalation rules untested. Every table and property test
+# runs under TCFG, an explicit score and threshold; test_unset_threshold_never_fires
+# pins the shipped behaviour.
+TCFG = {**CONFIG, "DISTRESS_SCORE": "z", "DISTRESS_HIGH": 1.0}
+T = TCFG["DISTRESS_HIGH"]
+
+
+def rules(*a, **kw):
+    return apply_rules(*a, cfg=TCFG, **kw)
+
+
 BASE = {"Emergency": 1, "Assistance": 2, "Pain": 3, "General": 3}
 TEXT = {"Emergency": "i have a severe pain in my chest", "Assistance": "i feel too weak to stand",
         "Pain": "my knee hurts", "General": "could i get some water"}
 
 
 def call(cls, distress_fired, trusted, speech, conf=0.9):
-    return apply_rules(
+    return rules(
         base_priority=BASE[cls], request_class=cls, class_confidence=conf,
-        distress=0.80 if distress_fired else 0.05,
+        distress=2.0 if distress_fired else 0.0,
         asr_confidence=-0.20 if trusted else -0.90,
         energy_ok=speech, non_speech_prob=0.0 if speech else None,
         energy_reason="" if speech else "signal level below floor",
@@ -95,8 +106,8 @@ def test_rules_table(key):
 # The rows the pipeline really sends for an empty transcript: Unclassified at P2.
 UNCLASSIFIED_ROWS = [
     # (distress, non_speech, energy_ok, asr_confidence) -> final, rules
-    (dict(distress=0.80, non_speech_prob=0.99, energy_ok=True, asr_confidence=-10.0), 1, [R1]),  # groan
-    (dict(distress=0.80, non_speech_prob=0.05, energy_ok=True, asr_confidence=-10.0), 1, [R1]),
+    (dict(distress=2.0, non_speech_prob=0.99, energy_ok=True, asr_confidence=-10.0), 1, [R1]),  # groan
+    (dict(distress=2.0, non_speech_prob=0.05, energy_ok=True, asr_confidence=-10.0), 1, [R1]),
     (dict(distress=0.05, non_speech_prob=0.99, energy_ok=True, asr_confidence=-10.0), 2, [R0]),  # fan
     (dict(distress=0.05, non_speech_prob=0.05, energy_ok=True, asr_confidence=-10.0), 2, []),
     (dict(distress=0.00, non_speech_prob=None, energy_ok=False, asr_confidence=None), 2, [R0]),  # silence
@@ -105,29 +116,29 @@ UNCLASSIFIED_ROWS = [
 
 @pytest.mark.parametrize("kw,want_p,want_rules", UNCLASSIFIED_ROWS)
 def test_unclassified_rows(kw, want_p, want_rules):
-    d = apply_rules(base_priority=CONFIG["P_NO_SPEECH"], request_class=UNCLASSIFIED,
+    d = rules(base_priority=CONFIG["P_NO_SPEECH"], request_class=UNCLASSIFIED,
                     class_confidence=0.0, transcript="", **kw)
     assert (d.final_priority, d.rules_fired) == (want_p, want_rules), d.reason
 
 
 def test_audio_error_routes_like_a_call_button():
-    d = apply_rules(CONFIG["P_NO_SPEECH"], UNCLASSIFIED, 0.0, 0.0, transcript="",
+    d = rules(CONFIG["P_NO_SPEECH"], UNCLASSIFIED, 0.0, 0.0, transcript="",
                     audio_error="file not found: x.wav")
     assert (d.final_priority, d.rules_fired) == (2, ["R0_audio_error"])
     assert "file not found" in d.reason and not d.escalated
 
 
 def test_absent_asr_confidence_is_untrusted():
-    d = apply_rules(3, "Pain", 0.9, 0.0, asr_confidence=None, non_speech_prob=0.0,
+    d = rules(3, "Pain", 0.9, 0.0, asr_confidence=None, non_speech_prob=0.0,
                     transcript="my knee hurts")
     assert d.asr_trusted is False
 
 
 def test_unclassified_invariant_both_directions():
     with pytest.raises(ValueError):
-        apply_rules(2, UNCLASSIFIED, 0.0, 0.0, transcript="hello")
+        rules(2, UNCLASSIFIED, 0.0, 0.0, transcript="hello")
     with pytest.raises(ValueError):
-        apply_rules(3, "General", 0.9, 0.0, transcript="  ")
+        rules(3, "General", 0.9, 0.0, transcript="  ")
 
 
 # ----------------------------------------------------------------- properties
@@ -136,7 +147,7 @@ CLASSES = list(BASE) + [UNCLASSIFIED]
 GRID = list(itertools.product(
     CLASSES,
     [0.30, 0.99],                    # class confidence
-    [0.0, 0.2, T - 1e-6, T, 0.9],    # distress, either side of the threshold
+    [None, 0.0, 0.5, T - 1e-6, T, 2.5],  # distress score, either side of the threshold
     [None, -10.0, -0.9, -0.2],       # asr confidence
     [True, False],                   # energy ok
     [None, 0.0, 0.5, 0.95],          # non_speech
@@ -146,7 +157,7 @@ GRID = list(itertools.product(
 def _run(cls, conf, distress, asr, energy, ns):
     unc = cls == UNCLASSIFIED
     base = CONFIG["P_NO_SPEECH"] if unc else BASE[cls]
-    return base, apply_rules(base, cls, 0.0 if unc else conf, distress, asr_confidence=asr,
+    return base, rules(base, cls, 0.0 if unc else conf, distress, asr_confidence=asr,
                              energy_ok=energy, non_speech_prob=ns,
                              transcript="" if unc else TEXT[cls])
 
@@ -164,7 +175,7 @@ def test_priority_never_increases_in_number():
 def test_confident_calm_class_cannot_cancel_fired_distress():
     for cls in BASE:
         for asr in (None, -0.9, -0.2):
-            d = apply_rules(BASE[cls], cls, 0.99, 0.90, asr_confidence=asr,
+            d = rules(BASE[cls], cls, 0.99, 2.0, asr_confidence=asr,
                             non_speech_prob=0.0, transcript=TEXT[cls])
             assert d.final_priority == 1 and d.distress_fired, (cls, asr, d.reason)
 
@@ -204,14 +215,14 @@ CARE = ["washroom"]
 @pytest.mark.parametrize("cls,base,want", [
     ("General", 3, 2), ("Pain", 3, 2), ("Assistance", 2, 2), ("Emergency", 1, 1)])
 def test_care_request_floors_at_p2_never_lowers(cls, base, want):
-    d = apply_rules(base, cls, 0.9, 0.0, asr_confidence=-0.3, non_speech_prob=0.0,
+    d = rules(base, cls, 0.9, 0.0, asr_confidence=-0.3, non_speech_prob=0.0,
                     transcript="i need to go to the washroom", care_request=CARE)
     assert d.final_priority == want, d.reason
     assert ("R5_care_request" in d.rules_fired) == (want < base)
 
 
 def test_care_request_ignored_without_transcript():
-    d = apply_rules(CONFIG["P_NO_SPEECH"], UNCLASSIFIED, 0.0, 0.0, asr_confidence=-10.0,
+    d = rules(CONFIG["P_NO_SPEECH"], UNCLASSIFIED, 0.0, 0.0, asr_confidence=-10.0,
                     non_speech_prob=0.99, transcript="", care_request=CARE)
     assert "R5_care_request" not in d.rules_fired
 
@@ -238,3 +249,20 @@ def test_care_request_tag_no_false_positives_on_corpus():
     ph = pd.read_csv(ROOT / "results" / "phrases.csv")
     hits = [p for p in ph.phrase if care_request_tag(p)]
     assert not hits, hits[:5]
+
+
+
+def test_unset_threshold_never_fires():
+    """Shipped config: DISTRESS_HIGH is None until a score is chosen, so no
+    distress value escalates, and the speech guard treats distress as absent."""
+    assert CONFIG["DISTRESS_HIGH"] is None
+    for dist in (None, 0.0, 5.0, 100.0):
+        d = apply_rules(3, "Pain", 0.9, dist, asr_confidence=-0.9, non_speech_prob=0.0,
+                        transcript="my knee hurts")
+        assert not d.distress_fired and d.final_priority == 3, d.reason
+
+
+def test_cold_start_none_score_never_fires():
+    d = rules(3, "Pain", 0.9, None, asr_confidence=-0.9, non_speech_prob=0.0,
+              transcript="my knee hurts")
+    assert not d.distress_fired and d.final_priority == 3

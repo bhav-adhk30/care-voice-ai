@@ -10,6 +10,7 @@ scikit-learn==1.6.1  # must match the version that pickled models/*.joblib
 jiwer
 faster-whisper
 huggingface_hub
+opensmile            # prosodic distress feature (eGeMAPSv02 HNR), src/prosody.py
 deepfilternet
 streamlit
 matplotlib

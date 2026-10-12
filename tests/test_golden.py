@@ -24,7 +24,7 @@ GOLDEN = ROOT / "tests" / "golden.json"
 
 EXACT = ("request_class", "base_priority", "final_priority", "rules_fired", "escalated",
          "distress_fired", "speech_present", "asr_trusted", "energy_ok", "medication")
-TOLERANCE = {"distress": 0.02, "non_speech_prob": 0.02, "arousal": 0.02,
+TOLERANCE = {"distress": 0.02, "non_speech_prob": 0.02, "arousal": 0.02, "hnr": 0.05,
              "class_confidence": 0.02, "asr_confidence": 0.05}
 # Not asserted, but kept in the file for a human reading the diff.
 VOLATILE = ("latency_ms", "audio_path", "bed")
@@ -75,7 +75,11 @@ def test_golden_thresholds_and_models_unchanged(fixture_results, golden):
 INTENT = {
     "chest": dict(request_class="Emergency", final_priority=1),
     "knee": dict(request_class="Pain", final_priority=3, escalated=False),
-    "groan": dict(final_priority=1, distress_fired=True, asr_trusted=False),
+    # No bed baseline in batch runs, so the groan gets no prosodic score: it is a
+    # wordless no-speech call at P2, never dropped. (It was P1 via the retired
+    # WavLM gate, which only fired because the clip is in that gate's training set.)
+    "groan": dict(request_class="Unclassified", final_priority=2, distress_fired=False,
+                  speech_present=False),
     "silence_5ms": dict(request_class="Unclassified", final_priority=2, speech_present=False,
                         energy_ok=False),
     "ward_noise": dict(request_class="Unclassified", final_priority=2, speech_present=False),

@@ -54,20 +54,20 @@ def test_unreadable_format(pipe, tmp_path, caplog):
 
 def test_missing_model_file_refuses_to_start(tmp_path, monkeypatch):
     """Unlike bad audio, a missing model is a deployment fault: a pipeline without
-    its distress gate must refuse to start - immediately, before loading anything
+    its arousal head (the speech guard) must refuse to start - immediately, before loading anything
     else, naming the file - rather than run a silently weaker triage all shift."""
     from src.pipeline import CareVoicePipeline
     models = tmp_path / "models"
     models.mkdir()
     for p in MODELS.iterdir():
-        if p.name != "distress_gate.joblib":
+        if p.name != "arousal_head.joblib":
             os.symlink(p, models / p.name)
 
     def must_not_load(self):
         raise AssertionError("loaded a model before checking all model files exist")
     monkeypatch.setattr(CareVoicePipeline, "_load_asr", must_not_load)
 
-    with pytest.raises(FileNotFoundError, match="distress_gate.joblib"):
+    with pytest.raises(FileNotFoundError, match="arousal_head.joblib"):
         CareVoicePipeline(model_dir=str(models))
 
 

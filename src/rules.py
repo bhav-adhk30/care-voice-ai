@@ -18,22 +18,31 @@ from typing import Optional
 # ---------------------------------------------------------------------------
 
 CONFIG = {
-    # Distress gate, v2 (notebooks/11_head_refit.ipynb, results/head_refit_v2.json).
-    # WavLM, no padding, mean-pooled over real frames, RMS 0.05 (extraction
-    # contract "no_pad_meanpool_rms0.05"); logistic regression, VIVAE pain/fear
-    # against other VIVAE vocalisations, CREMA-D neutral, ESC-50 ward noise and
-    # silence, VIVAE deduplicated by content hash (480 duplicates removed).
-    # Held-out AUC 0.863 against all negatives, 0.629 within VIVAE alone (pain
-    # versus other intense vocalisations - it cannot tell pain from triumph).
-    # At 0.4028: 63.7% distress recall; false alarms 0.75% on medical speech,
-    # 1.7% on ward noise, 0% on silence (results/operating_curve_distress_v2.csv).
+    # Prosodic distress (src/prosody.py, src/baseline.py): the call's mean HNR
+    # (openSMILE eGeMAPSv02 HNRdBACF_sma3nz_amean, native sample rate) as a
+    # z-score against the same bed's previous calm calls. Replaces the WavLM
+    # distress gate, which never fired on the team's real voices (distressed
+    # speech from two speakers, a real groan); that model is retired.
     #
-    # Replaces 0.0677, which came from a curve whose negatives were a different
-    # corpus (CREMA-D) padded differently: clip duration alone separates VIVAE
-    # from CREMA-D at AUC 0.9965 (results/padding_diagnostic.json), so that
-    # threshold measured corpus identity, not distress, and sat below every
-    # observed score.
-    "DISTRESS_HIGH": 0.4028,
+    # SCORE AND THRESHOLD DELIBERATELY UNSET (no acoustic escalation) pending a
+    # decision. Measured on 51 clips, 3 speakers, phone mic, 48 kHz, baseline =
+    # each speaker's other calm clips, threshold chosen leave-one-speaker-out,
+    # all 12 distress clips positive (no grading, no exclusions):
+    #   one-sided z : AUC 0.733; recall 7/12 (58%), false alarm 2/39 (5.1%);
+    #                 per speaker 0/4, 3/4, 4/4
+    #   two-sided |z|: AUC 0.765; recall 3/12 (25%), false alarm 3/39 (7.7%)
+    # One speaker's distress lowers HNR (breathier) while the other two raise it
+    # (pressed), and that speaker's distress stays inside calm variability in
+    # either direction - a one-sided rule misses that presentation entirely and a
+    # two-sided one loses the others. Subtle distress is not caught at all.
+    "DISTRESS_SCORE": None,          # "z" (one-sided) or "abs_z" (two-sided)
+    "DISTRESS_HIGH": None,
+
+    # Per-bed baseline (src/baseline.py). Fewer than BASELINE_MIN_CALLS calls ->
+    # no prosodic score (cold start, "building baseline (n/5)"). Last
+    # BASELINE_MAX_CALLS non-escalated, non-Emergency calls with speech are kept.
+    "BASELINE_MIN_CALLS": 5,
+    "BASELINE_MAX_CALLS": 50,
 
     # Speech guard: the arousal head's non_speech class (7th class, trained on
     # ESC-50 ward noise and silence against CREMA-D speech; F1 0.988 out of fold
@@ -81,15 +90,14 @@ CONFIG = {
 }
 
 
-# The distress gate is BINARY, not graded. On the v1 features its score
-# correlated with annotated intensity only weakly (Spearman rho = 0.16,
-# n = 1565 including duplicates); not re-measured on v2. It fires or it doesn't.
+# Distress is BINARY, not graded: the score fires at the threshold or it doesn't.
+# (The retired WavLM gate's score tracked annotated intensity only weakly, Spearman
+# rho 0.16; the prosodic score's relation to intensity is unmeasured.)
 DISTRESS_IS_BINARY = True
 
-# The v2 gate still cannot separate anger from distress. Out of fold, anger
-# averages 0.417 against pain 0.465 and fear 0.480, and anger's false-alarm rate
-# is above the overall rate at every threshold, so anger cannot be filtered out
-# acoustically.
+# The retired WavLM gate could not separate anger from distress (out of fold,
+# anger 0.417 vs pain 0.465 and fear 0.480). Whether the prosodic score reacts to
+# anger is unmeasured: one irritated take in the own-voice set is too few.
 #
 # There is NO anger suppression. A text-emotion suppressor was tried and removed:
 # the pretrained emotion model (j-hartmann/emotion-english-distilroberta-base)
@@ -137,6 +145,13 @@ class Decision:
         return asdict(self)
 
 
+def distress_fires(distress: Optional[float], cfg: dict = CONFIG) -> bool:
+    """True only with a score AND a configured threshold. During a bed's cold
+    start, or while DISTRESS_HIGH is unset, nothing escalates acoustically."""
+    return (distress is not None and cfg["DISTRESS_HIGH"] is not None
+            and distress >= cfg["DISTRESS_HIGH"])
+
+
 def speech_guard(energy_ok: bool, non_speech_prob: Optional[float],
                  transcript: str, asr_confidence: Optional[float],
                  distress: Optional[float], energy_reason: str = "",
@@ -159,7 +174,7 @@ def speech_guard(energy_ok: bool, non_speech_prob: Optional[float],
         return True, ""
     if transcript.strip() and asr_confidence is not None and asr_confidence >= cfg["ASR_MIN"]:
         return True, ""
-    if distress is not None and distress >= cfg["DISTRESS_HIGH"]:
+    if distress_fires(distress, cfg):
         return True, ""
     heard = (f"untrusted transcript {transcript.strip()!r}" if transcript.strip()
              else "no transcript")
@@ -171,7 +186,7 @@ def apply_rules(
     base_priority: int,
     request_class: str,
     class_confidence: float,
-    distress: float,
+    distress: Optional[float],
     asr_confidence: Optional[float] = None,
     energy_ok: bool = True,
     non_speech_prob: Optional[float] = None,
@@ -196,7 +211,8 @@ def apply_rules(
     request_class    "Emergency" | "Pain" | "Assistance" | "General", or
                      UNCLASSIFIED exactly when the transcript is empty
     class_confidence softmax probability of the predicted class, 0..1
-    distress         distress-gate probability, 0..1
+    distress         prosodic distress score (rules CONFIG DISTRESS_SCORE), or
+                     None during a bed's cold start / when unset; None never fires
     asr_confidence   mean token log-probability from Whisper, or None when ASR did
                      not run; None is UNTRUSTED here and in speech_guard alike
     energy_ok        preprocess.energy_present pre-filter result
@@ -279,7 +295,7 @@ def apply_rules(
     if not asr_trusted:
         reasons.append("ASR confidence below threshold; transcript not trusted")
 
-    distress_fired = distress >= cfg["DISTRESS_HIGH"]
+    distress_fired = distress_fires(distress, cfg)
 
     # --- Rule 1: untrusted transcript plus distress -> immediate -------------
     # The text branch cannot be relied on and the acoustic path is the only
@@ -294,8 +310,8 @@ def apply_rules(
     # No anger suppression: see ANGER_NOT_SEPARABLE_ACOUSTICALLY above.
     elif distress_fired:
         priority = min(priority, cfg["P_IMMEDIATE"])
-        reasons.append(f"distress gate fired ({distress:.3f} >= "
-                       f"{cfg['DISTRESS_HIGH']})")
+        reasons.append(f"prosodic distress ({distress:+.2f} >= "
+                       f"{cfg['DISTRESS_HIGH']}, against this bed's baseline)")
         fired.append("R2_distress")
 
     # (Rule 3, arousal raises one level, was removed in v2: 14.5% fear recall at
