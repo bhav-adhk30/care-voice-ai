@@ -130,6 +130,12 @@ same bed's previous calls (`src/prosody.py`, `src/baseline.py`).
   presentation entirely; a two-sided one loses the others to calm variability. Subtle
   distress is not caught at all. An earlier figure of AUC 0.974 / 88% recall excluded the
   speaker it fails on — do not quote it.
+- **Also tried and failed (2026-10-14), same protocol, pass mark set beforehand (every
+  speaker ≥ 2/4, false alarms ≤ 2/39):** 11 eGeMAPS measures combined (5/12, Sumayah 0/4,
+  FA 7.7%); the pretrained audEERING MSP-Podcast arousal model, job 14 (1/12, AUC 0.54,
+  `results/pretrained_arousal.json`). Exploratory only: that model's *valence drop*
+  separated distress at AUC 0.86 (5/12, FA 2/39) — a hypothesis to test on NEW
+  recordings, not a result.
 - **Decision (2026-10-14): stays off, reported as a measured negative.** The two-sided |z|
   check was the condition for switching it on, and it does not catch Bhavishya (0/4).
   `rules.CONFIG["DISTRESS_SCORE"]` and `["DISTRESS_HIGH"]` remain `None`.
