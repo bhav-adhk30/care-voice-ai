@@ -1,0 +1,107 @@
+{
+  "model": "audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim",
+  "verdict": "FAIL",
+  "pass_mark": {
+    "pass_min_per_speaker": 2,
+    "pass_max_false_alarms": 2
+  },
+  "primary_one_sided_arousal_z": {
+    "auc": 0.543,
+    "recall": "1/12",
+    "false_alarms": "4/39",
+    "tp": 1,
+    "fp": 4,
+    "per_speaker": {
+      "bhavishya": {
+        "threshold": 1.29,
+        "distress_caught": "1/4",
+        "calm_fa": "1/13"
+      },
+      "sumayah": {
+        "threshold": 1.946,
+        "distress_caught": "0/4",
+        "calm_fa": "0/13"
+      },
+      "vinuthna": {
+        "threshold": 1.05,
+        "distress_caught": "0/4",
+        "calm_fa": "3/13"
+      }
+    }
+  },
+  "exploratory": {
+    "two_sided_arousal_|z|": {
+      "auc": 0.487,
+      "recall": "0/12",
+      "false_alarms": "2/39",
+      "tp": 0,
+      "fp": 2,
+      "per_speaker": {
+        "bhavishya": {
+          "threshold": 2.191,
+          "distress_caught": "0/4",
+          "calm_fa": "2/13"
+        },
+        "sumayah": {
+          "threshold": 2.542,
+          "distress_caught": "0/4",
+          "calm_fa": "0/13"
+        },
+        "vinuthna": {
+          "threshold": 2.491,
+          "distress_caught": "0/4",
+          "calm_fa": "0/13"
+        }
+      }
+    },
+    "arousal_z_minus_valence_z": {
+      "auc": 0.861,
+      "recall": "5/12",
+      "false_alarms": "2/39",
+      "tp": 5,
+      "fp": 2,
+      "per_speaker": {
+        "bhavishya": {
+          "threshold": 2.473,
+          "distress_caught": "1/4",
+          "calm_fa": "0/13"
+        },
+        "sumayah": {
+          "threshold": 2.417,
+          "distress_caught": "1/4",
+          "calm_fa": "0/13"
+        },
+        "vinuthna": {
+          "threshold": 1.88,
+          "distress_caught": "3/4",
+          "calm_fa": "2/13"
+        }
+      }
+    },
+    "raw_arousal_no_baseline": {
+      "auc": 0.541,
+      "recall": "1/12",
+      "false_alarms": "4/39",
+      "tp": 1,
+      "fp": 4,
+      "per_speaker": {
+        "bhavishya": {
+          "threshold": 0.523,
+          "distress_caught": "0/4",
+          "calm_fa": "0/13"
+        },
+        "sumayah": {
+          "threshold": 0.524,
+          "distress_caught": "1/4",
+          "calm_fa": "0/13"
+        },
+        "vinuthna": {
+          "threshold": 0.492,
+          "distress_caught": "0/4",
+          "calm_fa": "4/13"
+        }
+      }
+    }
+  },
+  "smoke": false
+}
