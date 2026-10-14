@@ -1,0 +1,16 @@
+{
+  "id": "bhavishyaadhikari/care-voice-end-to-end-v2",
+  "title": "care-voice-end-to-end-v2",
+  "code_file": "script.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "paultimothymooney/medical-speech-transcription-and-intent",
+    "bhavishyaadhikari/care-voice-code",
+    "bhavishyaadhikari/care-voice-clinicalbert",
+    "bhavishyaadhikari/care-voice-heads-v2"
+  ]
+}
