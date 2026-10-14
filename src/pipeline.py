@@ -47,7 +47,8 @@ import joblib
 import numpy as np
 import torch
 
-from src.mapping import care_request_tag, class_base_priority, distress_words, medication_tag
+from src.mapping import (care_request_tag, class_base_priority, comfort_request_tag,
+                         distress_words, medication_tag)
 from src.preprocess import SPEECH_GUARD
 from src.preprocess import CONFIG as PREPROCESS_CONFIG
 from src import prosody
@@ -488,6 +489,7 @@ class CareVoicePipeline:
         medication = medication_tag(transcript)
         care_request = care_request_tag(transcript)
         words_distress = distress_words(transcript)
+        comfort = comfort_request_tag(transcript)
         lat["sentiment"] = _ms(t0)
 
         # --- the rule ---
@@ -506,7 +508,13 @@ class CareVoicePipeline:
             audio_error=audio_error,
             care_request=care_request,
             distress_words=words_distress,
+            comfort_request=comfort,
         )
+        # The dashboard shows the routed class; the classifier's own output stays
+        # in class_probs / classifier_class for the audit.
+        classifier_class = request_class
+        if "R7_comfort_request" in decision.rules_fired:
+            request_class = "Assistance"
         lat["rules"] = _ms(t0)
 
         # A call joins its bed's baseline only if it is an ordinary call: speech,
@@ -538,6 +546,8 @@ class CareVoicePipeline:
             "medication": medication,
             "care_request": care_request,
             "distress_words": words_distress,
+            "comfort_request": comfort,
+            "classifier_class": classifier_class,
             "sentiment": sentiment,
             "sentiment_label": sentiment_label,
             "sentiment_enabled": self.emo_model is not None,

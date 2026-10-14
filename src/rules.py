@@ -95,6 +95,14 @@ CONFIG = {
     # On the team's recordings: 7/12 distressed takes, 0/39 calm (cue list chosen
     # after seeing those transcripts, so optimistic). results/text_distress_cues.json
     "P_TEXT_DISTRESS": 2,
+
+    # A non-clinical comfort request (mapping.comfort_request_tag: window, light,
+    # TV, glasses, pillow... asked for, with no symptom word) is routed to the
+    # Assistance level. The ONLY rule that may lower a priority: the classifier
+    # has never seen such requests and put "Can you close the window?" in
+    # Emergency at 0.75. Only with a trusted transcript; distress rules can still
+    # raise it afterwards.
+    "P_COMFORT_REQUEST": 2,
 }
 
 
@@ -206,6 +214,7 @@ def apply_rules(
     audio_error: Optional[str] = None,
     care_request: Optional[list] = None,
     distress_words: Optional[list] = None,
+    comfort_request: Optional[list] = None,
 ) -> Decision:
     """
     Combine the two branches into a final priority.
@@ -229,6 +238,8 @@ def apply_rules(
                      pre-filter stopped the clip before WavLM ran
     energy_reason    why the pre-filter failed, shown on the dashboard
     transcript       the ASR output; required, to enforce the invariant below
+    comfort_request  mapping.comfort_request_tag(transcript): comfort objects in a
+                     non-clinical request; non-empty SETS P_COMFORT_REQUEST
     distress_words   mapping.distress_words(transcript): distress cues in the
                      words; non-empty floors the call at P_TEXT_DISTRESS
     care_request     mapping.care_request_tag(transcript): toileting / mobility
@@ -307,6 +318,17 @@ def apply_rules(
         reasons.append("ASR confidence below threshold; transcript not trusted")
 
     distress_fired = distress_fires(distress, cfg)
+
+    # --- Rule 7: comfort request (runs first; the only rule that can lower) ---
+    # Out-of-distribution input for the classifier, which only knows symptoms.
+    # Applied before every escalation rule, so distress can still raise it.
+    if comfort_request and asr_trusted and transcript.strip():
+        if priority != cfg["P_COMFORT_REQUEST"]:
+            reasons.append(f"comfort request ({', '.join(comfort_request)}), no symptom words: "
+                           f"routed to P{cfg['P_COMFORT_REQUEST']} (classifier said {request_class} "
+                           f"P{base_priority})")
+        fired.append("R7_comfort_request")
+        priority = cfg["P_COMFORT_REQUEST"]
 
     # --- Rule 1: untrusted transcript plus distress -> immediate -------------
     # The text branch cannot be relied on and the acoustic path is the only

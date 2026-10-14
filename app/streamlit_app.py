@@ -82,6 +82,7 @@ RULE_WORDS = {
     "R2_distress": "Voice sounds distressed compared with this bed's usual voice: raised to immediate",
     "R4_emergency_floor": "Emergency request: kept urgent however calm it sounds",
     "R5_care_request": "Asked for help to the toilet or to move: raised to urgent",
+    "R7_comfort_request": "Asked for a comfort item (window, light, TV...): routed to Assistance",
     "R6_distress_words": "Sounds urgent in their words (e.g. \"please come\", \"oh no!\"): raised to urgent",
 }
 
@@ -338,6 +339,9 @@ def render_breakdown(r: dict):
         else:
             st.markdown(f"**Request type:** {class_badge(UNCLASSIFIED)} (no transcript, ClinicalBERT "
                         "not run)", unsafe_allow_html=True)
+        if r.get("comfort_request"):
+            st.markdown(f"**Comfort request:** {', '.join(r['comfort_request'])} — routed to Assistance "
+                        f"(ClinicalBERT said {r.get('classifier_class')}; it was trained only on symptoms)")
         st.markdown(f"**Distress in words:** {', '.join(r.get('distress_words') or []) or 'none'} "
                     "<span style='font-size:0.8em'>(keyword rule; floors at P2)</span>",
                     unsafe_allow_html=True)

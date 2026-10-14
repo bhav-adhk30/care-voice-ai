@@ -18,6 +18,8 @@
     "medication": [],
     "care_request": [],
     "distress_words": [],
+    "comfort_request": [],
+    "classifier_class": "Unclassified",
     "sentiment": {},
     "sentiment_label": null,
     "sentiment_enabled": false,
@@ -51,6 +53,7 @@
       "P_NO_SPEECH": 2,
       "P_CARE_REQUEST": 2,
       "P_TEXT_DISTRESS": 2,
+      "P_COMFORT_REQUEST": 2,
       "MIN_RAW_RMS": 0.0001,
       "denoise_enabled": false,
       "acoustic_contract": "no_pad_meanpool_rms0.05"
@@ -62,7 +65,7 @@
     },
     "acoustic_contract": "no_pad_meanpool_rms0.05",
     "latency_ms": {
-      "load": 9.8,
+      "load": 3.9,
       "load_acoustic": 0.0,
       "wavlm_and_heads": 0.0,
       "prosody": 0.0,
@@ -70,9 +73,9 @@
       "trim": 0.0,
       "asr": 0.0,
       "text_classifier": 0.0,
-      "sentiment": 0.1,
-      "rules": 0.1,
-      "total": 10.0
+      "sentiment": 0.0,
+      "rules": 0.0,
+      "total": 3.9
     }
   }
 }
