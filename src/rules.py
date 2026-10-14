@@ -103,6 +103,12 @@ CONFIG = {
     # Emergency at 0.75. Only with a trusted transcript; distress rules can still
     # raise it afterwards.
     "P_COMFORT_REQUEST": 2,
+
+    # A medication request with no symptom words ("Can I have my painkillers?",
+    # mapping.medication_tag + symptom veto) is routed to the Medication category
+    # at this level. Like Rule 7 it can lower a misclassification; with symptom
+    # words it does not fire and the classifier decides.
+    "P_MEDICATION": 3,
 }
 
 
@@ -215,6 +221,7 @@ def apply_rules(
     care_request: Optional[list] = None,
     distress_words: Optional[list] = None,
     comfort_request: Optional[list] = None,
+    medication_request: Optional[list] = None,
 ) -> Decision:
     """
     Combine the two branches into a final priority.
@@ -238,6 +245,8 @@ def apply_rules(
                      pre-filter stopped the clip before WavLM ran
     energy_reason    why the pre-filter failed, shown on the dashboard
     transcript       the ASR output; required, to enforce the invariant below
+    medication_request  medication keywords in a request with no symptom words
+                     (pipeline applies the veto); non-empty SETS P_MEDICATION
     comfort_request  mapping.comfort_request_tag(transcript): comfort objects in a
                      non-clinical request; non-empty SETS P_COMFORT_REQUEST
     distress_words   mapping.distress_words(transcript): distress cues in the
@@ -329,6 +338,15 @@ def apply_rules(
                            f"P{base_priority})")
         fired.append("R7_comfort_request")
         priority = cfg["P_COMFORT_REQUEST"]
+
+    # --- Rule 8: medication request (after 7; distress rules can still raise) -
+    if medication_request and asr_trusted and transcript.strip():
+        if priority != cfg["P_MEDICATION"]:
+            reasons.append(f"medication request ({', '.join(medication_request)}), no symptom "
+                           f"words: routed to P{cfg['P_MEDICATION']} (classifier said "
+                           f"{request_class} P{base_priority})")
+        fired.append("R8_medication")
+        priority = cfg["P_MEDICATION"]
 
     # --- Rule 1: untrusted transcript plus distress -> immediate -------------
     # The text branch cannot be relied on and the acoustic path is the only

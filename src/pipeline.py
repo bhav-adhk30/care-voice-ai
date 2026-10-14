@@ -47,8 +47,8 @@ import joblib
 import numpy as np
 import torch
 
-from src.mapping import (care_request_tag, class_base_priority, comfort_request_tag,
-                         distress_words, medication_tag)
+from src.mapping import (MEDICATION_CLASS, care_request_tag, class_base_priority,
+                         comfort_request_tag, distress_words, medication_tag, symptom_words)
 from src.preprocess import SPEECH_GUARD
 from src.preprocess import CONFIG as PREPROCESS_CONFIG
 from src import prosody
@@ -490,6 +490,7 @@ class CareVoicePipeline:
         care_request = care_request_tag(transcript)
         words_distress = distress_words(transcript)
         comfort = comfort_request_tag(transcript)
+        medication_route = medication if (medication and not symptom_words(transcript)) else []
         lat["sentiment"] = _ms(t0)
 
         # --- the rule ---
@@ -509,11 +510,14 @@ class CareVoicePipeline:
             care_request=care_request,
             distress_words=words_distress,
             comfort_request=comfort,
+            medication_request=medication_route,
         )
         # The dashboard shows the routed class; the classifier's own output stays
         # in class_probs / classifier_class for the audit.
         classifier_class = request_class
-        if "R7_comfort_request" in decision.rules_fired:
+        if "R8_medication" in decision.rules_fired:
+            request_class = MEDICATION_CLASS
+        elif "R7_comfort_request" in decision.rules_fired:
             request_class = "Assistance"
         lat["rules"] = _ms(t0)
 
