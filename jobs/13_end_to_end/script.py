@@ -72,7 +72,7 @@ LOCAL_REPO = Path(__file__).resolve().parents[2]
 
 if ON_KAGGLE:
     subprocess.run([sys.executable, "-m", "pip", "install", "-q", "faster-whisper",
-                    "pyloudnorm", "jiwer", "scikit-learn==1.6.1"], check=True)
+                    "pyloudnorm", "jiwer", "opensmile", "scikit-learn==1.6.1"], check=True)
 
 
 def find_one(pattern, what):
