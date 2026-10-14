@@ -528,10 +528,17 @@ document.getElementById('ask').onclick = async () => {
     s.getTracks().forEach(t => t.stop());
     say('✅', 'Microphone allowed — use the recorder below.');
   } catch (e) {
-    if (e.name === 'NotAllowedError') say('⛔', 'The browser or macOS refused the microphone.',
-      '1) Arc: icon left of the address bar → Microphone → <b>Allow</b>, then reload.<br>' +
-      '2) Mac: System Settings → Privacy &amp; Security → Microphone → turn on <b>Arc</b>, then quit (⌘Q) and reopen Arc.<br>' +
-      '3) Inside the Claude app panel the microphone never works — use Arc.');
+    // Chromium (Arc, Chrome) says "Permission denied by system" when macOS blocks
+    // the browser itself, and plain "Permission denied" when the site is blocked.
+    if (e.name === 'NotAllowedError' && /system/i.test(e.message)) say('⛔', 'macOS is blocking Arc from the microphone.',
+      'System Settings → Privacy &amp; Security → <b>Microphone</b> → switch <b>Arc</b> on (if Arc is not in the list, ' +
+      'it has never asked: quit Arc with ⌘Q, reopen it, click this button again and accept the macOS pop-up). ' +
+      'After switching it on, quit Arc fully with ⌘Q and reopen it — macOS only applies it on restart.' +
+      '<br><span style="color:#94a3b8">(' + e.message + ')</span>');
+    else if (e.name === 'NotAllowedError') say('⛔', 'Arc has blocked the microphone for this site.',
+      'Click the <b>ⓘ</b> icon at the left of the address bar → <b>Microphone → Allow</b> (or Reset permission), then reload. ' +
+      'If there is no Microphone entry there: Arc Settings → Privacy → Site settings → Microphone → remove localhost from "Not allowed".' +
+      '<br><span style="color:#94a3b8">(' + e.message + ')</span>');
     else if (e.name === 'NotFoundError') say('⛔', 'No microphone found.', 'Plug in or enable a microphone, then try again.');
     else say('⛔', e.name + ': ' + e.message);
   }
