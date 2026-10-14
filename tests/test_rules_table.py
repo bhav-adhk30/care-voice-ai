@@ -313,3 +313,52 @@ def test_distress_words_false_alarm_rate_on_calm_medical_speech():
     from tests.conftest import ROOT
     med = pd.read_csv(ROOT / "results" / "transcripts.csv").whisper.fillna("").astype(str)
     assert sum(bool(distress_words(t)) for t in med) <= 26
+
+
+# ----------------------------------------------------------------- Rule 7: comfort requests
+
+from src.mapping import comfort_request_tag  # noqa: E402
+
+
+@pytest.mark.parametrize("cls,base", [("Emergency", 1), ("Pain", 3), ("General", 3), ("Assistance", 2)])
+def test_comfort_request_sets_p2(cls, base):
+    d = rules(base, cls, 0.75, None, asr_confidence=-0.3, non_speech_prob=0.0,
+              transcript="can you close the window", comfort_request=["window"])
+    assert d.final_priority == CONFIG["P_COMFORT_REQUEST"] == 2
+    assert "R7_comfort_request" in d.rules_fired
+
+
+def test_comfort_request_needs_trusted_transcript():
+    d = rules(1, "Emergency", 0.75, None, asr_confidence=-2.0, non_speech_prob=0.0,
+              transcript="can you close the window", comfort_request=["window"])
+    assert d.final_priority == 1 and "R7_comfort_request" not in d.rules_fired
+
+
+def test_distress_still_raises_a_comfort_request():
+    d = rules(1, "Emergency", 0.75, 2.0, asr_confidence=-0.3, non_speech_prob=0.0,
+              transcript="can you close the window", comfort_request=["window"])
+    assert d.final_priority == 1
+
+
+@pytest.mark.parametrize("text", [
+    "Can you close the window?", "Could you turn the light down?", "Can I have another pillow?",
+    "Could someone pass me my glasses?", "Can you turn on the TV", "Close the curtain please"])
+def test_comfort_tag_catches(text):
+    assert comfort_request_tag(text)
+
+
+@pytest.mark.parametrize("text", [
+    "I fell through a window and glass is stuck in my leg", "I feel dizzy and light-headed",
+    "My chest hurts, please close the window", "Can you open the window, I can't breathe",
+    "I have pain in my back when I sit on a chair", "There are lots of hairs on my pillow",
+    "Could I have some water?"])
+def test_comfort_tag_leaves_symptoms_to_classifier(text):
+    assert comfort_request_tag(text) == []
+
+
+def test_comfort_tag_no_corpus_matches():
+    """Every corpus phrase is a symptom; a match would demote one. Measured 0."""
+    import pandas as pd
+    from tests.conftest import ROOT
+    ph = pd.read_csv(ROOT / "results" / "phrases.csv")
+    assert not [p for p in ph.phrase if comfort_request_tag(p)]

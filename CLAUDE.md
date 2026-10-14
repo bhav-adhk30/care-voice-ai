@@ -130,8 +130,11 @@ same bed's previous calls (`src/prosody.py`, `src/baseline.py`).
   presentation entirely; a two-sided one loses the others to calm variability. Subtle
   distress is not caught at all. An earlier figure of AUC 0.974 / 88% recall excluded the
   speaker it fails on — do not quote it.
-- **Status:** `rules.CONFIG["DISTRESS_SCORE"]` and `["DISTRESS_HIGH"]` are `None`: no
-  acoustic escalation until a score and threshold are chosen deliberately.
+- **Decision (2026-10-14): stays off, reported as a measured negative.** The two-sided |z|
+  check was the condition for switching it on, and it does not catch Bhavishya (0/4).
+  `rules.CONFIG["DISTRESS_SCORE"]` and `["DISTRESS_HIGH"]` remain `None`.
+- A panicked plea ("please come fast") is P2 via Rule 6, deliberately not P1: it is
+  evidence of urgency in the speaker's mind, not of medical urgency.
 
 ### 2.9 Distress in words (Rule 6) complements the voice
 
@@ -152,6 +155,26 @@ Words and voice catch nearly the same takes: the speakers who improvised ("pleas
 ordinary sentence with an ordinary voice (Bhavishya 0/4 on both). The own-voice recall is
 optimistic — the cue list was chosen after reading those transcripts; the 0.39% is out of
 sample.
+
+### 2.10 Comfort requests are routed, not classified (Rule 7)
+
+The corpus's 25 intents are all symptoms, so the classifier is operating outside its
+training distribution on exactly the calls a ward receives most. Measured on the team's
+recordings: "Can you close the window?" → **Emergency 0.75** for all three speakers,
+"Could you turn the light down?" → Emergency 0.43; 5 of 30 calm requests reached P1.
+
+A confidence floor was rejected: it cannot catch 0.75, and on the 1,303 true-Emergency
+Whisper transcripts a 0.8 floor demotes 81 correctly caught emergencies (6.9%), 0.5 demotes
+18 — in-sample, so the real cost is higher. Emergency recall is the headline metric.
+
+Instead `mapping.comfort_request_tag` routes a request for a comfort object (window, light,
+curtain, TV, phone, glasses, blanket, pillow, chair, remote, fan…) phrased as a request and
+containing **no symptom word** to Assistance P2 (Rule 7). The symptom veto matters: 13 corpus
+phrases contain those words, two of them Emergencies ("I fell through a window… shard of
+glass", "dizzy and light-headed"). Measured: 0/706 corpus matches; after the fix 0/30 calm
+requests reach P1 and all 11 chest/dizzy takes still do. Rule 7 is the only rule that can
+lower a priority; it needs a trusted transcript and runs before the distress rules, which
+can still raise the call. The classifier's own class is kept as `classifier_class`.
 
 ### 2.7 The demo imports the evaluated code
 
@@ -514,6 +537,10 @@ The moments, as they stand after real-voice testing:
 3. **A calm "I have chest pain"** → Emergency P1 from the words alone.
 4. **"I need to go to the washroom"** → General from the classifier, raised to P2 by the
    care-request rule (R5): the dataset has no care-request intents.
+5. **"Can you close the window?"** → the classifier says Emergency (it only knows symptoms);
+   Rule 7 routes it to Assistance P2. Show the classifier's bar chart next to the routed class.
+6. **Give each speaker their own bed**: the prosodic baseline assumes one patient per bed,
+   as in a real ward.
 
 ### Demo reliability
 

@@ -224,3 +224,54 @@ def distress_words(transcript: str) -> list[str]:
     exclamation, repetition), in that order; [] if none."""
     t = transcript or ""
     return [name for name, rx in _DISTRESS_CUES.items() if rx.search(t)]
+
+
+# ---------------------------------------------------------------------------
+# Comfort / environment requests: a keyword ROUTE, and the one rule that may
+# lower a priority.
+#
+# The corpus's 25 intents are all symptoms, so ClinicalBERT has never seen a
+# non-medical request and must force it into a symptom class. Measured on the
+# team's recordings: "Can you close the window?" -> Emergency 0.75 for all three
+# speakers, "Could you turn the light down?" -> Emergency 0.43. A confidence
+# floor cannot fix that (0.75 is above any sensible floor) and would cost real
+# emergencies: on the 1,303 true-Emergency Whisper transcripts a 0.8 floor
+# demotes 81 correctly caught ones (6.9%), 0.5 demotes 18 - in-sample, so the
+# true cost is higher. So these requests are routed explicitly instead.
+#
+# Two conditions, both required:
+#   1. a request for a comfort object: a request form ("can you", "could
+#      someone", "please", "pass/bring/close/turn ...") AND an object (window,
+#      light, curtain, TV, phone, glasses, blanket, pillow, chair, remote, fan...)
+#   2. NO symptom vocabulary. 13 of the 706 corpus phrases contain a comfort
+#      word, two of them Emergencies ("I fell through a window ... shard of
+#      glass", "dizzy and light-headed"); a bare keyword match would demote them.
+# Measured: 0 of 706 corpus phrases match (every match would demote a symptom).
+# rules.py Rule 7 sets such a call to P_COMFORT_REQUEST (P2, Assistance level).
+# ---------------------------------------------------------------------------
+
+_COMFORT_OBJECT_RE = re.compile(
+    r"\b(windows?|lights?|lamp|curtains?|blinds?|tv|television|phone|mobile|glasses|"
+    r"spectacles|blankets?|pillows?|chair|remote|fan|heater|air ?con(ditioning)?|ac|"
+    r"charger|book|newspaper|tray|door|radio|thermostat)\b", re.IGNORECASE)
+_COMFORT_REQUEST_RE = re.compile(
+    r"\b(can|could|would|will)\s+(you|someone|somebody|i\s+(have|get))\b"
+    r"|\bplease\b|\bi(\s+would|'d)\s+like\b|\bi\s+(need|want)\b"
+    r"|^\s*(close|open|shut|turn|switch|dim|pass|bring|hand|fetch|get|adjust|move)\b",
+    re.IGNORECASE)
+_SYMPTOM_RE = re.compile(
+    r"\b(pain|painful|hurts?|hurting|ache|aching|sore|dizzy|light[- ]?headed|faint|"
+    r"breath|breathe|breathing|chest|heart|bleed|bleeding|blood|wound|glass|cut|fell|"
+    r"fall(en)?|vomit|sick|nause\w*|fever|burn\w*|swollen|numb|weak|cold|chill\w*|"
+    r"freezing|shiver\w*|blurry|vision|itch\w*|rash|cough\w*|can'?t|cannot|help me)\b",
+    re.IGNORECASE)
+
+
+def comfort_request_tag(transcript: str) -> list[str]:
+    """Comfort objects asked for in a non-clinical request, e.g. ["window"];
+    [] if the sentence is not a request, names no comfort object, or contains
+    any symptom word (then the classifier decides, unchanged)."""
+    t = transcript or ""
+    if _SYMPTOM_RE.search(t) or not _COMFORT_REQUEST_RE.search(t):
+        return []
+    return list(dict.fromkeys(m.group(1).lower() for m in _COMFORT_OBJECT_RE.finditer(t)))
