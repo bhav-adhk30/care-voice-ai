@@ -497,6 +497,59 @@ def result_card(r: dict):
             st.bar_chart(lat[lat > 0], horizontal=True, height=220)
 
 
+MIC_HELPER_HTML = """
+<div style="font-family:sans-serif;font-size:14px;color:#0f172a">
+  <button id="ask" style="background:#1d4ed8;color:#fff;border:0;border-radius:8px;padding:8px 14px;
+    font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap">🎙️ Allow microphone</button>
+  <div id="state" style="margin-top:8px;font-weight:600"></div>
+  <div id="help" style="margin-top:8px;color:#475569;font-size:13px;line-height:1.45"></div>
+</div>
+<script>
+const st = document.getElementById('state'), help = document.getElementById('help');
+const say = (icon, msg, tip) => { st.textContent = icon + ' ' + msg; help.innerHTML = tip || ''; };
+const host = window.top === window ? location.hostname : (document.referrer ? new URL(document.referrer).hostname : location.hostname);
+async function current() {
+  if (!window.isSecureContext || !navigator.mediaDevices) {
+    say('⛔', 'This address cannot use a microphone.',
+        'Open the app at <b>http://localhost:8501</b> (not a 192.168… address).'); return; }
+  try {
+    const p = await navigator.permissions.query({name: 'microphone'});
+    const show = () => p.state === 'granted' ? say('✅', 'Microphone allowed — use the recorder below.')
+      : p.state === 'denied' ? say('⛔', 'Microphone blocked for this site.',
+          'In Arc: click the icon left of the address bar → Microphone → <b>Allow</b>, then reload. ' +
+          'If it is already allowed there: System Settings → Privacy &amp; Security → Microphone → turn on Arc, then quit and reopen Arc.')
+      : say('ℹ️', 'Click the button: your browser will ask for permission.');
+    show(); p.onchange = show;
+  } catch (e) { say('ℹ️', 'Click the button: your browser will ask for permission.'); }
+}
+document.getElementById('ask').onclick = async () => {
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({audio: true});
+    s.getTracks().forEach(t => t.stop());
+    say('✅', 'Microphone allowed — use the recorder below.');
+  } catch (e) {
+    if (e.name === 'NotAllowedError') say('⛔', 'The browser or macOS refused the microphone.',
+      '1) Arc: icon left of the address bar → Microphone → <b>Allow</b>, then reload.<br>' +
+      '2) Mac: System Settings → Privacy &amp; Security → Microphone → turn on <b>Arc</b>, then quit (⌘Q) and reopen Arc.<br>' +
+      '3) Inside the Claude app panel the microphone never works — use Arc.');
+    else if (e.name === 'NotFoundError') say('⛔', 'No microphone found.', 'Plug in or enable a microphone, then try again.');
+    else say('⛔', e.name + ': ' + e.message);
+  }
+};
+current();
+</script>
+"""
+
+
+def mic_permission_helper():
+    """Asks the browser for the microphone on click, which makes it show its
+    permission prompt, and says in plain words why recording would fail (blocked
+    site, macOS permission off, no mic, non-localhost address). Runs in a component
+    iframe; Streamlit's iframes are allowed to use the microphone."""
+    import streamlit.components.v1 as components
+    components.html(MIC_HELPER_HTML, height=200, scrolling=True)
+
+
 def demo_label(fname: str) -> str:
     stem = Path(fname).stem
     num, _, rest = stem.partition("_")
@@ -521,6 +574,7 @@ def tab_submit(cached_mode: bool):
         name = data = None
         default_bed = "14"
         if source == "Record":
+            mic_permission_helper()
             rec = st.audio_input("Press to record the patient's request",
                                  sample_rate=CONFIG["mic_sample_rate"])
             if rec:
