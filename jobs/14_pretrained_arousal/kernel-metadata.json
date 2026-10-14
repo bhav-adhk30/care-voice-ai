@@ -1,0 +1,14 @@
+{
+  "id": "bhavishyaadhikari/care-voice-pretrained-arousal",
+  "title": "care-voice-pretrained-arousal",
+  "code_file": "script.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "bhavishyaadhikari/care-voice-own-voices",
+    "bhavishyaadhikari/care-voice-code"
+  ]
+}
