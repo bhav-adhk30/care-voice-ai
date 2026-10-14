@@ -57,7 +57,7 @@ from src.preprocess import DENOISE_DISABLED_REASON, AudioLoadError, load_audio_n
 from src.preprocess import (ACOUSTIC_CONTRACT, denoise, energy_present, load_audio,
                             load_audio_acoustic, trim)
 from src.rules import CONFIG as RULES_CONFIG
-from src.rules import UNCLASSIFIED, apply_rules, speech_guard
+from src.rules import EMERGENCY_BUTTON, UNCLASSIFIED, apply_rules, emergency_button, speech_guard
 
 log = logging.getLogger(__name__)
 
@@ -160,6 +160,39 @@ def embed_clip(feature_extractor, wavlm, wav: np.ndarray, device: str = "cpu") -
                             return_tensors="pt")
     h = wavlm(inp.input_values.to(device)).last_hidden_state
     return h.mean(dim=1).float().cpu().numpy()
+
+
+def thresholds_snapshot() -> dict:
+    """Every threshold in force, stored with each decision so an old audit row can be
+    reconstructed after the config moves."""
+    return {**{k: v for k, v in RULES_CONFIG.items() if k != "STARVATION_SECONDS"},
+            "MIN_RAW_RMS": SPEECH_GUARD["MIN_RAW_RMS"],
+            "denoise_enabled": PREPROCESS_CONFIG["enable_denoise"],
+            "acoustic_contract": ACOUSTIC_CONTRACT}
+
+
+def emergency_button_result(bed=None) -> dict:
+    """A call from the bedside emergency button, in the same shape as
+    CareVoicePipeline.process() output so the queue, dashboard and audit log treat it
+    like any other call. No audio and no model: rules.emergency_button() decides."""
+    d = emergency_button()
+    return {
+        "audio_path": "emergency_button", "bed": bed, "duration_s": 0.0, "audio_error": None,
+        "transcript": "", "asr_heard": "", "asr_confidence": None, "asr_trusted": False,
+        "energy_ok": False, "non_speech_prob": None, "speech_present": False,
+        "speech_reason": "emergency button pressed (no audio)",
+        "request_class": EMERGENCY_BUTTON, "classifier_class": None, "class_probs": {},
+        "class_confidence": 0.0, "medication": [], "care_request": [], "distress_words": [],
+        "comfort_request": [], "sentiment": None, "sentiment_label": None,
+        "sentiment_enabled": False, "text_anger": None, "base_priority": d.base_priority,
+        "arousal": None, "hnr": None, "prosody_sr": None, "baseline_n": 0,
+        "baseline_min": RULES_CONFIG["BASELINE_MIN_CALLS"], "baseline_ready": False,
+        "baseline_joined": False, "distress_z": None, "distress": None, "distress_fired": False,
+        "final_priority": d.final_priority, "escalated": d.escalated,
+        "rules_fired": d.rules_fired, "reason": d.reason, "thresholds": thresholds_snapshot(),
+        "model_versions": {}, "acoustic_contract": ACOUSTIC_CONTRACT,
+        "latency_ms": {"total": 0.0},
+    }
 
 
 class CareVoicePipeline:
@@ -573,10 +606,7 @@ class CareVoicePipeline:
             "rules_fired": decision.rules_fired,
             "reason": decision.reason,
             # Everything needed to reconstruct this decision after the config moves.
-            "thresholds": {**{k: v for k, v in RULES_CONFIG.items() if k != "STARVATION_SECONDS"},
-                           "MIN_RAW_RMS": SPEECH_GUARD["MIN_RAW_RMS"],
-                           "denoise_enabled": PREPROCESS_CONFIG["enable_denoise"],
-                           "acoustic_contract": ACOUSTIC_CONTRACT},
+            "thresholds": thresholds_snapshot(),
             "model_versions": self.model_versions,
             "acoustic_contract": ACOUSTIC_CONTRACT,
             "latency_ms": lat,

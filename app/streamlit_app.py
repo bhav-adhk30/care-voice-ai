@@ -42,7 +42,7 @@ import streamlit as st
 from src.audit import AuditLog
 from src.mapping import CLASS_BASE_PRIORITY, MEDICATION_CLASS
 from src.rules import CONFIG as RULES
-from src.rules import UNCLASSIFIED, starvation_priority
+from src.rules import EMERGENCY_BUTTON, UNCLASSIFIED, starvation_priority
 
 CONFIG = {
     "model_dir": ROOT / "models",
@@ -63,7 +63,8 @@ CONFIG = {
                     "webm", "aiff", "aif", "caf", "3gp", "amr"],
     "beds": [str(b) for b in range(1, 31)],
     "demo_clock": [1, 10, 60],     # waiting time multiplier, so starvation is visible on stage
-    "keep_warm_s": 30,             # dummy-inference interval when the keep-warm switch is on
+    "keep_warm_s": 30,
+    "emergency_debounce_s": 3,     # a second press for the same bed this soon is a double-tap             # dummy-inference interval when the keep-warm switch is on
 }
 
 st.set_page_config(page_title="Care-Voice AI", page_icon="🔔", layout="wide")
@@ -105,6 +106,14 @@ header[data-testid="stHeader"] { background: transparent; }
 .cv-step b { display:block; font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
 .cv-arrow { display:inline-block; margin:0 8px; color:#94a3b8; font-size:1.2rem; }
 div[data-testid="stVerticalBlockBorderWrapper"] { background:var(--card); border-radius:14px; }
+.st-key-emergency_btn button { background:#dc2626; border:0; color:#fff; font-size:1.25rem;
+  font-weight:800; padding:18px 10px; border-radius:14px; letter-spacing:0.02em;
+  box-shadow:0 6px 18px rgba(220,38,38,0.35); }
+.st-key-emergency_btn button:hover { background:#b91c1c; color:#fff; }
+.st-key-beep { display:none; }
+@keyframes cvflash { 0%,100% { background:#dc2626; } 50% { background:#7f1d1d; } }
+.cv-alarm { animation:cvflash 1s infinite; color:#fff; border-radius:14px; padding:14px 20px;
+  font-size:1.15rem; font-weight:750; margin:6px 0 10px; }
 </style>
 """
 
@@ -121,6 +130,7 @@ CLASS_STYLE = {
     "General": ("#e2e8f0", "#334155", "💬 General"),
     MEDICATION_CLASS: ("#ede9fe", "#5b21b6", "💊 Medication"),
     UNCLASSIFIED: ("#f1f5f9", "#475569", "🔔 Call button (no words)"),
+    EMERGENCY_BUTTON: ("#dc2626", "#ffffff", "🚨 Emergency button"),
 }
 
 # Plain-language versions of the rule ids in rules.Decision.rules_fired.
@@ -134,6 +144,7 @@ RULE_WORDS = {
     "R6_distress_words": "Urgent words (\"please come\", \"oh no!\")",
     "R7_comfort_request": "Comfort request (window, light, TV...)",
     "R8_medication": "Medication request",
+    "R9_emergency_button": "Patient pressed the EMERGENCY button: go now",
 }
 
 SENTIMENT_EMOJI = {"anger": "😠", "disgust": "😖", "fear": "😨", "joy": "🙂", "neutral": "😐",
@@ -204,7 +215,25 @@ def plain_reason(r: dict, bumps: list[int] | None = None, waited: float = 0.0) -
 
 def quote(r: dict) -> str:
     t = (r.get("transcript") or "").strip()
+    if r.get("request_class") == EMERGENCY_BUTTON:
+        return "<i>Emergency button pressed</i>"
     return f"“{t}”" if t else "<i>(no words)</i>"
+
+
+@st.cache_data
+def beep_wav() -> bytes:
+    """Three short 880 Hz pips: the nurse-station alert for a new P1 call."""
+    import io
+
+    import numpy as np
+    import soundfile as sf
+    sr = 22050
+    pip = np.sin(2 * np.pi * 880 * np.arange(int(0.16 * sr)) / sr) * np.hanning(int(0.16 * sr))
+    gap = np.zeros(int(0.09 * sr))
+    wav = np.concatenate([pip, gap, pip, gap, pip]).astype(np.float32) * 0.6
+    buf = io.BytesIO()
+    sf.write(buf, wav, sr, format="WAV")
+    return buf.getvalue()
 
 
 def kpi(col, value, label):
@@ -281,6 +310,29 @@ def load_cache() -> dict:
         return {}
 
 
+def press_emergency(bed: str) -> dict:
+    """The bedside emergency button: no audio, no model, works in cached mode too.
+    src.pipeline.emergency_button_result builds the call; it is logged and queued
+    like any other."""
+    from src.pipeline import emergency_button_result
+    r = {**emergency_button_result(bed), "cached": False}
+    audit_id = audit_log().append(r, bed=bed, audio_name="emergency_button", audio_bytes=b"",
+                                  mode="button")
+    enqueue(bed, audit_id, r)
+    return {**r, "audit_id": audit_id}
+
+
+def on_emergency_click():
+    """Runs exactly once per click. A second press for the same bed within
+    CONFIG['emergency_debounce_s'] is a double-tap, not a new emergency."""
+    bed, now = st.session_state.get("eb_bed", "14"), time.time()
+    last = st.session_state.get("eb_last", {})
+    if now - last.get(bed, 0) < CONFIG["emergency_debounce_s"]:
+        return
+    st.session_state["eb_last"] = {**last, bed: now}
+    st.session_state["last_result"] = press_emergency(bed)
+
+
 def run_call(name: str, data: bytes, bed: str, cached_mode: bool) -> dict | None:
     if cached_mode:
         r = load_cache().get(name)
@@ -322,12 +374,32 @@ def header(cached_mode: bool):
 
 # --------------------------------------------------------------------------- tab 1
 
+def alarm(q: list[dict]):
+    """Flashing banner for every waiting P1 call, and a beep when a new one arrives
+    (emergency button, a voice emergency, or a call the waiting timer pushed to P1).
+    Runs inside the 1 s queue fragment, so it alerts whichever tab is open."""
+    p1 = [c for c in q if c["eff"] == 1]
+    seen = st.session_state.setdefault("alerted", set())
+    new = [c["qid"] for c in p1 if c["qid"] not in seen]
+    if new:
+        seen.update(new)
+        st.session_state["beep_until"] = time.time() + 2.5
+    if p1:
+        beds = ", ".join(f"Bed {c['bed']}" + (" (button)" if c["request_class"] == EMERGENCY_BUTTON else "")
+                         for c in p1)
+        st.markdown(f"<div class='cv-alarm'>🚨 IMMEDIATE — {beds}</div>", unsafe_allow_html=True)
+    if st.session_state.get("alert_sound", True) and time.time() < st.session_state.get("beep_until", 0):
+        with st.container(key="beep"):
+            st.audio(beep_wav(), format="audio/wav", autoplay=True)
+
+
 def tab_nurse_station():
 
     @st.fragment(run_every=CONFIG["queue_refresh_s"])
     def queue_view():
         clock = st.session_state.get("demo_clock", 1)
         q = waiting_queue(clock)
+        alarm(q)
         k = st.columns(4)
         kpi(k[0], len(q), "Calls waiting")
         kpi(k[1], sum(c["eff"] == 1 for c in q), "P1 immediate")
@@ -383,6 +455,10 @@ def result_card(r: dict):
             + f"<div class='cv-quote'>{quote(r)}</div>"
             f"<div class='cv-why'><b>Why:</b> {plain_reason(r)}</div>" + sentiment_chip(r),
             unsafe_allow_html=True)
+        if r["request_class"] == EMERGENCY_BUTTON:
+            st.caption(f"Sent to the nurse station as P1 — the alarm sounds there until a nurse "
+                       f"marks bed {r['bed']} done.")
+            return
         m = st.columns(3)
         m[0].metric("Response time", f"{r['latency_ms']['total'] / 1000:.1f} s")
         m[1].metric("Speech-to-text confidence", "trusted" if r["asr_trusted"] else "low",
@@ -431,7 +507,15 @@ def demo_label(fname: str) -> str:
 def tab_submit(cached_mode: bool):
     left, right = st.columns([1, 1.5], gap="large")
     with left:
-        st.markdown("#### New call")
+        st.markdown("#### Patient")
+        eb_bed = st.selectbox("Bed", CONFIG["beds"], index=CONFIG["beds"].index("14"), key="eb_bed")
+        # A click callback, not `if st.button(...)`: the queue refreshes every second and
+        # a returned True was replayed on those reruns (one press made a call per second).
+        st.button("🚨  EMERGENCY — I need help now", key="emergency_btn", width="stretch",
+                  on_click=on_emergency_click)
+        st.caption("One press, no recording: an immediate P1 call that sounds at the nurse station.")
+        st.divider()
+        st.markdown("#### Or speak a request")
         source = st.radio("Audio", ["Demo clip", "Record", "Upload a file"], horizontal=True,
                           label_visibility="collapsed")
         name = data = None
@@ -575,6 +659,8 @@ with st.sidebar:
     st.toggle("Sentiment", value=True, key="emotion_on", on_change=apply_emotion_toggle,
               help="Text sentiment, shown for every call; never affects priority. Switch off if "
                    "the machine is short of memory.")
+    st.toggle("Alert sound", value=True, key="alert_sound",
+              help="Beep at the nurse station when a new P1 call arrives.")
     st.toggle("Keep models warm", value=False, key="keep_warm",
               help=f"Runs a dummy inference every {CONFIG['keep_warm_s']} s so the weights are "
                    "not swapped out between calls. Only helps once the machine has free RAM.")
