@@ -109,6 +109,10 @@ CONFIG = {
     # at this level. Like Rule 7 it can lower a misclassification; with symptom
     # words it does not fire and the classifier decides.
     "P_MEDICATION": 3,
+
+    # The bedside emergency button: no audio, no model, straight to P1. For the
+    # patient who cannot speak, or does not want to wait for a recording.
+    "P_EMERGENCY_BUTTON": 1,
 }
 
 
@@ -143,6 +147,7 @@ ANGER_NOT_SEPARABLE_ACOUSTICALLY = True
 # Emergency). Instead it is Unclassified at P_NO_SPEECH and the acoustic rules
 # still apply, so a distressed groan goes Unclassified P2 -> distress gate -> P1.
 UNCLASSIFIED = "Unclassified"
+EMERGENCY_BUTTON = "Emergency button"     # call source, not a predicted class
 
 
 @dataclass
@@ -165,6 +170,15 @@ class Decision:
 
     def to_dict(self):
         return asdict(self)
+
+
+def emergency_button(cfg: dict = CONFIG) -> Decision:
+    """Rule 9: the emergency button. Always P1, no audio, nothing can lower it."""
+    p = cfg["P_EMERGENCY_BUTTON"]
+    return Decision(final_priority=p, base_priority=p, escalated=False, distress_fired=False,
+                    asr_trusted=False, speech_present=False, acoustic_used=False,
+                    energy_ok=False, reason="patient pressed the emergency button",
+                    rules_fired=["R9_emergency_button"])
 
 
 def distress_fires(distress: Optional[float], cfg: dict = CONFIG) -> bool:
