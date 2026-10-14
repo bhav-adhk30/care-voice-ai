@@ -40,7 +40,7 @@ import pandas as pd
 import streamlit as st
 
 from src.audit import AuditLog
-from src.mapping import CLASS_BASE_PRIORITY
+from src.mapping import CLASS_BASE_PRIORITY, MEDICATION_CLASS
 from src.rules import CONFIG as RULES
 from src.rules import UNCLASSIFIED, starvation_priority
 
@@ -82,6 +82,7 @@ RULE_WORDS = {
     "R2_distress": "Voice sounds distressed compared with this bed's usual voice: raised to immediate",
     "R4_emergency_floor": "Emergency request: kept urgent however calm it sounds",
     "R5_care_request": "Asked for help to the toilet or to move: raised to urgent",
+    "R8_medication": "Asked for medication: routed to Medication",
     "R7_comfort_request": "Asked for a comfort item (window, light, TV...): routed to Assistance",
     "R6_distress_words": "Sounds urgent in their words (e.g. \"please come\", \"oh no!\"): raised to urgent",
 }
@@ -108,6 +109,10 @@ def class_badge(request_class: str, medication: list | None = None,
     # never a priority colour.
     if request_class == UNCLASSIFIED:
         html = _badge(UNCLASSIFIED, *UNCLASSIFIED_STYLE)
+    elif request_class == MEDICATION_CLASS:
+        # Rule-routed category (src/mapping.py), not one of the four trained classes.
+        html = _badge("💊 Medication", "#4527a0", "#ffffff")
+        medication = None
     else:
         bg, fg, _ = PRIORITY_STYLE[CLASS_BASE_PRIORITY[request_class]]
         html = _badge(request_class, bg, fg)
@@ -121,6 +126,20 @@ def class_badge(request_class: str, medication: list | None = None,
         # Keyword rule (src/mapping.py), floors the call at P2 (rules.py Rule 6).
         html += "<br>" + _badge("❗ distress in words", "#ad1457", "#ffffff", small=True)
     return html
+
+
+SENTIMENT_EMOJI = {"anger": "😠", "disgust": "😖", "fear": "😨", "joy": "🙂", "neutral": "😐",
+                   "sadness": "😢", "surprise": "😮"}
+
+
+def sentiment_chip(r: dict) -> str:
+    """Small sentiment line under a transcript (display only, never priority)."""
+    lab = r.get("sentiment_label")
+    if not lab:
+        return ""
+    p = (r.get("sentiment") or {}).get(lab)
+    return (f"<br><span style='font-size:0.8em;opacity:0.8'>{SENTIMENT_EMOJI.get(lab, '')} "
+            f"{lab}{f' {p:.0%}' if p is not None else ''}</span>")
 
 
 def prosody_text(r: dict) -> str:
@@ -215,7 +234,7 @@ def apply_emotion_toggle():
     """Load or free the display-only emotion model in the running pipeline. Does
     nothing before the pipeline exists: it is applied at the first call instead."""
     if st.session_state.get("pipeline_loaded"):
-        load_pipeline().set_emotion(st.session_state.get("emotion_on", False))
+        load_pipeline().set_emotion(st.session_state.get("emotion_on", True))
 
 
 def load_cache() -> dict:
@@ -235,7 +254,7 @@ def run_call(name: str, data: bytes, bed: str, cached_mode: bool) -> dict | None
         r = {**r, "bed": bed, "cached": True}
     else:
         pipe = load_pipeline()
-        pipe.set_emotion(st.session_state.get("emotion_on", False))
+        pipe.set_emotion(st.session_state.get("emotion_on", True))
         with tempfile.NamedTemporaryFile(suffix=Path(name).suffix or ".wav", delete=False) as f:
             f.write(data)
             tmp = f.name
@@ -281,7 +300,8 @@ def tab_nurse_station():
             row[3].markdown(class_badge(c["request_class"], c.get("medication"), c.get("care_request"),
                                         c.get("distress_words")),
                             unsafe_allow_html=True)
-            row[4].markdown(c["transcript"] or "*(no words)*")
+            row[4].markdown((c["transcript"] or "*(no words)*") + sentiment_chip(c),
+                            unsafe_allow_html=True)
             why = plain_reason(c, c["bumps"], c["waited"])
             if c.get("speech_present") and not c.get("baseline_ready", False):
                 why += (f"<br><span style='font-size:0.8em;opacity:0.7'>building baseline "
@@ -536,10 +556,10 @@ with st.sidebar:
     st.select_slider("Demo clock", CONFIG["demo_clock"], value=1, key="demo_clock",
                      format_func=lambda v: f"×{v}",
                      help="Speeds up waiting time so the starvation timer is visible on stage.")
-    st.toggle("Text emotion (display only)", value=False, key="emotion_on",
+    st.toggle("Sentiment (display only)", value=True, key="emotion_on",
               on_change=apply_emotion_toggle,
-              help="Loads the 313 MB emotion model. It never affects priority, so it is off "
-                   "by default to keep the demo machine out of swap.")
+              help="Text sentiment from the 313 MB emotion model, shown for every call. It "
+                   "never affects priority. Switch off if the machine is short of memory.")
     st.toggle("Keep models warm", value=False, key="keep_warm",
               help=f"Runs a dummy inference every {CONFIG['keep_warm_s']} s so the weights are "
                    "not swapped out between calls. Only helps once the machine has free RAM; "

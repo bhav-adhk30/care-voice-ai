@@ -176,6 +176,15 @@ requests reach P1 and all 11 chest/dizzy takes still do. Rule 7 is the only rule
 lower a priority; it needs a trusted transcript and runs before the distress rules, which
 can still raise the call. The classifier's own class is kept as `classifier_class`.
 
+### 2.11 The brief: sentiment is shown, voice distress is not required
+
+The project brief asks the system to classify requests (emergency, medication,
+assistance), "analyze sentiment and urgency" and produce prioritised alerts. Urgency is the
+priority (rules R0–R8); sentiment is the text emotion model, **on by default** in the app
+and shown for every call, display-only (§2.6: it labels "Oh no! pain in my chest!" as
+surprise, too weak to drive priority). Voice-based distress is not a requirement; it is off
+(§2.8). The deliverable is a working demo, not a paper.
+
 ### 2.7 The demo imports the evaluated code
 
 `app/streamlit_app.py` must import `CareVoicePipeline` from `src/pipeline.py`. The
@@ -322,9 +331,12 @@ Notes:
   time, correctly.
 - `"Blurry vision"` is in General. Its phrases are optometry complaints ("my television
   seems out of focus even though I have new glasses"), not stroke.
-- **There is no Medication class.** No intent in the dataset is a medication request. The
-  class exists in the system design but has no training data. Do not invent one, do not
-  synthesise one unless explicitly asked. The system trains on four classes.
+- **Medication is a rule-routed category, not a trained class.** No intent in the dataset is
+  a medication request, but the project brief requires the category, so (asked for
+  explicitly, 2026-10-14) Rule 8 routes a medication request with no symptom words
+  ("Can I have my painkillers?") to `Medication` at P3 (`mapping.medication_tag` +
+  `symptom_words` veto). With symptom words the classifier decides. Nothing is
+  synthesised; the classifier still trains on four classes.
 - Class balance after mapping (unique phrases): Pain 344, General 172, Emergency 138,
   Assistance 52. Assistance is the weak class. Use class-weighted loss. Report it honestly
   rather than merging it away.

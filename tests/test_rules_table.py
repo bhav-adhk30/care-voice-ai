@@ -362,3 +362,33 @@ def test_comfort_tag_no_corpus_matches():
     from tests.conftest import ROOT
     ph = pd.read_csv(ROOT / "results" / "phrases.csv")
     assert not [p for p in ph.phrase if comfort_request_tag(p)]
+
+
+# ----------------------------------------------------------------- Rule 8: medication
+
+from src.mapping import medication_tag, symptom_words  # noqa: E402
+
+
+@pytest.mark.parametrize("cls,base,want", [("Pain", 3, 3), ("General", 3, 3), ("Assistance", 2, 3),
+                                          ("Emergency", 1, 2)])   # Emergency floor still applies
+def test_medication_route(cls, base, want):
+    d = rules(base, cls, 0.8, None, asr_confidence=-0.3, non_speech_prob=0.0,
+              transcript="can i have my painkillers please", medication_request=["painkiller"])
+    assert d.final_priority == want and "R8_medication" in d.rules_fired
+
+
+def test_medication_words_raise_a_medication_request():
+    d = rules(3, "Pain", 0.8, None, asr_confidence=-0.3, non_speech_prob=0.0,
+              transcript="please hurry with my painkillers", medication_request=["painkiller"],
+              distress_words=["plea"])
+    assert d.final_priority == 2
+
+
+@pytest.mark.parametrize("text,routed", [
+    ("Can I have my painkillers please", True), ("What time is my next medication?", True),
+    ("I need my insulin", True), ("Could I get some paracetamol", True),
+    ("I need my inhaler, I can't breathe", False),        # symptom words: classifier decides
+    ("My chest hurts, can I have a tablet", False),
+    ("Could I have some water?", False)])
+def test_medication_route_respects_symptom_veto(text, routed):
+    assert bool(medication_tag(text) and not symptom_words(text)) == routed

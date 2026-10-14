@@ -30,7 +30,7 @@ def main() -> int:
     if not clips:
         print(f"no clips in {CONFIG['demo_dir']}")
         return 1
-    pipe = CareVoicePipeline(model_dir=str(ROOT / "models"))  # emotion off, as in the app default
+    pipe = CareVoicePipeline(model_dir=str(ROOT / "models"), load_emotion=True)  # sentiment on, as in the app default
     out = {}
     for p in clips:
         r = pipe.process(p)

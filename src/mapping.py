@@ -119,21 +119,26 @@ def class_base_priority(req_class: str) -> int:
 
 
 # ---------------------------------------------------------------------------
-# Medication tag: a keyword RULE, deliberately not a learned class.
+# Medication: a keyword RULE that routes to a Medication category.
 #
-# The system design has a Medication request type, but no public corpus labels
-# medication requests: none of the 25 intents in the Medical Speech corpus is
-# one (section 5), and nothing here is synthesised to fake one. So instead of a
-# fifth class, any transcript is tagged by keyword as a sub-label shown under
-# its predicted class ("Pain + medication"). It never changes the class or the
-# priority. Recall is whatever the keyword list covers; it has not been, and
-# cannot yet be, measured.
+# The project brief requires a Medication request type, but no public corpus
+# labels medication requests: none of the 25 intents in the Medical Speech
+# corpus is one (section 5), and nothing here is synthesised to fake one. So it
+# is not a trained class: medication_tag finds the keywords, and rules.py Rule 8
+# routes a medication request with NO symptom words (comfort_request_tag's veto)
+# to MEDICATION_CLASS at P_MEDICATION. With symptom words ("I need my inhaler, I
+# can't breathe") the classifier decides as before and the keyword shows as a
+# sub-label, so an emergency is never downgraded. Recall is whatever the keyword
+# list covers; it cannot be measured without labelled medication requests.
 # ---------------------------------------------------------------------------
 
 import re  # noqa: E402
 
-MEDICATION_KEYWORDS = ("medicine", "medication", "painkiller", "tablet", "dose",
-                       "injection", "pill")
+MEDICATION_CLASS = "Medication"      # rule-routed category, not one of the 4 trained classes
+
+MEDICATION_KEYWORDS = ("medicine", "medication", "meds", "painkiller", "pain killer", "tablet",
+                       "dose", "injection", "pill", "paracetamol", "ibuprofen", "insulin",
+                       "inhaler", "antibiotic", "drip")
 
 _MEDICATION_RE = re.compile(
     r"\b(" + "|".join(MEDICATION_KEYWORDS) + r")(s|es)?\b", re.IGNORECASE)
@@ -275,3 +280,9 @@ def comfort_request_tag(transcript: str) -> list[str]:
     if _SYMPTOM_RE.search(t) or not _COMFORT_REQUEST_RE.search(t):
         return []
     return list(dict.fromkeys(m.group(1).lower() for m in _COMFORT_OBJECT_RE.finditer(t)))
+
+
+def symptom_words(transcript: str) -> bool:
+    """True if the transcript contains any symptom word (the veto shared by the
+    comfort and medication routes)."""
+    return bool(_SYMPTOM_RE.search(transcript or ""))
