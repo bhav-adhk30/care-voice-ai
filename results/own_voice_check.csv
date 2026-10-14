@@ -1,0 +1,52 @@
+speaker,clip,delivery,kind,transcript,request_class,final_priority,rules_fired,latency_s
+Bhavishya,bathroom,calm,calm request,I'd like to go to the bathroom.,Assistance,2,,1.94
+Bhavishya,blanket,calm,calm request,I need help with the blanket.,Assistance,2,R7_comfort_request,1.86
+Bhavishya,chest,calm,emergency,I have a severe pain in my chest,Emergency,1,,2.07
+Bhavishya,chest,distress,emergency,I have severe pain in my chest.,Emergency,1,,1.97
+Bhavishya,dizzy,calm,emergency,I feel really dizzy. I feel like I am going to faint.,Emergency,1,,1.89
+Bhavishya,dizzy,distress,emergency,I feel really dizzy. I feel I'm going to faint.,Emergency,1,,1.98
+Bhavishya,doctor,calm,calm request,Is the doctor coming today?,General,3,,1.59
+Bhavishya,glasses,calm,calm request,Could someone pass me my glasses?,Assistance,2,R7_comfort_request,1.99
+Bhavishya,groan,distress,other,,Unclassified,2,R0_no_speech,1.74
+Bhavishya,knee,calm,other,My knee hurts when I bend it.,Pain,3,,1.85
+Bhavishya,knee,distress,other,My knee hurts when I bend it.,Pain,3,,1.81
+Bhavishya,light,calm,calm request,Can you turn the light down?,Assistance,2,R7_comfort_request,1.59
+Bhavishya,medication,calm,calm request,What time is my next medication?,Medication,3,R8_medication,1.78
+Bhavishya,pillow,calm,calm request,Can I have another pillow?,Assistance,2,R7_comfort_request,1.81
+Bhavishya,situp,calm,calm request,I'd like to sit up for a bit.,Assistance,2,,1.76
+Bhavishya,water,calm,calm request,Could I have some water?,General,3,,1.59
+Bhavishya,window,calm,calm request,Can you close the window?,Assistance,2,R7_comfort_request,1.63
+Sumayah,blanket,calm,calm request,I need help with the blanket.,Assistance,2,R7_comfort_request,1.56
+Sumayah,chest,calm,emergency,I have a severe pain in my chest.,Emergency,1,,1.65
+Sumayah,chest,distress,emergency,I have really severe pain in my chest.,Emergency,1,,1.7
+Sumayah,dizzy,calm,emergency,I feel really dizzy. I'm feeling like I'm going to faint.,Emergency,1,,2.01
+Sumayah,dizzy,distress,emergency,"I feel really dizzy, I feel like I'm going to faint, please come.",Emergency,1,,2.23
+Sumayah,doctor,calm,calm request,Is the doctor coming today?,General,3,,1.79
+Sumayah,glasses,calm,calm request,Could someone pass me my glasses?,Assistance,2,R7_comfort_request,1.83
+Sumayah,groan,distress,other,"Please come, please, please come fast.",General,2,R6_distress_words,2.03
+Sumayah,knee,calm,other,My knee hurts when I bend it.,Pain,3,,2.0
+Sumayah,knee,distress,other,"Oh, my knee hurts when I bend it.",Pain,2,R6_distress_words,1.81
+Sumayah,light,calm,calm request,Could you turn the light down?,Assistance,2,R7_comfort_request,2.01
+Sumayah,medication,calm,calm request,One time is my next medication.,Medication,3,R8_medication,1.9
+Sumayah,pillow,calm,calm request,Can I have another pillow?,Assistance,2,R7_comfort_request,1.61
+Sumayah,situp,calm,calm request,I would like to sit up a bit,Assistance,2,,1.82
+Sumayah,washroom,calm,calm request,I'd like to go to the washroom,Assistance,2,R5_care_request,1.68
+Sumayah,water,calm,calm request,Could I have some water?,General,3,,1.54
+Sumayah,window,calm,calm request,Can you close the window?,Assistance,2,R7_comfort_request,1.58
+Vinuthna,bathroom,calm,calm request,I would like to go to the bathroom.,Assistance,2,,1.59
+Vinuthna,blanket,calm,calm request,I need help with the blanket.,Assistance,2,R7_comfort_request,1.53
+Vinuthna,chest,calm,emergency,I have severance pain in my chest.,Emergency,1,,1.7
+Vinuthna,chest,distress,emergency,Oh no! I have several pain in my chest!,Emergency,1,,1.77
+Vinuthna,dizzy,calm,emergency,I feel dizzy. I feel like I'm going to faint.,Emergency,1,,1.82
+Vinuthna,dizzy,distress,emergency,"Oh no, I really feel busy. I think I'm going to faint.",General,2,R6_distress_words,1.95
+Vinuthna,doctor,calm,calm request,Is the doctor coming today?,General,3,,1.49
+Vinuthna,glasses,calm,calm request,Could someone pass me my glasses?,Assistance,2,R7_comfort_request,1.6
+Vinuthna,groan,distress,other,,Unclassified,2,R0_no_speech,1.72
+Vinuthna,knee,calm,other,My knee hurts when I bend it.,Pain,3,,1.64
+Vinuthna,knee,distress,other,"Ah, my knee hurts when I bend it.",Pain,2,R6_distress_words,1.68
+Vinuthna,light,calm,calm request,Could you turn the light down?,Assistance,2,R7_comfort_request,1.64
+Vinuthna,medication,calm,calm request,What time is my next medication?,Medication,3,R8_medication,1.73
+Vinuthna,pillow,calm,calm request,Can I have another pillow?,Assistance,2,R7_comfort_request,1.5
+Vinuthna,situp,calm,calm request,I would like to sit up a bit,Assistance,2,,1.6
+Vinuthna,water,calm,calm request,Could I have some water?,General,3,,1.57
+Vinuthna,window,calm,calm request,Can you close the window?,Assistance,2,R7_comfort_request,1.78

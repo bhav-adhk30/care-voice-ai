@@ -517,7 +517,8 @@ class CareVoicePipeline:
         classifier_class = request_class
         if "R8_medication" in decision.rules_fired:
             request_class = MEDICATION_CLASS
-        elif "R7_comfort_request" in decision.rules_fired:
+        elif ("R7_comfort_request" in decision.rules_fired
+              or ("R5_care_request" in decision.rules_fired and request_class != "Emergency")):
             request_class = "Assistance"
         lat["rules"] = _ms(t0)
 

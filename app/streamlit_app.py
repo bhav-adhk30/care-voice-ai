@@ -66,93 +66,120 @@ CONFIG = {
     "keep_warm_s": 30,             # dummy-inference interval when the keep-warm switch is on
 }
 
-PRIORITY_STYLE = {
-    1: ("#b71c1c", "#ffffff", "P1 immediate"),
-    2: ("#e65100", "#ffffff", "P2 urgent"),
-    3: ("#f9a825", "#1a1a1a", "P3 standard"),
-    4: ("#2e7d32", "#ffffff", "P4 routine"),
-}
-UNCLASSIFIED_STYLE = ("#757575", "#ffffff")
-
-# Plain-language versions of the rule ids in rules.Decision.rules_fired.
-RULE_WORDS = {
-    "R0_no_speech": "No words or voice detected: treated like a plain call-button press",
-    "R0_audio_error": "Recording missing or unreadable: treated like a plain call-button press",
-    "R1_distress_untrusted_transcript": "Sounds distressed and the words are unclear: go now",
-    "R2_distress": "Voice sounds distressed compared with this bed's usual voice: raised to immediate",
-    "R4_emergency_floor": "Emergency request: kept urgent however calm it sounds",
-    "R5_care_request": "Asked for help to the toilet or to move: raised to urgent",
-    "R8_medication": "Asked for medication: routed to Medication",
-    "R7_comfort_request": "Asked for a comfort item (window, light, TV...): routed to Assistance",
-    "R6_distress_words": "Sounds urgent in their words (e.g. \"please come\", \"oh no!\"): raised to urgent",
-}
-
 st.set_page_config(page_title="Care-Voice AI", page_icon="🔔", layout="wide")
 
 
-# --------------------------------------------------------------------------- display helpers
+# --------------------------------------------------------------------------- look and feel
 
-def _badge(text: str, bg: str, fg: str, small: bool = False) -> str:
-    size = "0.75em" if small else "0.85em"
-    return (f"<span style='background:{bg};color:{fg};padding:2px 9px;border-radius:10px;"
-            f"font-weight:600;font-size:{size};white-space:nowrap'>{text}</span>")
+# Presentation only. Light theme (.streamlit/config.toml) because projectors wash out
+# dark ones; colours are defined once here.
+CSS = """
+<style>
+:root { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --card:#ffffff; }
+.block-container { padding-top: 1.1rem; max-width: 1440px; }
+header[data-testid="stHeader"] { background: transparent; }
+.cv-hero { display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:18px 24px; border-radius:16px; margin-bottom:14px;
+  background:linear-gradient(120deg,#0b1f3a 0%,#123a6e 60%,#1d4ed8 100%); color:#fff; }
+.cv-hero h1 { font-size:1.65rem; margin:0; color:#fff; letter-spacing:-0.01em; }
+.cv-hero p { margin:3px 0 0; color:#c9d7ee; font-size:0.95rem; }
+.cv-pill { display:inline-block; padding:5px 12px; border-radius:999px; font-size:0.78rem;
+  font-weight:600; background:rgba(255,255,255,0.14); color:#fff; margin-left:6px; white-space:nowrap; }
+.cv-pill.ok::before { content:"●"; color:#4ade80; margin-right:6px; }
+.cv-pill.warn::before { content:"●"; color:#fbbf24; margin-right:6px; }
+.cv-kpi { border:1px solid var(--line); border-radius:14px; padding:12px 18px; background:var(--card); }
+.cv-kpi .v { font-size:1.9rem; font-weight:750; color:var(--ink); line-height:1.15; }
+.cv-kpi .l { font-size:0.74rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
+.cv-tile { border-radius:12px; padding:10px 4px; text-align:center; font-weight:750; }
+.cv-tile .p { font-size:1.55rem; line-height:1.05; }
+.cv-tile .t { font-size:0.62rem; letter-spacing:0.09em; text-transform:uppercase; opacity:0.92; }
+.cv-tile.big { padding:16px 6px; } .cv-tile.big .p { font-size:2.4rem; } .cv-tile.big .t { font-size:0.75rem; }
+.cv-bed { font-size:1.35rem; font-weight:750; color:var(--ink); line-height:1.1; }
+.cv-sub { font-size:0.78rem; color:var(--muted); }
+.cv-quote { font-size:1.06rem; color:var(--ink); margin:4px 0 2px; }
+.cv-why { font-size:0.86rem; color:#334155; }
+.cv-chip { display:inline-block; padding:2px 10px; border-radius:999px; font-weight:650;
+  font-size:0.8rem; white-space:nowrap; margin:0 4px 4px 0; }
+.cv-step { display:inline-block; padding:10px 14px; border-radius:12px; background:#fff;
+  border:1px solid var(--line); font-size:0.9rem; color:var(--ink); }
+.cv-step b { display:block; font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
+.cv-arrow { display:inline-block; margin:0 8px; color:#94a3b8; font-size:1.2rem; }
+div[data-testid="stVerticalBlockBorderWrapper"] { background:var(--card); border-radius:14px; }
+</style>
+"""
 
+PRIORITY_STYLE = {          # background, text, label
+    1: ("#b91c1c", "#ffffff", "Immediate"),
+    2: ("#ea580c", "#ffffff", "Urgent"),
+    3: ("#eab308", "#1f2937", "Standard"),
+    4: ("#16a34a", "#ffffff", "Routine"),
+}
+CLASS_STYLE = {
+    "Emergency": ("#fee2e2", "#991b1b", "🚨 Emergency"),
+    "Pain": ("#ffedd5", "#9a3412", "🩹 Pain"),
+    "Assistance": ("#dbeafe", "#1e40af", "🤝 Assistance"),
+    "General": ("#e2e8f0", "#334155", "💬 General"),
+    MEDICATION_CLASS: ("#ede9fe", "#5b21b6", "💊 Medication"),
+    UNCLASSIFIED: ("#f1f5f9", "#475569", "🔔 Call button (no words)"),
+}
 
-def priority_badge(p: int, short: bool = False) -> str:
-    bg, fg, label = PRIORITY_STYLE[p]
-    return _badge(f"P{p}" if short else label, bg, fg)
-
-
-def class_badge(request_class: str, medication: list | None = None,
-                care: list | None = None, words: list | None = None) -> str:
-    # Unclassified is a pipeline sentinel, not one of the four trained classes: grey,
-    # never a priority colour.
-    if request_class == UNCLASSIFIED:
-        html = _badge(UNCLASSIFIED, *UNCLASSIFIED_STYLE)
-    elif request_class == MEDICATION_CLASS:
-        # Rule-routed category (src/mapping.py), not one of the four trained classes.
-        html = _badge("💊 Medication", "#4527a0", "#ffffff")
-        medication = None
-    else:
-        bg, fg, _ = PRIORITY_STYLE[CLASS_BASE_PRIORITY[request_class]]
-        html = _badge(request_class, bg, fg)
-    if medication:
-        # Keyword rule, not a class (src/mapping.py): a sub-label under the class.
-        html += "<br>" + _badge("💊 medication", "#4527a0", "#ffffff", small=True)
-    if care:
-        # Keyword rule (src/mapping.py), floors the call at P2 (rules.py Rule 5).
-        html += "<br>" + _badge("🚻 care request", "#00695c", "#ffffff", small=True)
-    if words:
-        # Keyword rule (src/mapping.py), floors the call at P2 (rules.py Rule 6).
-        html += "<br>" + _badge("❗ distress in words", "#ad1457", "#ffffff", small=True)
-    return html
-
+# Plain-language versions of the rule ids in rules.Decision.rules_fired.
+RULE_WORDS = {
+    "R0_no_speech": "No words detected: treated like a call-button press",
+    "R0_audio_error": "Recording unreadable: treated like a call-button press",
+    "R1_distress_untrusted_transcript": "Sounds distressed and the words are unclear",
+    "R2_distress": "Voice sounds distressed for this patient",
+    "R4_emergency_floor": "Emergency request: always kept urgent",
+    "R5_care_request": "Needs help to the toilet or to move",
+    "R6_distress_words": "Urgent words (\"please come\", \"oh no!\")",
+    "R7_comfort_request": "Comfort request (window, light, TV...)",
+    "R8_medication": "Medication request",
+}
 
 SENTIMENT_EMOJI = {"anger": "😠", "disgust": "😖", "fear": "😨", "joy": "🙂", "neutral": "😐",
                    "sadness": "😢", "surprise": "😮"}
 
+# Demo clips are named NN_what__speaker.wav; each speaker keeps one bed, because the
+# per-bed voice baseline assumes one patient per bed (as on a real ward).
+SPEAKER_BED = {"bhavishya": "7", "sumayah": "12", "vinuthna": "3"}
+
+
+def _chip(text: str, bg: str, fg: str) -> str:
+    return f"<span class='cv-chip' style='background:{bg};color:{fg}'>{text}</span>"
+
+
+def priority_tile(p: int, big: bool = False) -> str:
+    bg, fg, label = PRIORITY_STYLE[p]
+    return (f"<div class='cv-tile{' big' if big else ''}' style='background:{bg};color:{fg}'>"
+            f"<div class='p'>P{p}</div><div class='t'>{label}</div></div>")
+
+
+def priority_badge(p: int, short: bool = False) -> str:
+    bg, fg, label = PRIORITY_STYLE[p]
+    return _chip(f"P{p}" if short else f"P{p} {label.lower()}", bg, fg)
+
+
+def class_badge(request_class: str, medication: list | None = None,
+                care: list | None = None, words: list | None = None) -> str:
+    bg, fg, label = CLASS_STYLE.get(request_class, CLASS_STYLE["General"])
+    html = _chip(label, bg, fg)
+    if medication and request_class != MEDICATION_CLASS:
+        html += _chip("💊 mentions medication", "#f5f3ff", "#5b21b6")
+    if care:
+        html += _chip("🚻 toilet / mobility", "#ccfbf1", "#115e59")
+    if words:
+        html += _chip("❗ urgent words", "#fce7f3", "#9d174d")
+    return html
+
 
 def sentiment_chip(r: dict) -> str:
-    """Small sentiment line under a transcript (display only, never priority)."""
+    """Sentiment of the words (display only, never priority)."""
     lab = r.get("sentiment_label")
     if not lab:
         return ""
     p = (r.get("sentiment") or {}).get(lab)
-    return (f"<br><span style='font-size:0.8em;opacity:0.8'>{SENTIMENT_EMOJI.get(lab, '')} "
-            f"{lab}{f' {p:.0%}' if p is not None else ''}</span>")
-
-
-def prosody_text(r: dict) -> str:
-    """One line for the prosodic distress state of a call."""
-    hnr = "n/a" if r.get("hnr") is None else f"{r['hnr']:.2f} dB at {r.get('prosody_sr')} Hz"
-    if not r.get("baseline_ready"):
-        return (f"building baseline ({r.get('baseline_n', 0)}/{r.get('baseline_min', RULES['BASELINE_MIN_CALLS'])})"
-                f" — no acoustic escalation for this bed yet · HNR {hnr}")
-    z = "n/a" if r.get("distress_z") is None else f"z {r['distress_z']:+.2f}"
-    if RULES["DISTRESS_HIGH"] is None:
-        return f"{z} against this bed's baseline · threshold not set, no escalation · HNR {hnr}"
-    fired = " — 🔴 **fired**" if r.get("distress_fired") else ""
-    return f"{z} (threshold {RULES['DISTRESS_HIGH']}){fired} · HNR {hnr}"
+    return (f"<span class='cv-sub'>Sentiment: {SENTIMENT_EMOJI.get(lab, '')} {lab}"
+            f"{f' ({p:.0%})' if p is not None else ''}</span>")
 
 
 def fmt_wait(seconds: float) -> str:
@@ -171,8 +198,18 @@ def plain_reason(r: dict, bumps: list[int] | None = None, waited: float = 0.0) -
         lines = (["Words unclear: check in person"] if not r["asr_trusted"]
                  else ["Priority from what they asked for"])
     if bumps:
-        lines.append(f"⏱️ Waiting {int(waited // 60)} min: bumped up from P{r['final_priority']}")
-    return "<br>".join(lines)
+        lines.append(f"⏱️ Waited {int(waited // 60)} min: raised from P{r['final_priority']}")
+    return " · ".join(lines)
+
+
+def quote(r: dict) -> str:
+    t = (r.get("transcript") or "").strip()
+    return f"“{t}”" if t else "<i>(no words)</i>"
+
+
+def kpi(col, value, label):
+    col.markdown(f"<div class='cv-kpi'><div class='v'>{value}</div><div class='l'>{label}</div></div>",
+                 unsafe_allow_html=True)
 
 
 # --------------------------------------------------------------------------- storage
@@ -269,59 +306,66 @@ def run_call(name: str, data: bytes, bed: str, cached_mode: bool) -> dict | None
     return {**r, "audit_id": audit_id}
 
 
+# --------------------------------------------------------------------------- header
+
+def header(cached_mode: bool):
+    models = ("Cached mode" if cached_mode else
+              "Models loaded" if st.session_state.get("pipeline_loaded") else "Models load on first call")
+    st.markdown(
+        f"<div class='cv-hero'><div><h1>🔔 Care-Voice AI</h1>"
+        f"<p>Patients speak instead of pressing a button. The nurse station sees what they need "
+        f"and how urgently.</p></div><div>"
+        f"<span class='cv-pill {'warn' if cached_mode else 'ok'}'>{models}</span>"
+        f"<span class='cv-pill'>Offline · on-device</span></div></div>",
+        unsafe_allow_html=True)
+
+
 # --------------------------------------------------------------------------- tab 1
 
 def tab_nurse_station():
-    widths = [0.9, 0.5, 0.7, 1.3, 3.0, 3.2, 0.5]
 
     @st.fragment(run_every=CONFIG["queue_refresh_s"])
     def queue_view():
         clock = st.session_state.get("demo_clock", 1)
         q = waiting_queue(clock)
-        st.caption(f"{len(q)} waiting · sorted by priority, then waiting time · starvation timer "
-                   f"P4→P3 after {RULES['STARVATION_SECONDS'][4] // 60} min, P3→P2 after "
+        k = st.columns(4)
+        kpi(k[0], len(q), "Calls waiting")
+        kpi(k[1], sum(c["eff"] == 1 for c in q), "P1 immediate")
+        kpi(k[2], sum(c["eff"] == 2 for c in q), "P2 urgent")
+        kpi(k[3], fmt_wait(max((c["waited"] for c in q), default=0)), "Longest wait")
+        st.caption(f"Ordered by priority, then waiting time. Nobody waits forever: P3→P2 after "
                    f"{RULES['STARVATION_SECONDS'][3] // 60} min, P2→P1 after "
                    f"{RULES['STARVATION_SECONDS'][2] // 60} min"
                    + (f" · **demo clock ×{clock}**" if clock != 1 else ""))
         if not q:
             st.success("No calls waiting.")
             return
-        for h, t in zip(st.columns(widths), ["Priority", "Bed", "Waiting", "Request", "Transcript",
-                                              "Why", ""]):
-            h.markdown(f"**{t}**")
         for c in q:
-            row = st.columns(widths, vertical_alignment="center")
-            badge = priority_badge(c["eff"], short=True)
-            if c["bumps"]:
-                badge += f" <span style='font-size:0.75em'>⏱️ was P{c['final_priority']}</span>"
-            row[0].markdown(badge, unsafe_allow_html=True)
-            row[1].markdown(f"**{c['bed']}**")
-            row[2].markdown(f"`{fmt_wait(c['waited'])}`")
-            row[3].markdown(class_badge(c["request_class"], c.get("medication"), c.get("care_request"),
-                                        c.get("distress_words")),
-                            unsafe_allow_html=True)
-            row[4].markdown((c["transcript"] or "*(no words)*") + sentiment_chip(c),
-                            unsafe_allow_html=True)
-            why = plain_reason(c, c["bumps"], c["waited"])
-            if c.get("speech_present") and not c.get("baseline_ready", False):
-                why += (f"<br><span style='font-size:0.8em;opacity:0.7'>building baseline "
-                        f"({c.get('baseline_n', 0)}/{c.get('baseline_min', RULES['BASELINE_MIN_CALLS'])})</span>")
-            row[5].markdown(why, unsafe_allow_html=True)
-            if row[6].button("✓", key=f"ans_{c['qid']}", help="Mark answered"):
-                answer(c["qid"])
-                st.rerun(scope="fragment")
+            with st.container(border=True):
+                col = st.columns([0.9, 1.0, 4.4, 3.2, 0.9], vertical_alignment="center")
+                col[0].markdown(priority_tile(c["eff"]), unsafe_allow_html=True)
+                bumped = (f"<div class='cv-sub'>⏱️ was P{c['final_priority']}</div>"
+                          if c["bumps"] else "")
+                col[1].markdown(f"<div class='cv-sub'>Bed</div><div class='cv-bed'>{c['bed']}</div>"
+                                f"<div class='cv-sub'>waiting {fmt_wait(c['waited'])}</div>{bumped}",
+                                unsafe_allow_html=True)
+                col[2].markdown(class_badge(c["request_class"], c.get("medication"), c.get("care_request"),
+                                            c.get("distress_words"))
+                                + f"<div class='cv-quote'>{quote(c)}</div>" + sentiment_chip(c),
+                                unsafe_allow_html=True)
+                col[3].markdown(f"<div class='cv-why'>{plain_reason(c, c['bumps'], c['waited'])}</div>",
+                                unsafe_allow_html=True)
+                if col[4].button("Done", key=f"ans_{c['qid']}", help="Mark answered",
+                                 width="stretch"):
+                    answer(c["qid"])
+                    st.rerun(scope="fragment")
 
     queue_view()
-    if st.button("Clear queue", help="Clears waiting calls only. The audit log cannot be cleared."):
-        queue_db().execute("DELETE FROM queue")
-        queue_db().commit()
-        st.rerun()
-    with st.expander("Audit log (append-only, read-only view)"):
+    with st.expander("Audit log: every decision, append-only"):
         rows = audit_log().recent(100)
         if rows:
             df = pd.DataFrame(rows)[["id", "ts_utc", "mode", "bed", "request_class", "base_priority",
-                                     "final_priority", "rules_fired", "distress", "non_speech_prob",
-                                     "text_anger", "transcript", "audio_sha256", "thresholds"]]
+                                     "final_priority", "rules_fired", "transcript", "audio_sha256"]]
             st.dataframe(df, hide_index=True, width="stretch")
         else:
             st.caption("No decisions logged yet.")
@@ -329,111 +373,112 @@ def tab_nurse_station():
 
 # --------------------------------------------------------------------------- tab 2
 
-def render_breakdown(r: dict):
-    c = st.columns(5)
-    c[0].markdown(f"**Final**<br>{priority_badge(r['final_priority'])}", unsafe_allow_html=True)
-    c[1].markdown(f"**Base**<br>{priority_badge(r['base_priority'])}", unsafe_allow_html=True)
-    c[2].markdown(f"**Request**<br>{class_badge(r['request_class'], r['medication'], r.get('care_request'), r.get('distress_words'))}",
-                  unsafe_allow_html=True)
-    c[3].markdown(f"**Rule fired**<br>{', '.join(r['rules_fired']) or 'none'}", unsafe_allow_html=True)
-    c[4].markdown(f"**Latency**<br>{r['latency_ms']['total']:.0f} ms", unsafe_allow_html=True)
-    st.markdown(f"**In plain words:** {plain_reason(r).replace('<br>', '; ')}")
-    st.caption(f"Rule trace: {r['reason']}")
-    if r.get("cached"):
-        st.caption("Replayed from cached_results.json (cached mode).")
+def result_card(r: dict):
+    with st.container(border=True):
+        top = st.columns([1.1, 5], vertical_alignment="center")
+        top[0].markdown(priority_tile(r["final_priority"], big=True), unsafe_allow_html=True)
+        top[1].markdown(
+            f"<div class='cv-sub'>Bed {r['bed']}{' · replayed (cached mode)' if r.get('cached') else ''}</div>"
+            + class_badge(r["request_class"], r["medication"], r.get("care_request"), r.get("distress_words"))
+            + f"<div class='cv-quote'>{quote(r)}</div>"
+            f"<div class='cv-why'><b>Why:</b> {plain_reason(r)}</div>" + sentiment_chip(r),
+            unsafe_allow_html=True)
+        m = st.columns(3)
+        m[0].metric("Response time", f"{r['latency_ms']['total'] / 1000:.1f} s")
+        m[1].metric("Speech-to-text confidence", "trusted" if r["asr_trusted"] else "low",
+                    help=f"Whisper log-probability {fmt(r['asr_confidence'], 2)} "
+                         f"(trusted above {RULES['ASR_MIN']})")
+        m[2].metric("Request confidence",
+                    f"{r['class_confidence']:.0%}" if r["class_probs"] else "n/a",
+                    help="ClinicalBERT's probability for its top class")
 
-    left, right = st.columns(2)
-    with left:
-        st.markdown("##### Text branch")
-        st.markdown(f"**Transcript:** {r['transcript'] or '*(empty)*'}")
-        if not r["speech_present"]:
-            st.info(f"No speech: {r['speech_reason']}. Text branch skipped.")
-            if r.get("asr_heard"):
-                st.caption(f"Whisper heard {r['asr_heard']!r}; discarded as an untrusted "
-                           "hallucination.")
-        st.markdown(f"**ASR confidence:** {fmt(r['asr_confidence'])} (ASR_MIN {RULES['ASR_MIN']}) — "
-                    f"{'trusted' if r['asr_trusted'] else '**not trusted**'}")
-        if r["class_probs"]:
-            st.markdown("**Request type** (ClinicalBERT)")
-            st.bar_chart(pd.Series(r["class_probs"], name="probability"), horizontal=True, height=170)
-        else:
-            st.markdown(f"**Request type:** {class_badge(UNCLASSIFIED)} (no transcript, ClinicalBERT "
-                        "not run)", unsafe_allow_html=True)
-        if r.get("comfort_request"):
-            st.markdown(f"**Comfort request:** {', '.join(r['comfort_request'])} — routed to Assistance "
-                        f"(ClinicalBERT said {r.get('classifier_class')}; it was trained only on symptoms)")
-        st.markdown(f"**Distress in words:** {', '.join(r.get('distress_words') or []) or 'none'} "
-                    "<span style='font-size:0.8em'>(keyword rule; floors at P2)</span>",
-                    unsafe_allow_html=True)
-        st.markdown(f"**Care request:** {', '.join(r.get('care_request') or []) or 'none'} "
-                    "<span style='font-size:0.8em'>(keyword rule; floors at P2)</span>",
-                    unsafe_allow_html=True)
-        st.markdown(f"**Medication tag:** {', '.join(r['medication']) or 'none'} "
-                    "<span style='font-size:0.8em'>(keyword rule, not a class)</span>",
-                    unsafe_allow_html=True)
-        if r["sentiment"]:
-            st.markdown(f"**Sentiment:** {r['sentiment_label']} · anger {fmt(r['text_anger'], 2)} "
-                        "— *display only, never affects priority*")
-            st.bar_chart(pd.Series(r["sentiment"], name="probability"), horizontal=True, height=200)
-        else:
-            st.markdown("**Sentiment:** " + ("n/a (no transcript)" if r.get("sentiment_enabled")
-                                             else "off (sidebar: Text emotion)"))
-    with right:
-        st.markdown("##### Acoustic branch")
-        if r["non_speech_prob"] is None:
-            st.caption("Not run: the energy pre-filter found no signal (digital silence).")
-        else:
-            st.markdown(f"**Prosodic distress:** {prosody_text(r)}")
-            st.markdown(f"**Non-speech:** {fmt(r['non_speech_prob'], 4)} (NON_SPEECH_HIGH "
-                        f"{RULES['NON_SPEECH_HIGH']}) — speech guard: "
-                        f"{'speech present' if r['speech_present'] else '**no speech**'}")
-            st.progress(min(1.0, r["non_speech_prob"]))
-            st.markdown(f"**Fear:** {fmt(r['arousal'], 4)} — *display only, never affects priority*")
-            st.progress(min(1.0, r["arousal"]))
-        st.markdown("##### Latency per stage (ms)")
-        lat = pd.Series(r["latency_ms"]).drop("total")
-        st.bar_chart(lat[lat > 0], horizontal=True, height=230)
+    with st.expander("How it decided"):
+        left, right = st.columns(2)
+        with left:
+            if r["class_probs"]:
+                st.markdown("**Request type** — ClinicalBERT probabilities")
+                st.bar_chart(pd.Series(r["class_probs"], name="probability"), horizontal=True, height=180)
+                if r.get("classifier_class") and r["classifier_class"] != r["request_class"]:
+                    st.caption(f"The model said {r['classifier_class']}; a safety rule routed it to "
+                               f"{r['request_class']} (the training data contains only symptoms).")
+            else:
+                st.markdown(f"**No words:** {r['speech_reason']}. Routed like a call-button press, "
+                            "never dropped.")
+            if r.get("sentiment"):
+                st.markdown("**Sentiment of the words** — shown to the nurse, never changes priority")
+                st.bar_chart(pd.Series(r["sentiment"], name="probability"), horizontal=True, height=200)
+        with right:
+            st.markdown("**Rules applied**")
+            st.markdown(f"Base priority from the request: {priority_badge(r['base_priority'])} → "
+                        f"final: {priority_badge(r['final_priority'])}", unsafe_allow_html=True)
+            st.caption(r["reason"])
+            st.markdown(f"**Speech check** (WavLM): "
+                        f"{'speech present' if r['speech_present'] else 'no speech'}"
+                        + (f" · non-speech score {r['non_speech_prob']:.2f}"
+                           if r["non_speech_prob"] is not None else ""))
+            st.markdown("**Time per stage** (ms)")
+            lat = pd.Series(r["latency_ms"]).drop("total")
+            st.bar_chart(lat[lat > 0], horizontal=True, height=220)
+
+
+def demo_label(fname: str) -> str:
+    stem = Path(fname).stem
+    num, _, rest = stem.partition("_")
+    what, _, who = rest.partition("__")
+    return f"{num} · {what.replace('_', ' ').capitalize()}" + (f" — {who.capitalize()}" if who else "")
 
 
 def tab_submit(cached_mode: bool):
-    bed = st.selectbox("Bed", CONFIG["beds"], index=13)
-    source = st.radio("Audio", ["Record", "Upload a file", "Demo clip"], horizontal=True)
-    name = data = None
-    if source == "Record":
-        rec = st.audio_input("Press to record the patient's request",
-                             sample_rate=CONFIG["mic_sample_rate"])
-        if rec:
-            name, data = f"mic_bed{bed}_{time.strftime('%H%M%S')}.wav", rec.getvalue()
-        if cached_mode:
-            st.warning("Cached mode cannot process a new recording; switch it off.")
-    elif source == "Upload a file":
-        up = st.file_uploader("Audio file", type=CONFIG["audio_types"])
-        if up:
-            name, data = up.name, up.getvalue()
-    else:
-        demo = sorted(p.name for p in CONFIG["demo_dir"].glob("*")
-                      if p.suffix.lstrip(".").lower() in CONFIG["audio_types"])
-        if not demo:
-            st.warning(f"No clips in {CONFIG['demo_dir'].relative_to(ROOT)}.")
+    left, right = st.columns([1, 1.5], gap="large")
+    with left:
+        st.markdown("#### New call")
+        source = st.radio("Audio", ["Demo clip", "Record", "Upload a file"], horizontal=True,
+                          label_visibility="collapsed")
+        name = data = None
+        default_bed = "14"
+        if source == "Record":
+            rec = st.audio_input("Press to record the patient's request",
+                                 sample_rate=CONFIG["mic_sample_rate"])
+            if rec:
+                name, data = f"mic_{time.strftime('%H%M%S')}.wav", rec.getvalue()
+            if cached_mode:
+                st.warning("Cached mode replays prepared clips only; switch it off to record.")
+        elif source == "Upload a file":
+            up = st.file_uploader("Audio file", type=CONFIG["audio_types"])
+            if up:
+                name, data = up.name, up.getvalue()
         else:
-            pick = st.selectbox("Clip", demo, key="demo_clip")
-            name, data = pick, (CONFIG["demo_dir"] / pick).read_bytes()
-            st.audio(data)
-
-    if st.button("Submit call", type="primary", disabled=data is None):
-        with st.spinner("Processing..."):
-            try:
-                r = run_call(name, data, bed, cached_mode)
-            except Exception as e:  # keep the demo standing; point at cached mode
-                st.error(f"Pipeline failed: {e}. Switch on cached mode in the sidebar.")
-                r = None
-        if r:
-            st.session_state["last_result"] = r
-    if "last_result" in st.session_state:
-        r = st.session_state["last_result"]
-        st.divider()
-        st.markdown(f"#### Bed {r['bed']} — {r['audio_path']} · audit #{r['audit_id']}")
-        render_breakdown(r)
+            demo = sorted(p.name for p in CONFIG["demo_dir"].glob("*")
+                          if p.suffix.lstrip(".").lower() in CONFIG["audio_types"])
+            if not demo:
+                st.warning(f"No clips in {CONFIG['demo_dir'].relative_to(ROOT)}.")
+            else:
+                pick = st.selectbox("Demo clip", demo, key="demo_clip", format_func=demo_label)
+                name, data = pick, (CONFIG["demo_dir"] / pick).read_bytes()
+                who = Path(pick).stem.partition("__")[2]
+                default_bed = SPEAKER_BED.get(who, default_bed)
+                st.audio(data)
+        bed = st.selectbox("Bed", CONFIG["beds"], index=CONFIG["beds"].index(default_bed),
+                           key=f"bed_{default_bed}")
+        go = st.button("Send call to nurse station", type="primary", disabled=data is None,
+                       width="stretch")
+    with right:
+        if go:
+            with st.spinner("Listening and deciding..."):
+                try:
+                    r = run_call(name, data, bed, cached_mode)
+                except Exception as e:  # keep the demo standing; point at cached mode
+                    st.error(f"Processing failed: {e}. Switch on cached mode in the sidebar.")
+                    r = None
+            if r:
+                st.session_state["last_result"] = r
+        if "last_result" in st.session_state:
+            st.markdown("#### Result")
+            result_card(st.session_state["last_result"])
+        else:
+            st.markdown("#### Result")
+            st.info("Pick a demo clip (or record one) and send it. The decision appears here and "
+                    "the call joins the Nurse Station queue.")
 
 
 # --------------------------------------------------------------------------- tab 3
@@ -450,120 +495,97 @@ def _csv(name, **kw):
     return pd.read_csv(p, **kw) if p.exists() else None
 
 
-def _fig(name, caption):
-    p = CONFIG["results_dir"] / "figures" / name
-    if p.exists():
-        st.image(str(p), caption=caption, width="stretch")
-
-
 def tab_results():
-    st.markdown("Emergency recall is the headline metric, not accuracy: a missed emergency and a "
-                "misrouted water request are not the same error.")
+    st.markdown("#### How it works")
+    steps = [("Capture", "Patient speaks at the bedside"), ("Whisper", "Speech → text"),
+             ("ClinicalBERT", "What they need"), ("Safety rules", "How urgent, and why"),
+             ("Nurse station", "Prioritised queue")]
+    st.markdown("<span class='cv-arrow'>→</span>".join(
+        f"<span class='cv-step'><b>{a}</b>{b}</span>" for a, b in steps), unsafe_allow_html=True)
+    st.caption("A speech check (WavLM) tells real requests from silence and noise. Priority comes "
+               "from written rules, not a black-box model: every decision has a reason and is logged.")
 
+    st.markdown("#### Measured accuracy")
+    st.caption("Emergency recall is the number that matters: a missed emergency and a misrouted "
+               "water request are not the same mistake.")
+    e2e = _json("end_to_end_v3.json")
     tb = _json("text_branch_final.json")
-    if tb:
-        st.markdown("#### Text branch — Emergency recall")
-        st.caption("Per recording (n = 6,661), 5-fold CV grouped by phrase.")
-        c = st.columns(4)
-        c[0].metric("ClinicalBERT, clean text", f"{tb['clinicalbert_clean']['emergency_recall']:.3f}")
-        c[1].metric("ClinicalBERT, on Whisper output", f"{tb['clinicalbert_on_asr']['emergency_recall']:.3f}")
-        c[2].metric("TF-IDF baseline", f"{tb['tfidf_phrase_level']['emergency_recall']:.3f}")
-        c[3].metric("Whisper small WER", f"{tb['wer_full_corpus']:.1%}")
-        st.caption(f"Missed emergencies: {tb['clinicalbert_clean']['emergency_fn']} on clean text, "
-                   f"{tb['clinicalbert_on_asr']['emergency_fn']} on Whisper output.")
-    rep = _csv("clinicalbert_report.csv", index_col=0)
-    if rep is not None:
-        st.markdown("**ClinicalBERT per-class** (recall is the column that matters; per unique phrase, n = 706)")
-        st.dataframe(rep.round(3), width="stretch")
+    c = st.columns(4)
+    if e2e:
+        kpi(c[0], f"{e2e['HEADLINE_emergency_under_triage']:.1%}", "Emergencies under-triaged")
+        kpi(c[1], f"{e2e['emergency_within_p2']:.1%}", "Emergencies reaching P1/P2")
+        kpi(c[2], f"{e2e['HEADLINE_under_triage']:.1%}", "All calls under-triaged")
+        kpi(c[3], f"{e2e['latency_median_ms'] / 1000:.1f} s", "Median response time")
+        st.caption(f"Full system, audio in → priority out, on {e2e['n_test_clips']:,} recordings of "
+                   f"{e2e['n_test_phrases']} sentences it never saw in training.")
+    elif tb:
+        kpi(c[0], f"{tb['clinicalbert_clean']['emergency_recall']:.1%}", "Emergency recall (text)")
+        kpi(c[1], f"{tb['clinicalbert_on_asr']['emergency_recall']:.1%}", "Emergency recall (from speech)")
+        kpi(c[2], f"{tb['wer_full_corpus']:.1%}", "Speech-to-text word error")
+        kpi(c[3], "706", "Distinct patient sentences")
+        st.caption("Medical Speech corpus, 6,661 recordings, 5-fold cross-validation grouped by "
+                   "sentence. Full end-to-end numbers appear here when the evaluation finishes.")
 
-    v2 = _json("head_refit_v2.json")
-    if v2:
-        st.markdown("#### Prosodic distress (current): HNR against the bed's own baseline")
+    own = _csv("own_voice_check.csv")
+    if own is not None:
+        st.markdown("#### Tested on our own voices")
+        calm = own[own.kind == "calm request"]
+        emer = own[own.kind == "emergency"]
+        c = st.columns(4)
+        kpi(c[0], f"{(emer.final_priority == 1).sum()}/{len(emer)}", "Emergency calls → P1")
+        kpi(c[1], f"{(calm.final_priority == 1).sum()}/{len(calm)}", "Everyday requests → P1 (false alarms)")
+        kpi(c[2], own.speaker.nunique(), "Speakers")
+        kpi(c[3], f"{own.latency_s.median():.1f} s", "Median response time")
+        show = own[["speaker", "transcript", "request_class", "final_priority"]].rename(
+            columns={"request_class": "routed to", "final_priority": "priority"})
+        st.dataframe(show, hide_index=True, width="stretch", height=280)
+
+    fig = CONFIG["results_dir"] / "noise_curve_heldout.png"
+    if fig.exists():
+        st.markdown("#### In a noisy ward")
+        st.image(str(fig), width="stretch")
+
+    with st.expander("Known limitations"):
         st.markdown(
-            "Measured on the team's own recordings: 51 clips, 3 speakers, phone mic, 48 kHz, "
-            "threshold chosen leave-one-speaker-out, all 12 distress clips positive.")
-        st.dataframe(pd.DataFrame([
-            {"score": "one-sided z", "AUC": 0.733, "recall": "7/12 (58%)", "false alarm": "2/39 (5.1%)",
-             "per speaker": "0/4 · 3/4 · 4/4"},
-            {"score": "two-sided |z|", "AUC": 0.765, "recall": "3/12 (25%)", "false alarm": "3/39 (7.7%)",
-             "per speaker": "0/4 · 0/4 · 3/4"}]), hide_index=True, width="stretch")
-        st.warning("Threshold not set: no acoustic escalation in the app yet. One speaker's distress "
-                   "lowers HNR while the others' raise it, and stays inside calm variability.")
-        st.markdown("#### Retired: WavLM distress gate (v2)")
-        st.caption("Never fired on the team's real voices (distressed speech, a real groan). "
-                   "Kept for the record; the arousal head still serves the speech guard.")
-        c = st.columns(4)
-        c[0].metric("Distress AUC, held out", f"{v2['distress_heldout_auc_all_negatives']:.3f}",
-                    help=f"Within VIVAE only (pain vs other vocalisations): {v2['distress_withincorpus_auc']:.3f}")
-        c[1].metric("Distress recall", f"{v2['distress_recall']:.1%}", help=f"at DISTRESS_HIGH = {v2['DISTRESS_HIGH_new']}")
-        c[2].metric("False alarms, medical speech", f"{v2['distress_fa_medical']:.2%}",
-                    help=f"ward noise {v2['distress_fa_ward_noise']:.1%}, silence {v2['distress_fa_silence']:.0%}")
-        c[3].metric("Fear recall at 2% false alarms", f"{v2['arousal_recall_at_2pct_medical_fa']:.1%}",
-                    help="Too low to escalate on: fear is displayed, never used")
-        curve = _csv("operating_curve_distress_v2.csv")
-        if curve is not None:
-            left, right = st.columns(2)
-            with left:
-                st.markdown("**Distress operating curve** (held out; recall against false-alarm rate)")
-                st.line_chart(curve.set_index("recall")[["fa_medical", "fa_ward_noise", "fa_vivae_other"]],
-                              height=260)
-            with right:
-                st.markdown(f"**At its old threshold {v2['DISTRESS_HIGH_new']}**")
-                row = curve[curve.threshold.round(4) == round(v2["DISTRESS_HIGH_new"], 4)]
-                st.dataframe(row.T.set_axis(["value"], axis=1), width="stretch")
-        groan = _csv("groan_check_v2.csv")
-        if groan is not None:
-            st.markdown(f"**Groan check:** {(groan.P == 1).sum()}/{len(groan)} VIVAE pain/fear clips "
-                        f"reached P1 through the full pipeline; {(groan.ns >= RULES['NON_SPEECH_HIGH']).sum()} "
-                        "of them scored as non-speech and were let through by the distress key of the "
-                        "speech guard. In-sample for the gate (held-out recall is "
-                        f"{v2['distress_recall']:.1%}).")
-        _fig("padding_diagnostic.png", "Padding diagnostic: why the v1 numbers were superseded")
-
-    with st.expander("Superseded: v1 acoustic results (padded features)"):
-        st.error("These numbers measured padding and corpus identity, not distress: clip duration "
-                 "alone separated the training corpora at AUC 0.9965 (results/padding_diagnostic.json). "
-                 "Kept for the record; do not quote.")
-        g1 = _json("distress_gate_results.json")
-        e2e = _json("end_to_end.json")
-        if g1:
-            c = st.columns(3)
-            c[0].metric("v1 distress AUC vs calm speech", g1["auc_vs_calm_speech"])
-            c[1].metric("v1 recall", f"{g1['operating_point']['recall']:.0%}")
-            c[2].metric("v1 false alarms", f"{g1['operating_point']['false_alarm']:.1%}")
-        if e2e:
-            st.caption(f"v1 end to end: Emergency reaching P1/P2 {e2e['emergency_reached_P1_P2']:.3f}, "
-                       f"escalated by acoustics {e2e['escalated_by_acoustics']} (v1 heads, arousal rule).")
-        cols = st.columns(3)
-        for col, (f, cap) in zip(cols, [("distress_curve.png", "v1 distress curve"),
-                                         ("operating_curve.png", "v1 arousal curve"),
-                                         ("gap_check.png", "v1 domain-gap check")]):
-            with col:
-                _fig(f, cap)
-
-    if not any(f.name.startswith("noise") for f in (CONFIG["results_dir"] / "figures").glob("*.png")):
-        st.info("Noise-degradation figure (notebook 07) not produced yet.")
+            "- **Distress in the tone of voice is not detected.** Four approaches were tested on our "
+            "own recordings and none caught all three speakers without false alarms, so it is off. "
+            "Distress is detected from the words (\"please come fast\", \"oh no!\") and emergencies "
+            "from what is said.\n"
+            "- **The training data contains only symptoms.** Everyday requests (window, light, "
+            "toilet, medication) are handled by explicit, tested rules rather than the model.\n"
+            "- **Speech-to-text can invent words from loud machine noise.** The speech check "
+            "catches most of it; a loud fan near the microphone is the case to avoid.\n"
+            "- **Sentiment is informational.** It is shown to the nurse and never changes priority.")
 
 
 # --------------------------------------------------------------------------- layout
 
+st.markdown(CSS, unsafe_allow_html=True)
+
 with st.sidebar:
-    st.markdown("## 🔔 Care-Voice AI")
+    st.markdown("### Presenter controls")
     cached_mode = st.toggle("Cached mode", value=False, key="cached_mode",
-                            help="Replay precomputed results instead of running the models live.")
+                            help="Replay precomputed results for the demo clips instead of running "
+                                 "the models. The backup if anything fails on stage.")
     n_cached = len(load_cache())
-    st.caption(f"{n_cached} clip(s) in cached_results.json" if n_cached else "No cached results yet.")
+    st.caption(f"{n_cached} demo clip(s) ready for cached mode" if n_cached else "No cached results yet.")
     st.select_slider("Demo clock", CONFIG["demo_clock"], value=1, key="demo_clock",
                      format_func=lambda v: f"×{v}",
-                     help="Speeds up waiting time so the starvation timer is visible on stage.")
-    st.toggle("Sentiment (display only)", value=True, key="emotion_on",
-              on_change=apply_emotion_toggle,
-              help="Text sentiment from the 313 MB emotion model, shown for every call. It "
-                   "never affects priority. Switch off if the machine is short of memory.")
+                     help="Speeds up waiting time so the 'nobody waits forever' timer is visible.")
+    st.toggle("Sentiment", value=True, key="emotion_on", on_change=apply_emotion_toggle,
+              help="Text sentiment, shown for every call; never affects priority. Switch off if "
+                   "the machine is short of memory.")
     st.toggle("Keep models warm", value=False, key="keep_warm",
               help=f"Runs a dummy inference every {CONFIG['keep_warm_s']} s so the weights are "
-                   "not swapped out between calls. Only helps once the machine has free RAM; "
-                   "under memory pressure it pushes the browser out instead.")
+                   "not swapped out between calls. Only helps once the machine has free RAM.")
+    if st.button("Reset demo", width="stretch",
+                 help="Clears waiting calls and per-bed voice baselines. The audit log is kept."):
+        queue_db().execute("DELETE FROM queue")
+        queue_db().execute("CREATE TABLE IF NOT EXISTS prosody_baseline (id INTEGER PRIMARY KEY)")
+        queue_db().execute("DELETE FROM prosody_baseline")
+        queue_db().commit()
+        st.session_state.pop("last_result", None)
+        st.rerun()
 
     # Keep-warm: touching every loaded model's weights stops the OS paging them out
     # between demo calls (measured: 1.5 s warm vs ~10 s after 60 s idle on the 8 GB
@@ -576,9 +598,9 @@ with st.sidebar:
             st.caption(f"Keep-warm ping {time.strftime('%H:%M:%S')}: {ms:.0f} ms")
 
     keep_warm_ping()
-    st.caption("Escalation is an auditable rule (src/rules.py), not a trained fusion model.")
 
-t1, t2, t3 = st.tabs(["Nurse Station", "Submit a Call", "Results"])
+header(cached_mode)
+t1, t2, t3 = st.tabs(["🏥 Nurse Station", "🎙️ Submit a Call", "📊 Results"])
 with t1:
     tab_nurse_station()
 with t2:
