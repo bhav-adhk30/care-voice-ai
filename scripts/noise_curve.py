@@ -24,19 +24,22 @@ choice of noise clip derive from the clip's content, never from loop position or
 index. A split that differs from Kaggle's just causes cache misses (re-transcription),
 not mispairing; a miss regenerates byte-identical audio.
 
-Noise: ESC-50 categories the deployed router (arousal head, notebook 11) never saw.
-nb11 trained its non_speech class on EVERY fold of 12 ward-like categories
-(clock_alarm, door_wood_knock, footsteps, clock_tick, washing_machine, vacuum_cleaner,
-mouse_click, keyboard_typing, can_opening, door_wood_creaks, water_drops,
-toilet_flush), so no unused fold exists; this curve uses disjoint categories instead
-(CONFIG["noise_categories"]), mostly human non-speech sounds of a ward. The check is
-enforced below. Mixing is src.preprocess.augment at active-speech SNR (CLAUDE.md §2.5).
+Noise: MS-SNSD (github.com/microsoft/MS-SNSD), machine and environmental categories
+only: air conditioner, door shutting, typing, copy machine, squeaky chair, vacuum,
+washer/dryer, traffic. MS-SNSD was built for SNR mixing and is not ESC-50, so the
+router (whose non_speech class saw ESC-50 ward noise, notebook 11) never heard any of
+it. Its speech-bearing categories (Babble, NeighborSpeaking, AirportAnnouncements,
+Munching, Cafeteria, Restaurant...) are excluded: a second voice in the room is a
+different question (and coughs or laboured breathing make the ground truth itself
+debatable). That human-noise experiment, if run, is a separate figure. Mixing is
+src.preprocess.augment at active-speech SNR (CLAUDE.md §2.5).
 """
 
 import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 import tempfile
 import time
@@ -61,22 +64,21 @@ CONFIG = {
     "seed": 42,
     "test_size": 0.20,
     "snrs": [None, 20, 10, 5, 0],          # None = clean (no noise added)
-    # ESC-50 categories NOT used to train the router (nb11 WARD list below).
-    "noise_categories": ["coughing", "sneezing", "breathing", "snoring", "drinking_sipping",
-                         "pouring_water", "laughing", "siren"],
-    "router_training_categories": ["clock_alarm", "door_wood_knock", "footsteps", "clock_tick",
-                                   "washing_machine", "vacuum_cleaner", "mouse_click",
-                                   "keyboard_typing", "can_opening", "door_wood_creaks",
-                                   "water_drops", "toilet_flush"],
+    # MS-SNSD machine / environmental categories; no speech-bearing ones.
+    "noise_categories": ["AirConditioner", "ShuttingDoor", "Typing", "CopyMachine",
+                         "SqueakyChair", "VacuumCleaner", "WasherDryer", "Washing", "Traffic"],
+    "noise_speech_categories_excluded": ["Babble", "NeighborSpeaking", "Neighbor",
+                                         "AirportAnnouncement", "AirportAnnouncements", "Munching",
+                                         "Cafe", "CafeTeria", "Restaurant"],
     "download_dir": Path(os.environ.get("NOISE_DL", ROOT / "data" / "downloads")),
     "clips_dir": ROOT / "data" / "medical_heldout",
-    "noise_dir": ROOT / "data" / "esc50_noise_unseen",
+    "noise_dir": ROOT / "data" / "ms-snsd",
     "models": ROOT / "models",
     "out_dir": ROOT / "results",
     "cache": ROOT / "data" / "noise_asr_cache.json",
     "sr": 16000,
 }
-assert not set(CONFIG["noise_categories"]) & set(CONFIG["router_training_categories"])
+assert not set(CONFIG["noise_categories"]) & set(CONFIG["noise_speech_categories_excluded"])
 
 
 def sha1_file(p) -> str:
@@ -132,18 +134,11 @@ def extract_inputs(te: pd.DataFrame) -> list[Path]:
                     have.add(b)
     assert not want - have, f"{len(want - have)} held-out clips not in the zip"
 
-    CONFIG["noise_dir"].mkdir(parents=True, exist_ok=True)
-    if not any(CONFIG["noise_dir"].glob("*.wav")):
-        with zipfile.ZipFile(dl / "esc50.zip") as z:
-            meta = pd.read_csv(z.open(next(n for n in z.namelist() if n.endswith("meta/esc50.csv"))))
-            missing = set(CONFIG["noise_categories"]) - set(meta.category)
-            assert not missing, f"not ESC-50 categories: {missing}"
-            keep = set(meta[meta.category.isin(CONFIG["noise_categories"])].filename)
-            for n in z.namelist():
-                if os.path.basename(n) in keep:
-                    (CONFIG["noise_dir"] / os.path.basename(n)).write_bytes(z.read(n))
-    noise = sorted(CONFIG["noise_dir"].glob("*.wav"), key=sha1_file)   # content order
-    print(f"held-out clips {len(want)}, unseen-category noise files {len(noise)}", flush=True)
+    noise = [p for d in ("noise_train", "noise_test") for p in (CONFIG["noise_dir"] / d).glob("*.wav")
+             if re.sub(r"_?\d+$", "", p.stem) in CONFIG["noise_categories"]]
+    assert noise, f"no MS-SNSD noise under {CONFIG['noise_dir']} (git clone microsoft/MS-SNSD there)"
+    noise = sorted(noise, key=sha1_file)   # content order
+    print(f"held-out clips {len(want)}, MS-SNSD machine-noise files {len(noise)}", flush=True)
     return noise
 
 
@@ -189,6 +184,8 @@ def cmd_transcribe():
     """Whisper only, via the pipeline's ASR path. Writes the cache and WER per SNR."""
     import jiwer
     te, _ = heldout_split()
+    if os.environ.get("NOISE_LIMIT"):                      # smoke test only
+        te = te.head(int(os.environ["NOISE_LIMIT"]))
     noise_files = extract_inputs(te)
     pipe = build_pipeline()
     cache = json.loads(CONFIG["cache"].read_text()) if CONFIG["cache"].exists() else {}
@@ -233,6 +230,8 @@ def cmd_evaluate(bert_dir: str, tag: str):
     if not bert_dir:
         raise SystemExit("--bert is required: pass 2 runs only with the held-out ClinicalBERT")
     te, _ = heldout_split()
+    if os.environ.get("NOISE_LIMIT"):                      # smoke test only
+        te = te.head(int(os.environ["NOISE_LIMIT"]))
     noise_files = extract_inputs(te)
     pipe = build_pipeline(bert_dir)
     cache = json.loads(CONFIG["cache"].read_text())
@@ -293,7 +292,7 @@ def plot(s: pd.DataFrame, tag: str):
                               ("wer", "Whisper WER", ":d")]:
         ax.plot(x, s[col], style, label=label)
     ax.set_xticks(list(x), s.snr)
-    ax.set_xlabel("added noise, active-speech SNR (ESC-50 categories unseen by the router)")
+    ax.set_xlabel("added machine/environmental noise (MS-SNSD), active-speech SNR")
     ax.set_ylim(0, 1)
     ax.grid(alpha=0.3)
     ax.set_title(f"Held-out clips under ward noise - ClinicalBERT trained on train phrases only "
