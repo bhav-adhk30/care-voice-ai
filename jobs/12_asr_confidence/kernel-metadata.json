@@ -1,0 +1,15 @@
+{
+  "id": "bhavishyaadhikari/care-voice-asr-confidence-v2",
+  "title": "care-voice-asr-confidence-v2",
+  "code_file": "script.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_internet": true,
+  "dataset_sources": [
+    "paultimothymooney/medical-speech-transcription-and-intent",
+    "bhavishyaadhikari/care-voice-code",
+    "bhavishyaadhikari/care-voice-clinicalbert"
+  ]
+}

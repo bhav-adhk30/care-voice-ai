@@ -12,3 +12,7 @@ app/audit_log.db
 # Raw demo takes: team members' voices, kept out of git
 app/demo_clips/raw/*
 !app/demo_clips/raw/05_vivae_ATTRIBUTION.txt
+
+# Team voice recordings: kept local (repo is public). Backup in data/demo_clips_backup/,
+# originals in the private Kaggle dataset bhavishyaadhikari/care-voice-own-voices.
+app/demo_clips/*__*.wav
