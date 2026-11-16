@@ -24,6 +24,7 @@ Emergency button ─────────────────────
 
 **Project report:** [docs/Care-Voice-AI-Project-Report.pdf](docs/Care-Voice-AI-Project-Report.pdf)
 (problem, methodology, implementation, tools, evaluation, results, limitations).
+**Presentation:** [docs/Care-Voice-AI-Presentation.pptx](docs/Care-Voice-AI-Presentation.pptx) (21 slides).
 
 ---
 
