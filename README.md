@@ -22,6 +22,9 @@ Emergency button ─────────────────────
 - **Nurse station:** live queue, waiting timer (P3→P2 after 15 min, P2→P1 after 5 min), red
   flashing alarm + beep for P1, append-only audit log.
 
+**Project report:** [docs/Care-Voice-AI-Project-Report.pdf](docs/Care-Voice-AI-Project-Report.pdf)
+(problem, methodology, implementation, tools, evaluation, results, limitations).
+
 ---
 
 ## Prerequisites
