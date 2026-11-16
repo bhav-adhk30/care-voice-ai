@@ -11,6 +11,6 @@ jiwer
 faster-whisper
 huggingface_hub
 opensmile            # prosodic distress feature (eGeMAPSv02 HNR), src/prosody.py
-deepfilternet
+# deepfilternet       # optional and DISABLED: needs deepfilterlib, which has no Python 3.12 wheel (see CLAUDE.md §9)
 streamlit
 matplotlib
